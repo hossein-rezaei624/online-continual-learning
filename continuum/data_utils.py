@@ -3,6 +3,8 @@ import torch
 from torch.utils import data
 from utils.setup_elements import transforms_match
 
+from torchvision import transforms
+
 def create_task_composition(class_nums, num_tasks, fixed_order=False):
     classes_per_task = class_nums // num_tasks
     total_classes = classes_per_task * num_tasks
