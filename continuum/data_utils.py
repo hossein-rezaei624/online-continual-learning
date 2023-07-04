@@ -60,7 +60,9 @@ def setup_test_loader(test_data, params):
     test_loaders = []
 
     for (x_test, y_test) in test_data:
-        test_dataset = dataset_transform(x_test, y_test, transform=transforms_match[params.data])
+
+        transform_test__ = transforms.Compose([transforms.ToTensor(), transforms.RandomRotation(90),])
+        test_dataset = dataset_transform(x_test, y_test, transform=transform_test__)
         test_loader = data.DataLoader(test_dataset, batch_size=params.test_batch, shuffle=True, num_workers=0)
         test_loaders.append(test_loader)
     return test_loaders
