@@ -101,7 +101,7 @@ class ASER_update(object):
         arg_buffer = sv_arg_small[nonzero_indices(sv_arg_small < n_cand_buf)]
 
         cand_ind = cand_ind.to(self.device)
-        arg_buffer = arg_buffer.to(self.device)
+        #arg_buffer = arg_buffer.to(self.device)
         
         ind_buffer = cand_ind[arg_buffer]
 
