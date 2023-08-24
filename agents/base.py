@@ -142,6 +142,7 @@ class ContinualLearner(torch.nn.Module, metaclass=abc.ABCMeta):
                 exemplar_means[cls] = mu_y
         with torch.no_grad():
             if self.params.error_analysis:
+                print("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa")
                 error = 0
                 no = 0
                 nn = 0
@@ -182,6 +183,7 @@ class ContinualLearner(torch.nn.Module, metaclass=abc.ABCMeta):
                         print("we are in else")
 
                     if self.params.error_analysis:
+                        print("bbbbbbbbbbbbbbbbbbbbbbbbbbbbbb")
                         correct_lb += [task] * len(batch_y)
                         for i in pred_label:
                             predict_lb.append(self.class_task_map[i.item()])
@@ -209,6 +211,7 @@ class ContinualLearner(torch.nn.Module, metaclass=abc.ABCMeta):
                 acc_array[task] = acc.avg()
         print(acc_array)
         if self.params.error_analysis:
+            print("cccccccccccccccccccccccccccccccccccc")
             self.error_list.append((no, nn, oo, on))
             self.new_class_score.append(new_class_score.avg())
             self.old_class_score.append(old_class_score.avg())
