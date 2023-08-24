@@ -22,6 +22,7 @@ class SupContrastReplay(ContinualLearner):
             RandomGrayscale(p=0.2)
 
         )
+        print("kkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk")
 
     def train_learner(self, x_train, y_train):
         self.before_train(x_train, y_train)
