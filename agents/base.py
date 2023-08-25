@@ -173,6 +173,9 @@ class ContinualLearner(torch.nn.Module, metaclass=abc.ABCMeta):
                         # may be faster
                         # feature = feature.squeeze(2).T
                         # _, preds = torch.matmul(means, feature).max(0)
+                        print("predicted labels with old:", np.array(self.old_labels)[pred_label.tolist()])
+                        print("predicted labels just:", pred_label)
+                        print("ground truth:", batch_y)
                         correct_cnt = (np.array(self.old_labels)[
                                            pred_label.tolist()] == batch_y.cpu().numpy()).sum().item() / batch_y.size(0)
                         print("we are in if")
