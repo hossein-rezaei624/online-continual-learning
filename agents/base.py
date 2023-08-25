@@ -188,7 +188,7 @@ class ContinualLearner(torch.nn.Module, metaclass=abc.ABCMeta):
                             batch_x_ = batch_x[where_[0]]
                             batch_y_ = batch_y[where_[0]]
 
-                            #batch_x_ = transforms.RandomRotation(90)(batch_x_)
+                            batch_x_ = transforms.RandomRotation(90)(batch_x_)
 
                             feature_ = self.model.features(batch_x_)  # (batch_size, feature_size)
                             for j in range(feature_.size(0)):  # Normalize
