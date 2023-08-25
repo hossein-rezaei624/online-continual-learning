@@ -78,6 +78,7 @@ def multiple_run(params, store=False, save_path=None):
             accuracy_list.append(acc_array)
 
     accuracy_array = np.array(accuracy_list)
+    accuracy_array_ = np.array(accuracy_list_)
     end = time.time()
     if store:
         result = {'time': end - start}
@@ -87,9 +88,12 @@ def multiple_run(params, store=False, save_path=None):
         save_file.close()
     if params.online:
         avg_end_acc, avg_end_fgt, avg_acc, avg_bwtp, avg_fwt = compute_performance(accuracy_array)
+        avg_end_acc_, avg_end_fgt_, avg_acc_, avg_bwtp_, avg_fwt_ = compute_performance(accuracy_array_)
         print('----------- Total {} run: {}s -----------'.format(params.num_runs, end - start))
         print('----------- Avg_End_Acc {} Avg_End_Fgt {} Avg_Acc {} Avg_Bwtp {} Avg_Fwt {}-----------'
               .format(avg_end_acc, avg_end_fgt, avg_acc, avg_bwtp, avg_fwt))
+        print('----------- Avg_End_Acc {} Avg_End_Fgt {} Avg_Acc {} Avg_Bwtp {} Avg_Fwt {}-----------'
+              .format(avg_end_acc_, avg_end_fgt_, avg_acc_, avg_bwtp_, avg_fwt_))
     else:
         print('----------- Total {} run: {}s -----------'.format(params.num_runs, end - start))
         print("avg_end_acc {}".format(np.mean(accuracy_list)))
