@@ -193,7 +193,7 @@ class ContinualLearner(torch.nn.Module, metaclass=abc.ABCMeta):
                         #print("we are in else", where_)
 
                         
-                        if where_[0]:
+                        if where_[0].item():
                             print(where_[0])
                             batch_x_ = batch_x[where_[0]]
                             batch_y_ = batch_y[where_[0]]
