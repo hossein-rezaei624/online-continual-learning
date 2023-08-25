@@ -257,4 +257,4 @@ class ContinualLearner(torch.nn.Module, metaclass=abc.ABCMeta):
             print(self.bias_norm_new)
             with open('confusion', 'wb') as fp:
                 pickle.dump([correct_lb, predict_lb], fp)
-        return acc_array
+        return acc_array, acc_array_
