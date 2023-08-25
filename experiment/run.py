@@ -15,6 +15,7 @@ import pickle
 
 
 def multiple_run(params, store=False, save_path=None):
+    print("multiple_run")
     # Set up data stream
     start = time.time()
     print('Setting up data stream')
@@ -90,6 +91,7 @@ def multiple_run(params, store=False, save_path=None):
 
 
 def multiple_run_tune(defaul_params, tune_params, save_path):
+    print("multiple_run_tune")
     # Set up data stream
     start = time.time()
     print('Setting up data stream')
@@ -178,6 +180,7 @@ def multiple_run_tune(defaul_params, tune_params, save_path):
 
 
 def multiple_run_tune_separate(default_params, tune_params, save_path):
+    print("multiple_run_tune_separate")
     # Set up data stream
     start = time.time()
     print('Setting up data stream')
@@ -236,6 +239,7 @@ def multiple_run_tune_separate(default_params, tune_params, save_path):
     print('----------- Seed {} RAM: {}s -----------'.format(default_params.seed, result['ram']))
 
 def single_tune(data_continuum, default_params, tune_params, params_keep, tmp_acc, run):
+    print("single_tune")
     tune_data = []
     # prepare val data loader
     test_loaders_full = setup_test_loader(data_continuum.test_data(), default_params)
@@ -307,6 +311,7 @@ def single_tune(data_continuum, default_params, tune_params, params_keep, tmp_ac
 
 
 def single_tune_train_val(data_continuum, default_params, tune_params, params_keep, tmp_acc, run):
+    print("single_tune_train_val")
     tune_data = []
     # prepare val data loader
     test_loaders_full = setup_test_loader(data_continuum.test_data(), default_params)
