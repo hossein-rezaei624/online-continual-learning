@@ -180,8 +180,39 @@ class ContinualLearner(torch.nn.Module, metaclass=abc.ABCMeta):
                         #print("ground truth:", batch_y)
                         correct_cnt = (np.array(self.old_labels)[
                                            pred_label.tolist()] == batch_y.cpu().numpy()).sum().item() / batch_y.size(0)
+                        
                         where_ = np.where(np.array(self.old_labels)[pred_label.tolist()] == batch_y.cpu().numpy())
                         #print("we are in if", where_)
+
+                        if where_[0] != []:
+                            batch_x_ = batch_x[where_[0]]
+                            batch_y_ = batch_y[where_[0]]
+
+                            #batch_x_ = transforms.RandomRotation(90)(batch_x_)
+
+                            feature_ = self.model.features(batch_x_)  # (batch_size, feature_size)
+                            for j in range(feature_.size(0)):  # Normalize
+                                feature_.data[j] = feature_.data[j] / feature_.data[j].norm()
+                            feature_ = feature_.unsqueeze(2)  # (batch_size, feature_size, 1)
+                            means_ = torch.stack([exemplar_means[cls] for cls in self.old_labels])  # (n_classes, feature_size)
+    
+                            #old ncm
+                            means = torch.stack([means] * batch_x.size(0))  # (batch_size, n_classes, feature_size)
+                            means = means.transpose(1, 2)
+                            feature = feature.expand_as(means)  # (batch_size, feature_size, n_classes)
+                            dists = (feature - means).pow(2).sum(1).squeeze()  # (batch_size, n_classes)
+                            _, pred_label = dists.min(1)
+                            # may be faster
+                            # feature = feature.squeeze(2).T
+                            # _, preds = torch.matmul(means, feature).max(0)
+                            #print("predicted labels with old:", np.array(self.old_labels)[pred_label.tolist()])
+                            #print("ground truth:", batch_y)
+                            correct_cnt = (np.array(self.old_labels)[
+                                               pred_label.tolist()] == batch_y.cpu().numpy()).sum().item() / batch_y.size(0)
+                    
+                        else:
+                            correct_cnt_ = 0
+                    
                     else:
                         #print("a", type(batch_x),"b", type(batch_y))
                         logits = self.model.forward(batch_x)
