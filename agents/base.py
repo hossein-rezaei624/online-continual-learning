@@ -154,6 +154,7 @@ class ContinualLearner(torch.nn.Module, metaclass=abc.ABCMeta):
                 predict_lb = []
             for task, test_loader in enumerate(test_loaders):
                 acc = AverageMeter()
+                acc_ = AverageMeter()
                 for i, (batch_x, batch_y) in enumerate(test_loader):
                     batch_x = maybe_cuda(batch_x, self.cuda)
                     batch_y = maybe_cuda(batch_y, self.cuda)
@@ -224,6 +225,7 @@ class ContinualLearner(torch.nn.Module, metaclass=abc.ABCMeta):
                         else:
                             pass
                     acc.update(correct_cnt, batch_y.size(0))
+                    acc_.update(correct_cnt_, batch_y_.size(0))
                 acc_array[task] = acc.avg()
         print(acc_array)
         if self.params.error_analysis:
