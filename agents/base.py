@@ -227,7 +227,9 @@ class ContinualLearner(torch.nn.Module, metaclass=abc.ABCMeta):
                     acc.update(correct_cnt, batch_y.size(0))
                     acc_.update(correct_cnt_, batch_y_.size(0))
                 acc_array[task] = acc.avg()
+                acc_array_[task] = acc_.avg()
         print(acc_array)
+        print(acc_array_)
         if self.params.error_analysis:
             print("cccccccccccccccccccccccccccccccccccc")
             self.error_list.append((no, nn, oo, on))
