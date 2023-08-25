@@ -32,8 +32,10 @@ def multiple_run(params, store=False, save_path=None):
             save_path = params.model_name + '_' + params.data_name + '.pkl'
 
     accuracy_list = []
+    accuracy_list_ = []
     for run in range(params.num_runs):
         tmp_acc = []
+        tmp_acc_ = []
         run_start = time.time()
         data_continuum.new_run()
         model = setup_architecture(params)
@@ -48,13 +50,18 @@ def multiple_run(params, store=False, save_path=None):
                 print("-----------run {} training batch {}-------------".format(run, i))
                 print('size: {}, {}'.format(x_train.shape, y_train.shape))
                 agent.train_learner(x_train, y_train)
-                acc_array = agent.evaluate(test_loaders)
+                acc_array, acc_array_ = agent.evaluate(test_loaders)
                 tmp_acc.append(acc_array)
+                tmp_acc_.append(acc_array_)
             run_end = time.time()
             print(
                 "-----------run {}-----------avg_end_acc {}-----------train time {}".format(run, np.mean(tmp_acc[-1]),
                                                                                run_end - run_start))
+            print(
+                "-----------run {}-----------avg_end_acc {}-----------train time {}".format(run, np.mean(tmp_acc_[-1]),
+                                                                               run_end - run_start))
             accuracy_list.append(np.array(tmp_acc))
+            accuracy_list_.append(np.array(tmp_acc_))
         else:
             x_train_offline = []
             y_train_offline = []
