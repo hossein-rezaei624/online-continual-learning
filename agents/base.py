@@ -183,7 +183,8 @@ class ContinualLearner(torch.nn.Module, metaclass=abc.ABCMeta):
                         logits = self.model.forward(batch_x)
                         _, pred_label = torch.max(logits, 1)
                         correct_cnt = (pred_label == batch_y).sum().item()/batch_y.size(0)
-                        print("we are in else")
+                        where_ = np.where(pred_label.cpu().numpy() == batch_y.cpu().numpy())
+                        print("we are in else", where_)
 
                     if self.params.error_analysis:
                         print("bbbbbbbbbbbbbbbbbbbbbbbbbbbbbb")
