@@ -9,6 +9,7 @@ from torch.utils.data import TensorDataset, DataLoader
 import copy
 from utils.loss import SupConLoss
 import pickle
+import torchvision.transforms as transforms
 
 
 class ContinualLearner(torch.nn.Module, metaclass=abc.ABCMeta):
@@ -194,9 +195,10 @@ class ContinualLearner(torch.nn.Module, metaclass=abc.ABCMeta):
 
                         
                         if where_[0] != []:
-                            print(where_[0])
                             batch_x_ = batch_x[where_[0]]
                             batch_y_ = batch_y[where_[0]]
+
+                            batch_x_ = transforms.RandomRotation(90)(batch_x_)
                             
                             logits_ = self.model.forward(batch_x_)
                             __, pred_label_ = torch.max(logits_, 1)
