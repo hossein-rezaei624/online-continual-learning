@@ -181,12 +181,12 @@ class ContinualLearner(torch.nn.Module, metaclass=abc.ABCMeta):
                         #print("we are in if", where_)
                     else:
                         print("a", type(batch_x),"b", type(batch_y))
-                        print("hahahahha", batch_x[where_[0]])
-                        print("jajajjajajajja", batch_y[where_[0]])
                         logits = self.model.forward(batch_x)
                         _, pred_label = torch.max(logits, 1)
                         correct_cnt = (pred_label == batch_y).sum().item()/batch_y.size(0)
                         where_ = np.where(pred_label.cpu().numpy() == batch_y.cpu().numpy())
+                        print("hahahahha", batch_x[where_[0]])
+                        print("jajajjajajajja", batch_y[where_[0]])
                         #print("we are in else", where_)
 
                     if self.params.error_analysis:
