@@ -197,18 +197,14 @@ class ContinualLearner(torch.nn.Module, metaclass=abc.ABCMeta):
                             means_ = torch.stack([exemplar_means[cls] for cls in self.old_labels])  # (n_classes, feature_size)
     
                             #old ncm
-                            means = torch.stack([means] * batch_x.size(0))  # (batch_size, n_classes, feature_size)
-                            means = means.transpose(1, 2)
-                            feature = feature.expand_as(means)  # (batch_size, feature_size, n_classes)
-                            dists = (feature - means).pow(2).sum(1).squeeze()  # (batch_size, n_classes)
-                            _, pred_label = dists.min(1)
-                            # may be faster
-                            # feature = feature.squeeze(2).T
-                            # _, preds = torch.matmul(means, feature).max(0)
-                            #print("predicted labels with old:", np.array(self.old_labels)[pred_label.tolist()])
-                            #print("ground truth:", batch_y)
-                            correct_cnt = (np.array(self.old_labels)[
-                                               pred_label.tolist()] == batch_y.cpu().numpy()).sum().item() / batch_y.size(0)
+                            means_ = torch.stack([means_] * batch_x_.size(0))  # (batch_size, n_classes, feature_size)
+                            means_ = means_.transpose(1, 2)
+                            feature_ = feature_.expand_as(means_)  # (batch_size, feature_size, n_classes)
+                            dists_ = (feature_ - means_).pow(2).sum(1).squeeze()  # (batch_size, n_classes)
+                            __, pred_label_ = dists_.min(1)
+
+                            correct_cnt_ = (np.array(self.old_labels)[
+                                               pred_label_.tolist()] == batch_y_.cpu().numpy()).sum().item() / batch_y_.size(0)
                     
                         else:
                             correct_cnt_ = 0
