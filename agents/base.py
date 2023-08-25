@@ -193,13 +193,14 @@ class ContinualLearner(torch.nn.Module, metaclass=abc.ABCMeta):
                         #print("we are in else", where_)
 
                         
-                        print(where_[0])
-                        batch_x_ = batch_x[where_[0]]
-                        batch_y_ = batch_y[where_[0]]
-                        
-                        logits_ = self.model.forward(batch_x_)
-                        __, pred_label_ = torch.max(logits_, 1)
-                        correct_cnt_ = (pred_label_ == batch_y_).sum().item()/batch_y_.size(0)
+                        if where_[0]:
+                            print(where_[0])
+                            batch_x_ = batch_x[where_[0]]
+                            batch_y_ = batch_y[where_[0]]
+                            
+                            logits_ = self.model.forward(batch_x_)
+                            __, pred_label_ = torch.max(logits_, 1)
+                            correct_cnt_ = (pred_label_ == batch_y_).sum().item()/batch_y_.size(0)
 
                     if self.params.error_analysis:
                         print("bbbbbbbbbbbbbbbbbbbbbbbbbbbbbb")
