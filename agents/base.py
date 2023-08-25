@@ -203,7 +203,9 @@ class ContinualLearner(torch.nn.Module, metaclass=abc.ABCMeta):
                             logits_ = self.model.forward(batch_x_)
                             __, pred_label_ = torch.max(logits_, 1)
                             correct_cnt_ = (pred_label_ == batch_y_).sum().item()/batch_y_.size(0)
+                            print(correct_cnt_)
                             correct_cnt_ = round(correct_cnt_, 3)
+                            print(correct_cnt_)
 
                         else:
                             correct_cnt_ = 0
