@@ -180,14 +180,23 @@ class ContinualLearner(torch.nn.Module, metaclass=abc.ABCMeta):
                         where_ = np.where(np.array(self.old_labels)[pred_label.tolist()] == batch_y.cpu().numpy())
                         #print("we are in if", where_)
                     else:
-                        print("a", type(batch_x),"b", type(batch_y))
+                        #print("a", type(batch_x),"b", type(batch_y))
                         logits = self.model.forward(batch_x)
                         _, pred_label = torch.max(logits, 1)
                         correct_cnt = (pred_label == batch_y).sum().item()/batch_y.size(0)
+                        
                         where_ = np.where(pred_label.cpu().numpy() == batch_y.cpu().numpy())
-                        print("hahahahha", batch_x[where_[0]])
-                        print("jajajjajajajja", batch_y[where_[0]])
+                        #print("hahahahha", batch_x[where_[0]])
+                        #print("jajajjajajajja", batch_y[where_[0]])
                         #print("we are in else", where_)
+
+                        
+                        batch_x_ = batch_x[where_[0]]
+                        batch_y_ = batch_y[where_[0]]
+                        
+                        logits_ = self.model.forward(batch_x_)
+                        __, pred_label_ = torch.max(logits_, 1)
+                        correct_cnt_ = (pred_label_ == batch_y_).sum().item()/batch_y_.size(0)
 
                     if self.params.error_analysis:
                         print("bbbbbbbbbbbbbbbbbbbbbbbbbbbbbb")
@@ -216,7 +225,7 @@ class ContinualLearner(torch.nn.Module, metaclass=abc.ABCMeta):
                             pass
                     acc.update(correct_cnt, batch_y.size(0))
                 acc_array[task] = acc.avg()
-        print("yessssss:", acc_array)
+        print(acc_array)
         if self.params.error_analysis:
             print("cccccccccccccccccccccccccccccccccccc")
             self.error_list.append((no, nn, oo, on))
