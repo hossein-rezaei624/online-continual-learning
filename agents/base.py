@@ -204,6 +204,9 @@ class ContinualLearner(torch.nn.Module, metaclass=abc.ABCMeta):
                             __, pred_label_ = torch.max(logits_, 1)
                             correct_cnt_ = (pred_label_ == batch_y_).sum().item()/batch_y_.size(0)
 
+                        else:
+                            correct_cnt_ = 0
+
                     if self.params.error_analysis:
                         print("bbbbbbbbbbbbbbbbbbbbbbbbbbbbbb")
                         correct_lb += [task] * len(batch_y)
