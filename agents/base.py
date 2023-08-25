@@ -198,7 +198,7 @@ class ContinualLearner(torch.nn.Module, metaclass=abc.ABCMeta):
                             batch_x_ = batch_x[where_[0]]
                             batch_y_ = batch_y[where_[0]]
 
-                            #batch_x_ = transforms.RandomRotation(90)(batch_x_)
+                            batch_x_ = transforms.RandomRotation(90)(batch_x_)
                             
                             logits_ = self.model.forward(batch_x_)
                             __, pred_label_ = torch.max(logits_, 1)
