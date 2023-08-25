@@ -118,6 +118,7 @@ class ContinualLearner(torch.nn.Module, metaclass=abc.ABCMeta):
     def evaluate(self, test_loaders):
         self.model.eval()
         acc_array = np.zeros(len(test_loaders))
+        acc_array_ = np.zeros(len(test_loaders))
         if self.params.trick['ncm_trick'] or self.params.agent in ['ICARL', 'SCR', 'SCP']:
             exemplar_means = {}
             cls_exemplar = {cls: [] for cls in self.old_labels}
