@@ -7,6 +7,7 @@ import random
 
 
 def random_retrieve(buffer, num_retrieve, excl_indices=None, return_indices=False):
+    print("in the function:", buffer)
     filled_indices = np.arange(buffer.current_index)
     if excl_indices is not None:
         excl_indices = list(excl_indices)
