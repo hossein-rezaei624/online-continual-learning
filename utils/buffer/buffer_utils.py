@@ -20,7 +20,7 @@ def random_retrieve(buffer, num_retrieve, excl_indices=None, return_indices=Fals
     x = buffer.buffer_img[indices]
 
     y = buffer.buffer_label[indices]
-    print("buffer.buffer_label", buffer.buffer_label)
+    print("buffer.buffer_label", buffer.buffer_label, "buffer.buffer_label.shape", buffer.buffer_label.shape)
     if return_indices:
         return x, y, indices
     else:
