@@ -7,7 +7,7 @@ import random
 
 
 def random_retrieve(buffer, num_retrieve, excl_indices=None, return_indices=False):
-    #print("buffer.current_index outtt:", buffer.current_index)
+    print("buffer.current_index outtt:", buffer.current_index)
     filled_indices = np.arange(buffer.current_index)
     if excl_indices is not None:
         excl_indices = list(excl_indices)
@@ -16,11 +16,11 @@ def random_retrieve(buffer, num_retrieve, excl_indices=None, return_indices=Fals
     valid_indices = np.setdiff1d(filled_indices, np.array(excl_indices))
     num_retrieve = min(num_retrieve, valid_indices.shape[0])
     indices = torch.from_numpy(np.random.choice(valid_indices, num_retrieve, replace=False)).long()
-    #print("num_retrieve", num_retrieve)
+    print("num_retrieve", num_retrieve)
     x = buffer.buffer_img[indices]
 
     y = buffer.buffer_label[indices]
-    #print("buffer.buffer_label", buffer.buffer_label, "buffer.buffer_label.shape", buffer.buffer_label.shape)
+    print("buffer.buffer_label", buffer.buffer_label, "buffer.buffer_label.shape", buffer.buffer_label.shape)
     if return_indices:
         return x, y, indices
     else:
