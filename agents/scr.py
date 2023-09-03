@@ -46,6 +46,7 @@ class SupContrastReplay(ContinualLearner):
                 for j in range(self.mem_iters):
                     print("iiiiii", i)
                     print("in the loop batch_y:", batch_y)
+                    print("self.buffer", self.buffer)
                     mem_x, mem_y = self.buffer.retrieve(x=batch_x, y=batch_y)
                     print("in the loop mem_y:", mem_y)
 
