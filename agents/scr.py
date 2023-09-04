@@ -46,13 +46,13 @@ class SupContrastReplay(ContinualLearner):
                 batch_y = maybe_cuda(batch_y, self.cuda)
 
                 for j in range(self.mem_iters):
-                    print("iiiiii", i)
+                    #print("iiiiii", i)
                     #print("in the loop batch_y:", batch_y)
                     #print("buffer.current_index innn", self.buffer.current_index)
                     #print("self.buffer.buffer_label in:", self.buffer.buffer_label, "self.buffer.buffer_label.shape in:", self.buffer.buffer_label.shape)
                     mem_x, mem_y = self.buffer.retrieve(x=batch_x, y=batch_y)
                     #mem_x, mem_y = self.buffer.retrieve()
-                    print("in the loop mem_y.shape:", mem_y.shape)
+                    #print("in the loop mem_y.shape:", mem_y.shape)
 
                     if mem_x.size(0) > 0:
                         mem_x = maybe_cuda(mem_x, self.cuda)
