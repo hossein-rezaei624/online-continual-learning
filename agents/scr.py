@@ -52,7 +52,7 @@ class SupContrastReplay(ContinualLearner):
         
         if count_ != self.buffer.buffer_label.shape[0]:
             unique_classes.update(self.buffer.buffer_label.cpu().numpy())
-        print(f"Number of unique classes: {len(unique_classes)}", unique_classes)
+        #print(f"Number of unique classes: {len(unique_classes)}", unique_classes)
 
         device = "cuda"
         Model_Carto = ResNet18(len(unique_classes))
@@ -73,6 +73,12 @@ class SupContrastReplay(ContinualLearner):
             Carto = []
             for batch_idx, (inputs, targets) in enumerate(train_loader):
                 inputs, targets = inputs.to(device), targets.to(device)
+
+                print("targets", targets)
+                mapping = {26:0, 86:1, 2:2, 55:3, 75:4, 93:5, 16:6, 73:7, 54:8, 95:9}
+                targets = torch.tensor([mapping[val.item()] for val in targets])
+                print("targets", targets)
+                
                 optimizer_.zero_grad()
                 outputs = Model_Carto(inputs)
                 #print("outputs.shape", outputs.shape)
@@ -80,7 +86,6 @@ class SupContrastReplay(ContinualLearner):
                 #print("soft_", soft_)
                 confidence_batch = []
                 #print("outputs", outputs)
-                print("targets", targets)
         
                 for i in range(targets.shape[0]):
                   confidence_batch.append(soft_[i,targets[i]].item())
