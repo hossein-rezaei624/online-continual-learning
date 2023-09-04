@@ -110,7 +110,7 @@ class SupContrastReplay(ContinualLearner):
                 #print("targets", targets)
                 
                 optimizer_.zero_grad()
-                print("inputs.shapeeeeeeeeeee", inputs.shape)
+                #print("inputs.shapeeeeeeeeeee", inputs.shape)
                 outputs = Model_Carto(inputs)
                 #print("outputs.shape", outputs.shape)
                 soft_ = self.soft_(outputs)
@@ -242,7 +242,7 @@ class SupContrastReplay(ContinualLearner):
         #print("self.buffer.buffer_img", self.buffer.buffer_img.cpu().numpy().reshape((5000, 32, 32, 3)).shape, type(self.buffer.buffer_img.cpu().numpy()))
         #print("self.buffer.buffer_label", self.buffer.buffer_label.cpu().numpy().shape, type(self.buffer.buffer_label.cpu().numpy()), self.buffer.buffer_label.cpu().numpy())
 
-        self.buffer.buffer_img = all_images.to(device)
-        self.buffer.buffer_label = all_labels.to(device)
+        #self.buffer.buffer_img = all_images.to(device)
+        #self.buffer.buffer_label = all_labels.to(device)
         
         self.after_train()
