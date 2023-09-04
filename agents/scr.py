@@ -9,7 +9,6 @@ from kornia.augmentation import RandomResizedCrop, RandomHorizontalFlip, ColorJi
 import torch.nn as nn
 
 from models.resnet import ResNet18
-import numpy as np
 
 class SupContrastReplay(ContinualLearner):
     def __init__(self, model, opt, params):
@@ -38,18 +37,6 @@ class SupContrastReplay(ContinualLearner):
         # setup tracker
         losses = AverageMeter()
         acc_batch = AverageMeter()
-        
-        unique_classes = set()
-        
-        count_ = np.sum(self.buffer.buffer_label.cpu().numpy() == 0)
-        # Assuming each batch's labels are in the second element
-        
-        for _, labels in train_loader:
-            unique_classes.update(labels.numpy())
-        
-        if count_ != self.buffer.buffer_label.shape[0]:
-            unique_classes.update(self.buffer.buffer_label.cpu().numpy())
-        print(f"Number of unique classes: {len(unique_classes)}", unique_classes)
 
         for ep in range(self.epoch):
             for i, batch_data in enumerate(train_loader):
@@ -89,5 +76,12 @@ class SupContrastReplay(ContinualLearner):
                         )
 
 
+        unique_classes = set()
+
+        # Assuming each batch's labels are in the second element
+        for _, labels in train_loader:
+            unique_classes.update(labels.numpy())
+        
+        print(f"Number of unique classes: {len(unique_classes)}", unique_classes)
         
         self.after_train()
