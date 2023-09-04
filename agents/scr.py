@@ -68,6 +68,7 @@ class SupContrastReplay(ContinualLearner):
             merged_loader = data.DataLoader(merged_dataset, batch_size=self.batch, shuffle=False, num_workers=0, drop_last=True)
 
         else:
+            merged_dataset = train_dataset
             merged_loader = train_loader
 
         #print(f"Number of unique classes: {len(unique_classes)}", unique_classes)
@@ -177,7 +178,7 @@ class SupContrastReplay(ContinualLearner):
         
         print("top_indices_sorted", top_indices_sorted, top_indices_sorted.shape)
         
-        subset_data = torch.utils.data.Subset(merged_loader, top_indices_sorted)
+        subset_data = torch.utils.data.Subset(merged_dataset, top_indices_sorted)
         #print("subset_dataaaaaaaa", subset_data)
         trainloader_C = torch.utils.data.DataLoader(subset_data, batch_size=self.batch, shuffle=False)
 
