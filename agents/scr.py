@@ -9,6 +9,7 @@ from kornia.augmentation import RandomResizedCrop, RandomHorizontalFlip, ColorJi
 import torch.nn as nn
 
 from models.resnet import ResNet18
+import numpy as np
 
 class SupContrastReplay(ContinualLearner):
     def __init__(self, model, opt, params):
