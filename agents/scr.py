@@ -12,6 +12,7 @@ from models.resnet import ResNet18
 import numpy as np
 import torch.optim as optim
 import torch.nn as nn
+import matplotlib.pyplot as plt
 
 class SupContrastReplay(ContinualLearner):
     def __init__(self, model, opt, params):
