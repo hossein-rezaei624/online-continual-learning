@@ -75,7 +75,9 @@ class SupContrastReplay(ContinualLearner):
                 inputs, targets = inputs.to(device), targets.to(device)
                 optimizer_.zero_grad()
                 outputs = Model_Carto(inputs)
+                print("outputs.shape", outputs.shape)
                 soft_ = self.soft_(outputs)
+                print("soft_", soft_)
                 confidence_batch = []
         
                 for i in range(targets.shape[0]):
