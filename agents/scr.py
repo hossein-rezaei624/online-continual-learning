@@ -42,7 +42,7 @@ class SupContrastReplay(ContinualLearner):
         unique_classes = set()
         #print(self.buffer.buffer_label, type(self.buffer.buffer_label))
         count = np.sum(self.buffer.buffer_label.cpu().numpy() == 0)
-        print(f"The value {value} appears {count} times in the array.")
+        print(f"The value 0 appears {count} times in the array.")
         # Assuming each batch's labels are in the second element
         for _, labels in train_loader:
             unique_classes.update(labels.numpy())
