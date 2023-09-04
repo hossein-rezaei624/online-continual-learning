@@ -56,9 +56,9 @@ class SupContrastReplay(ContinualLearner):
         
         if count_ != self.buffer.buffer_label.shape[0]:
             unique_classes.update(self.buffer.buffer_label.cpu().numpy())
-            print("self.buffer.buffer_img.cpu().numpy().shape", self.buffer.buffer_img.cpu().numpy().shape)
-            print("self.buffer.buffer_img.permute(0, 3, 1, 2).cpu().numpy().shape", self.buffer.buffer_img.permute(0, 3, 1, 2).cpu().numpy().shape)
-            train_dataset_buffer = dataset_transform(self.buffer.buffer_img.permute(0, 3, 1, 2).cpu().numpy(), 
+            #print("self.buffer.buffer_img.cpu().numpy().shape", self.buffer.buffer_img.cpu().numpy().shape)
+            #print("self.buffer.buffer_img.permute(0, 3, 1, 2).cpu().numpy().shape", self.buffer.buffer_img.permute(0, 3, 1, 2).cpu().numpy().shape)
+            train_dataset_buffer = dataset_transform(self.buffer.buffer_img.permute(0, 2, 3, 1).cpu().numpy(), 
                                                      self.buffer.buffer_label.cpu().numpy(), 
                                                      transform=transforms_match[self.data])
             '''train_loader_buffer = data.DataLoader(train_dataset_buffer, batch_size=self.batch, shuffle=False, num_workers=0,
@@ -244,7 +244,7 @@ class SupContrastReplay(ContinualLearner):
         #print("self.buffer.buffer_img", self.buffer.buffer_img.cpu().numpy().reshape((5000, 32, 32, 3)).shape, type(self.buffer.buffer_img.cpu().numpy()))
         #print("self.buffer.buffer_label", self.buffer.buffer_label.cpu().numpy().shape, type(self.buffer.buffer_label.cpu().numpy()), self.buffer.buffer_label.cpu().numpy())
 
-        #self.buffer.buffer_img = all_images.to(device)
-        #self.buffer.buffer_label = all_labels.to(device)
+        self.buffer.buffer_img = all_images.to(device)
+        self.buffer.buffer_label = all_labels.to(device)
         
         self.after_train()
