@@ -71,7 +71,7 @@ class SupContrastReplay(ContinualLearner):
             merged_dataset = train_dataset
             merged_loader = train_loader
 
-        #print(f"Number of unique classes: {len(unique_classes)}", unique_classes)
+        print(f"Number of unique classes: {len(unique_classes)}", unique_classes)
 
         device = "cuda"
         Model_Carto = ResNet18(len(unique_classes))
@@ -110,6 +110,7 @@ class SupContrastReplay(ContinualLearner):
                 #print("targets", targets)
                 
                 optimizer_.zero_grad()
+                print("inputs.shapeeeeeeeeeee", inputs.shape)
                 outputs = Model_Carto(inputs)
                 #print("outputs.shape", outputs.shape)
                 soft_ = self.soft_(outputs)
