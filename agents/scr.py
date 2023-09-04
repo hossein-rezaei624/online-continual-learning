@@ -74,4 +74,14 @@ class SupContrastReplay(ContinualLearner):
                             '==>>> it: {}, avg. loss: {:.6f}, '
                                 .format(i, losses.avg(), acc_batch.avg())
                         )
+
+
+        unique_classes = set()
+
+        # Assuming each batch's labels are in the second element
+        for _, labels in train_loader:
+            unique_classes.update(labels.numpy())
+        
+        print(f"Number of unique classes: {len(unique_classes)}")
+        
         self.after_train()
