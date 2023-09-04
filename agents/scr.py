@@ -145,7 +145,24 @@ class SupContrastReplay(ContinualLearner):
         
         plt.savefig('scatter_plot.png')
 
+
+        # Number of top values you're interested in
+        top_n = params.mem_size
         
+        # Find the indices that would sort the array
+        sorted_indices = np.argsort(Variability.numpy())
+        
+        # Take the last 'top_n' indices (i.e., the top values)
+        top_indices = sorted_indices[-top_n:]
+        
+        # If you want these indices in ascending order, you can sort them
+        top_indices_sorted = np.sort(top_indices)
+        
+        print(top_indices_sorted)
+        
+        #subset_data = torch.utils.data.Subset(train_dataset, top_indices_sorted)
+        #trainloader = torch.utils.data.DataLoader(subset_data, batch_size=self.batch, shuffle=False)
+
 
         for ep in range(self.epoch):
             for i, batch_data in enumerate(train_loader):
