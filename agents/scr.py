@@ -76,7 +76,7 @@ class SupContrastReplay(ContinualLearner):
 
                 print("targets", targets)
                 mapping = {26:0, 86:1, 2:2, 55:3, 75:4, 93:5, 16:6, 73:7, 54:8, 95:9}
-                targets = torch.tensor([mapping[val.item()] for val in targets])
+                targets = torch.tensor([mapping[val.item()] for val in targets]).to(device)
                 print("targets", targets)
                 
                 optimizer_.zero_grad()
