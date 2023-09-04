@@ -37,7 +37,6 @@ class SupContrastReplay(ContinualLearner):
         # setup tracker
         losses = AverageMeter()
         acc_batch = AverageMeter()
-        unique_classes = set()
 
         for ep in range(self.epoch):
             for i, batch_data in enumerate(train_loader):
@@ -60,7 +59,6 @@ class SupContrastReplay(ContinualLearner):
                         mem_y = maybe_cuda(mem_y, self.cuda)
                         combined_batch = torch.cat((mem_x, batch_x))
                         combined_labels = torch.cat((mem_y, batch_y))
-                        unique_classes.update(combined_labels.cpu().numpy())
                         combined_batch_aug = self.transform(combined_batch)
                         features = torch.cat([self.model.forward(combined_batch).unsqueeze(1), self.model.forward(combined_batch_aug).unsqueeze(1)], dim=1)
                         loss = self.criterion(features, combined_labels)
@@ -77,6 +75,12 @@ class SupContrastReplay(ContinualLearner):
                                 .format(i, losses.avg(), acc_batch.avg())
                         )
 
+
+        unique_classes = set()
+
+        # Assuming each batch's labels are in the second element
+        for _, labels in train_loader:
+            unique_classes.update(labels.numpy())
         
         print(f"Number of unique classes: {len(unique_classes)}", unique_classes)
         
