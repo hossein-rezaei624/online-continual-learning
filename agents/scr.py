@@ -37,6 +37,14 @@ class SupContrastReplay(ContinualLearner):
         # setup tracker
         losses = AverageMeter()
         acc_batch = AverageMeter()
+        
+        unique_classes = set()
+        print(self.buffer.buffer_label, type(self.buffer.buffer_label))
+        # Assuming each batch's labels are in the second element
+        for _, labels in train_loader:
+            unique_classes.update(labels.numpy())
+        unique_classes.update(self.buffer.buffer_label.numpy())
+        #print(f"Number of unique classes: {len(unique_classes)}", unique_classes)
 
         for ep in range(self.epoch):
             for i, batch_data in enumerate(train_loader):
@@ -76,12 +84,5 @@ class SupContrastReplay(ContinualLearner):
                         )
 
 
-        unique_classes = set()
-
-        # Assuming each batch's labels are in the second element
-        for _, labels in train_loader:
-            unique_classes.update(labels.numpy())
-        
-        print(f"Number of unique classes: {len(unique_classes)}", unique_classes)
         
         self.after_train()
