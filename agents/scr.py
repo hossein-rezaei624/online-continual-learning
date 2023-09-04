@@ -79,6 +79,8 @@ class SupContrastReplay(ContinualLearner):
                 soft_ = self.soft_(outputs)
                 #print("soft_", soft_)
                 confidence_batch = []
+                #print("outputs", outputs)
+                print("targets", targets)
         
                 for i in range(targets.shape[0]):
                   confidence_batch.append(soft_[i,targets[i]].item())
