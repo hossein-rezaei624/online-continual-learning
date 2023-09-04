@@ -64,6 +64,7 @@ class SupContrastReplay(ContinualLearner):
         scheduler_ = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer_, T_max=200)
         
         # Training
+        Carto = []
         for epoch_ in range(6):
             print('\nEpoch: %d' % epoch_)
             Model_Carto.train()
@@ -71,7 +72,6 @@ class SupContrastReplay(ContinualLearner):
             correct = 0
             total = 0
             confidence_epoch = []
-            Carto = []
             for batch_idx, (inputs, targets) in enumerate(train_loader):
                 inputs, targets = inputs.to(device), targets.to(device)
 
