@@ -179,23 +179,21 @@ class SupContrastReplay(ContinualLearner):
         
         subset_data = torch.utils.data.Subset(merged_loader, top_indices_sorted)
         #print("subset_dataaaaaaaa", subset_data)
-        #trainloader_C = torch.utils.data.DataLoader(subset_data, batch_size=self.batch, shuffle=False)
+        trainloader_C = torch.utils.data.DataLoader(subset_data, batch_size=self.batch, shuffle=False)
 
-        # Assuming your transform_train has torchvision.transforms.ToTensor() to convert images to tensors
-        tensor_list = [img for img, _ in subset_data]
+        images_list = []
+        labels_list = []
         
-        # Stack the tensors
-        all_images = torch.stack(tensor_list, dim=0)
+        for images, labels in trainloader_C:  # Assuming train_loader is your DataLoader
+            images_list.append(images)
+            labels_list.append(labels)
         
-        print(all_images.shape) 
-
-        # Extract labels
-        label_list = [label for _, label in subset_data]
+        all_images = torch.cat(images_list, dim=0)
+        all_labels = torch.cat(labels_list, dim=0)
         
-        # Convert the list of labels to a tensor
-        all_labels = torch.tensor(label_list)
-        
+        print(all_images.shape)  # This should print something like torch.Size([50000, 3, 32, 32]) depending on your DataLoader's batch size
         print(all_labels.shape)  # This should print torch.Size([50000])
+
 
         for ep in range(self.epoch):
             for i, batch_data in enumerate(train_loader):
