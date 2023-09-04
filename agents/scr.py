@@ -56,7 +56,7 @@ class SupContrastReplay(ContinualLearner):
         
         if count_ != self.buffer.buffer_label.shape[0]:
             unique_classes.update(self.buffer.buffer_label.cpu().numpy())
-            train_dataset_buffer = dataset_transform(self.buffer.buffer_img.cpu().numpy().permute(0, 3, 1, 2), 
+            train_dataset_buffer = dataset_transform(self.buffer.buffer_img.permute(0, 3, 1, 2).cpu().numpy(), 
                                                      self.buffer.buffer_label.cpu().numpy(), 
                                                      transform=transforms_match[self.data])
             '''train_loader_buffer = data.DataLoader(train_dataset_buffer, batch_size=self.batch, shuffle=False, num_workers=0,
