@@ -8,6 +8,8 @@ from utils.utils import maybe_cuda, AverageMeter
 from kornia.augmentation import RandomResizedCrop, RandomHorizontalFlip, ColorJitter, RandomGrayscale
 import torch.nn as nn
 
+from models.resnet import ResNet18
+
 class SupContrastReplay(ContinualLearner):
     def __init__(self, model, opt, params):
         super(SupContrastReplay, self).__init__(model, opt, params)
