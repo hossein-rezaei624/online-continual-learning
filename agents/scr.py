@@ -204,7 +204,7 @@ class SupContrastReplay(ContinualLearner):
                         )
 
 
-        print("self.buffer.buffer_img", self.buffer.buffer_img.shape, type(self.buffer.buffer_img))
-        print("self.buffer.buffer_label", self.buffer.buffer_label.shape, type(self.buffer.buffer_label))
+        print("self.buffer.buffer_img", self.buffer.buffer_img.cpu().numpy().shape, type(self.buffer.buffer_img.cpu().numpy()))
+        print("self.buffer.buffer_label", self.buffer.buffer_label.cpu().numpy().shape, type(self.buffer.buffer_label.cpu().numpy()))
         
         self.after_train()
