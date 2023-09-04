@@ -147,7 +147,7 @@ class SupContrastReplay(ContinualLearner):
 
 
         # Number of top values you're interested in
-        top_n = params.mem_size
+        top_n = self.params.mem_size
         
         # Find the indices that would sort the array
         sorted_indices = np.argsort(Variability.numpy())
