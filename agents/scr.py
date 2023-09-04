@@ -50,8 +50,8 @@ class SupContrastReplay(ContinualLearner):
         for _, labels in train_loader:
             unique_classes.update(labels.numpy())
         
-        if count_ != self.buffer.buffer_label.shape[0]:
-            unique_classes.update(self.buffer.buffer_label.cpu().numpy())
+        '''if count_ != self.buffer.buffer_label.shape[0]:
+            unique_classes.update(self.buffer.buffer_label.cpu().numpy())'''
         #print(f"Number of unique classes: {len(unique_classes)}", unique_classes)
 
         device = "cuda"
@@ -75,9 +75,9 @@ class SupContrastReplay(ContinualLearner):
                 inputs, targets = inputs.to(device), targets.to(device)
                 optimizer_.zero_grad()
                 outputs = Model_Carto(inputs)
-                print("outputs.shape", outputs.shape)
+                #print("outputs.shape", outputs.shape)
                 soft_ = self.soft_(outputs)
-                print("soft_", soft_)
+                #print("soft_", soft_)
                 confidence_batch = []
         
                 for i in range(targets.shape[0]):
