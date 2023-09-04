@@ -13,6 +13,7 @@ import numpy as np
 import torch.optim as optim
 import torch.nn as nn
 import matplotlib.pyplot as plt
+from torch.utils.data import ConcatDataset
 
 class SupContrastReplay(ContinualLearner):
     def __init__(self, model, opt, params):
@@ -32,8 +33,8 @@ class SupContrastReplay(ContinualLearner):
 
     def train_learner(self, x_train, y_train):
         self.before_train(x_train, y_train)
-        print("y_trainnnnnnn", y_train.shape, type(y_train), y_train)
-        print("x_trainnnnnnn", x_train.shape, type(x_train))
+        #print("y_trainnnnnnn", y_train.shape, type(y_train), y_train)
+        #print("x_trainnnnnnn", x_train.shape, type(x_train))
         # set up loader
         train_dataset = dataset_transform(x_train, y_train, transform=transforms_match[self.data])
         train_loader = data.DataLoader(train_dataset, batch_size=self.batch, shuffle=False, num_workers=0,
@@ -55,6 +56,20 @@ class SupContrastReplay(ContinualLearner):
         
         if count_ != self.buffer.buffer_label.shape[0]:
             unique_classes.update(self.buffer.buffer_label.cpu().numpy())
+            train_dataset_buffer = dataset_transform(self.buffer.buffer_img.cpu().numpy().reshape((5000, 32, 32, 3)), 
+                                                     self.buffer.buffer_label.cpu().numpy(), 
+                                                     transform=transforms_match[self.data])
+            '''train_loader_buffer = data.DataLoader(train_dataset_buffer, batch_size=self.batch, shuffle=False, num_workers=0,
+                               drop_last=True)'''
+            # Merge the two datasets
+            merged_dataset = ConcatDataset([train_dataset, train_dataset_buffer])
+            
+            # Create a DataLoader for the merged dataset
+            merged_loader = data.DataLoader(merged_dataset, batch_size=self.batch, shuffle=False, num_workers=0, drop_last=True)
+
+        else:
+            merged_loader = train_loader
+
         #print(f"Number of unique classes: {len(unique_classes)}", unique_classes)
 
         device = "cuda"
@@ -74,7 +89,7 @@ class SupContrastReplay(ContinualLearner):
             correct = 0
             total = 0
             confidence_epoch = []
-            for batch_idx, (inputs, targets) in enumerate(train_loader):
+            for batch_idx, (inputs, targets) in enumerate(merged_loader):
                 inputs, targets = inputs.to(device), targets.to(device)
 
                 #print("targets", targets)
@@ -149,7 +164,7 @@ class SupContrastReplay(ContinualLearner):
 
 
         # Number of top values you're interested in
-        top_n = self.params.mem_size
+        top_n = self.params.mem_size + 1
         
         # Find the indices that would sort the array
         sorted_indices = np.argsort(Variability.numpy())
@@ -204,7 +219,7 @@ class SupContrastReplay(ContinualLearner):
                         )
 
 
-        print("self.buffer.buffer_img", self.buffer.buffer_img.cpu().numpy().reshape((5000, 32, 32, 3)).shape, type(self.buffer.buffer_img.cpu().numpy()))
-        print("self.buffer.buffer_label", self.buffer.buffer_label.cpu().numpy().shape, type(self.buffer.buffer_label.cpu().numpy()), self.buffer.buffer_label.cpu().numpy())
+        #print("self.buffer.buffer_img", self.buffer.buffer_img.cpu().numpy().reshape((5000, 32, 32, 3)).shape, type(self.buffer.buffer_img.cpu().numpy()))
+        #print("self.buffer.buffer_label", self.buffer.buffer_label.cpu().numpy().shape, type(self.buffer.buffer_label.cpu().numpy()), self.buffer.buffer_label.cpu().numpy())
         
         self.after_train()
