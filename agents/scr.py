@@ -46,7 +46,7 @@ class SupContrastReplay(ContinualLearner):
         
         count_ = np.sum(self.buffer.buffer_label.cpu().numpy() == 0)
         # Assuming each batch's labels are in the second element
-        self.after_train()
+        
         for _, labels in train_loader:
             unique_classes.update(labels.numpy())
         
