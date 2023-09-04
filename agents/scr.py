@@ -175,7 +175,7 @@ class SupContrastReplay(ContinualLearner):
         # If you want these indices in ascending order, you can sort them
         top_indices_sorted = np.sort(top_indices)
         
-        print("top_indices_sorted", top_indices_sorted)
+        print("top_indices_sorted", top_indices_sorted, top_indices_sorted.shape)
         
         #subset_data = torch.utils.data.Subset(train_dataset, top_indices_sorted)
         #trainloader = torch.utils.data.DataLoader(subset_data, batch_size=self.batch, shuffle=False)
@@ -196,6 +196,7 @@ class SupContrastReplay(ContinualLearner):
                     mem_x, mem_y = self.buffer.retrieve(x=batch_x, y=batch_y)
                     #mem_x, mem_y = self.buffer.retrieve()
                     #print("in the loop mem_y.shape:", mem_y.shape)
+                    print("mem_x.shape", mem_x.shape)
 
                     if mem_x.size(0) > 0:
                         mem_x = maybe_cuda(mem_x, self.cuda)
