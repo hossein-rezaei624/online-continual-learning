@@ -10,6 +10,8 @@ import torch.nn as nn
 
 from models.resnet import ResNet18
 import numpy as np
+import torch.optim as optim
+import torch.nn as nn
 
 class SupContrastReplay(ContinualLearner):
     def __init__(self, model, opt, params):
@@ -25,6 +27,7 @@ class SupContrastReplay(ContinualLearner):
             RandomGrayscale(p=0.2)
 
         )
+        self.soft_ = nn.Softmax(dim=1)
 
     def train_learner(self, x_train, y_train):
         self.before_train(x_train, y_train)
@@ -49,7 +52,78 @@ class SupContrastReplay(ContinualLearner):
         
         if count_ != self.buffer.buffer_label.shape[0]:
             unique_classes.update(self.buffer.buffer_label.cpu().numpy())
-        print(f"Number of unique classes: {len(unique_classes)}", unique_classes)
+        #print(f"Number of unique classes: {len(unique_classes)}", unique_classes)
+
+        Model_Carto = ResNet18(len(unique_classes))
+        criterion_ = nn.CrossEntropyLoss()
+        optimizer_ = optim.SGD(Model_Carto.parameters(), lr=args.lr,
+                              momentum=0.9, weight_decay=5e-4)
+        scheduler_ = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer_, T_max=200)
+        
+        device = "cuda"
+        # Training
+        for epoch_ in range(6):
+            print('\nEpoch: %d' % epoch_)
+            Model_Carto.train()
+            train_loss = 0
+            correct = 0
+            total = 0
+            confidence_epoch = []
+            Carto = []
+            for batch_idx, (inputs, targets) in enumerate(train_loader):
+                inputs, targets = inputs.to(device), targets.to(device)
+                optimizer_.zero_grad()
+                outputs = Model_Carto(inputs)
+                soft_ = self.soft_(outputs)
+                confidence_batch = []
+        
+                for i in range(targets.shape[0]):
+                  confidence_batch.append(soft_[i,targets[i]].item())
+                if (targets.shape[0] != self.batch):
+                  for j in range(self.batch - targets.shape[0]):
+                    confidence_batch.append(0)
+                confidence_epoch.append(confidence_batch)
+                #print(len(confidence_epoch[0]))
+        
+                loss = criterion_(outputs, targets)
+                loss.backward()
+                optimizer_.step()
+        
+                train_loss += loss.item()
+                _, predicted = outputs.max(1)
+                total += targets.size(0)
+                correct += predicted.eq(targets).sum().item()
+        
+
+            print("Accuracy:", 100.*correct/total, ", and:", correct, "/", total)
+            conf_tensor = torch.tensor(confidence_epoch)
+            conf_tensor = conf_tensor.reshape(conf_tensor.shape[0]*conf_tensor.shape[1])
+            conf_tensor = conf_tensor[:(total-1)]
+            #print(conf_tensor.shape)
+            
+            Carto.append(conf_tensor.numpy())
+            scheduler_.step()
+
+        Carto_tensor = torch.tensor(np.array(Carto))
+        #print(Carto_tensor.shape)
+        Confidence_mean = Carto_tensor.mean(dim=0)
+        Variability = Carto_tensor.std(dim = 0)
+        #print(Confidence_mean.shape)
+        #print(Variability.shape)
+        
+        plt.scatter(Variability, Confidence_mean, s = 2)
+        
+        
+        # Add Axes Labels
+        
+        plt.xlabel("Variability") 
+        plt.ylabel("Confidence") 
+        
+        # Display
+        
+        plt.savefig('scatter_plot.png')
+
+        
 
         for ep in range(self.epoch):
             for i, batch_data in enumerate(train_loader):
