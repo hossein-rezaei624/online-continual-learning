@@ -30,7 +30,7 @@ class SupContrastReplay(ContinualLearner):
         self.soft_ = nn.Softmax(dim=1)
 
     def train_learner(self, x_train, y_train):
-        self.before_train(x_train, y_train)
+        #self.before_train(x_train, y_train)
         # set up loader
         train_dataset = dataset_transform(x_train, y_train, transform=transforms_match[self.data])
         train_loader = data.DataLoader(train_dataset, batch_size=self.batch, shuffle=False, num_workers=0,
@@ -50,9 +50,9 @@ class SupContrastReplay(ContinualLearner):
         for _, labels in train_loader:
             unique_classes.update(labels.numpy())
         
-        '''if count_ != self.buffer.buffer_label.shape[0]:
-            unique_classes.update(self.buffer.buffer_label.cpu().numpy())'''
-        #print(f"Number of unique classes: {len(unique_classes)}", unique_classes)
+        if count_ != self.buffer.buffer_label.shape[0]:
+            unique_classes.update(self.buffer.buffer_label.cpu().numpy())
+        print(f"Number of unique classes: {len(unique_classes)}", unique_classes)
 
         device = "cuda"
         Model_Carto = ResNet18(len(unique_classes))
