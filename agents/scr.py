@@ -60,7 +60,7 @@ class SupContrastReplay(ContinualLearner):
                         mem_y = maybe_cuda(mem_y, self.cuda)
                         combined_batch = torch.cat((mem_x, batch_x))
                         combined_labels = torch.cat((mem_y, batch_y))
-                        unique_classes.update(combined_labels.numpy())
+                        unique_classes.update(combined_labels.cpu().numpy())
                         combined_batch_aug = self.transform(combined_batch)
                         features = torch.cat([self.model.forward(combined_batch).unsqueeze(1), self.model.forward(combined_batch_aug).unsqueeze(1)], dim=1)
                         loss = self.criterion(features, combined_labels)
