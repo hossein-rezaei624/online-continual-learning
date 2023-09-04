@@ -147,8 +147,8 @@ class SupContrastReplay(ContinualLearner):
         #print(Carto_tensor.shape)
         Confidence_mean = Carto_tensor.mean(dim=0)
         Variability = Carto_tensor.std(dim = 0)
-        #print(Confidence_mean.shape)
-        #print(Variability.shape)
+        print("Confidence_mean.shape", Confidence_mean.shape)
+        print("Variability.shape", Variability.shape)
         
         plt.scatter(Variability, Confidence_mean, s = 2)
         
@@ -175,7 +175,7 @@ class SupContrastReplay(ContinualLearner):
         # If you want these indices in ascending order, you can sort them
         top_indices_sorted = np.sort(top_indices)
         
-        print(top_indices_sorted)
+        print("top_indices_sorted", top_indices_sorted)
         
         #subset_data = torch.utils.data.Subset(train_dataset, top_indices_sorted)
         #trainloader = torch.utils.data.DataLoader(subset_data, batch_size=self.batch, shuffle=False)
