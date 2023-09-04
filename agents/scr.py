@@ -148,7 +148,7 @@ class SupContrastReplay(ContinualLearner):
         #print(Carto_tensor.shape)
         Confidence_mean = Carto_tensor.mean(dim=0)
         Variability = Carto_tensor.std(dim = 0)
-        print("Confidence_mean.shape", Confidence_mean.shape)
+        #print("Confidence_mean.shape", Confidence_mean.shape)
         print("Variability.shape", Variability.shape)
         
         plt.scatter(Variability, Confidence_mean, s = 2)
@@ -176,7 +176,8 @@ class SupContrastReplay(ContinualLearner):
         # If you want these indices in ascending order, you can sort them
         top_indices_sorted = np.sort(top_indices)
         
-        print("top_indices_sorted", top_indices_sorted, top_indices_sorted.shape)
+        #print("top_indices_sorted", top_indices_sorted, top_indices_sorted.shape)
+        print("top_indices_sorted.shape", top_indices_sorted.shape)
         
         subset_data = torch.utils.data.Subset(merged_dataset, top_indices_sorted)
         #print("subset_dataaaaaaaa", subset_data)
@@ -216,8 +217,8 @@ class SupContrastReplay(ContinualLearner):
                     if mem_x.size(0) > 0:
                         mem_x = maybe_cuda(mem_x, self.cuda)
                         mem_y = maybe_cuda(mem_y, self.cuda)
-                        print("mem_x.shape", mem_x.shape)
-                        print("batch_x.shape", batch_x.shape)
+                        #print("mem_x.shape", mem_x.shape)
+                        #print("batch_x.shape", batch_x.shape)
                         combined_batch = torch.cat((mem_x, batch_x))
                         combined_labels = torch.cat((mem_y, batch_y))
                         combined_batch_aug = self.transform(combined_batch)
