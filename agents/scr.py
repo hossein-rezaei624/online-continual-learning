@@ -82,6 +82,6 @@ class SupContrastReplay(ContinualLearner):
         for _, labels in train_loader:
             unique_classes.update(labels.numpy())
         
-        print(f"Number of unique classes: {len(unique_classes)}")
+        print(f"Number of unique classes: {len(unique_classes)}", unique_classes)
         
         self.after_train()
