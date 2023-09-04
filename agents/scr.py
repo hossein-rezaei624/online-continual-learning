@@ -141,7 +141,7 @@ class SupContrastReplay(ContinualLearner):
             print("Accuracy:", 100.*correct/total, ", and:", correct, "/", total)
             conf_tensor = torch.tensor(confidence_epoch)
             conf_tensor = conf_tensor.reshape(conf_tensor.shape[0]*conf_tensor.shape[1])
-            conf_tensor = conf_tensor[:(total-1)]
+            conf_tensor = conf_tensor[:total]
             #print(conf_tensor.shape)
             
             Carto.append(conf_tensor.numpy())
