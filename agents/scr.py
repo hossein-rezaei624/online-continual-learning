@@ -72,7 +72,7 @@ class SupContrastReplay(ContinualLearner):
         else:
             merged_dataset = train_dataset
             merged_loader = train_loader
-
+            temp_update = 1
 
         #print(f"Number of unique classes: {len(unique_classes)}", unique_classes)
 
@@ -238,7 +238,7 @@ class SupContrastReplay(ContinualLearner):
                         self.opt.step()
 
                 # update mem
-                if count_ == self.buffer.buffer_label.shape[0]:
+                if temp_update == 1:
                     self.buffer.update(batch_x, batch_y)
                 if i % 100 == 1 and self.verbose:
                         print(
