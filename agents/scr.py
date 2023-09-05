@@ -178,7 +178,7 @@ class SupContrastReplay(ContinualLearner):
         sorted_indices = np.argsort(Confidence_mean.numpy())
         
         # Take the last 'top_n' indices (i.e., the top values)
-        top_indices = sorted_indices[-top_n:]
+        top_indices = sorted_indices[:top_n]
         
         # If you want these indices in ascending order, you can sort them
         top_indices_sorted = np.sort(top_indices)
