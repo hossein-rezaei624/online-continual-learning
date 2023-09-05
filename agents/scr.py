@@ -73,15 +73,6 @@ class SupContrastReplay(ContinualLearner):
             merged_dataset = train_dataset
             merged_loader = train_loader
 
-            images_list_ = []
-            labels_list_ = []
-            
-            for images, labels in train_loader:  # Assuming train_loader is your DataLoader
-                images_list_.append(images)
-                labels_list_.append(labels)
-            
-            self.buffer.buffer_img = torch.cat(images_list_, dim=0)
-            self.buffer.buffer_label = torch.cat(labels_list_, dim=0)
 
         #print(f"Number of unique classes: {len(unique_classes)}", unique_classes)
 
@@ -247,7 +238,8 @@ class SupContrastReplay(ContinualLearner):
                         self.opt.step()
 
                 # update mem
-                #self.buffer.update(batch_x, batch_y)
+                if count_ == self.buffer.buffer_label.shape[0]:
+                    self.buffer.update(batch_x, batch_y)
                 if i % 100 == 1 and self.verbose:
                         print(
                             '==>>> it: {}, avg. loss: {:.6f}, '
