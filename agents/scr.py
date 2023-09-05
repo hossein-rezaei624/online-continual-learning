@@ -175,7 +175,7 @@ class SupContrastReplay(ContinualLearner):
         top_n = self.params.mem_size
         
         # Find the indices that would sort the array
-        sorted_indices = np.argsort(Variability.numpy())
+        sorted_indices = np.argsort(Confidence_mean.numpy())
         
         # Take the last 'top_n' indices (i.e., the top values)
         top_indices = sorted_indices[:top_n]
@@ -237,7 +237,7 @@ class SupContrastReplay(ContinualLearner):
                         self.opt.step()
 
                 # update mem
-                self.buffer.update(batch_x, batch_y)
+                #self.buffer.update(batch_x, batch_y)
                 if i % 100 == 1 and self.verbose:
                         print(
                             '==>>> it: {}, avg. loss: {:.6f}, '
