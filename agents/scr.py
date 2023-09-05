@@ -73,7 +73,17 @@ class SupContrastReplay(ContinualLearner):
             merged_dataset = train_dataset
             merged_loader = train_loader
 
-        print(f"Number of unique classes: {len(unique_classes)}", unique_classes)
+            images_list_ = []
+            labels_list_ = []
+            
+            for images, labels in train_loader:  # Assuming train_loader is your DataLoader
+                images_list_.append(images)
+                labels_list_.append(labels)
+            
+            self.buffer.buffer_img = torch.cat(images_list_, dim=0)
+            self.buffer.buffer_label = torch.cat(labels_list_, dim=0)
+
+        #print(f"Number of unique classes: {len(unique_classes)}", unique_classes)
 
         device = "cuda"
         Model_Carto = ResNet18(len(unique_classes))
@@ -95,7 +105,7 @@ class SupContrastReplay(ContinualLearner):
                   87:90, 36:91, 21:92, 83:93, 9:94, 96:95, 67:96, 64:97, 47:98, 44:99}'''
 
         mapping = {value: index for index, value in enumerate(unique_classes)}
-        print(mapping)
+        #print(mapping)
         
         # Training
         Carto = []
@@ -156,7 +166,7 @@ class SupContrastReplay(ContinualLearner):
         Confidence_mean = Carto_tensor.mean(dim=0)
         Variability = Carto_tensor.std(dim = 0)
         #print("Confidence_mean.shape", Confidence_mean.shape)
-        print("Variability.shape", Variability.shape)
+        #print("Variability.shape", Variability.shape)
         
         plt.scatter(Variability, Confidence_mean, s = 2)
         
@@ -184,7 +194,7 @@ class SupContrastReplay(ContinualLearner):
         top_indices_sorted = np.sort(top_indices)
         
         #print("top_indices_sorted", top_indices_sorted, top_indices_sorted.shape)
-        print("top_indices_sorted.shape", top_indices_sorted.shape)
+        #print("top_indices_sorted.shape", top_indices_sorted.shape)
         
         subset_data = torch.utils.data.Subset(merged_dataset, top_indices_sorted)
         #print("subset_dataaaaaaaa", subset_data)
@@ -200,8 +210,8 @@ class SupContrastReplay(ContinualLearner):
         all_images = torch.cat(images_list, dim=0)
         all_labels = torch.cat(labels_list, dim=0)
         
-        print(all_images.shape)  # This should print something like torch.Size([50000, 3, 32, 32]) depending on your DataLoader's batch size
-        print(all_labels.shape)  # This should print torch.Size([50000])
+        #print(all_images.shape)  # This should print something like torch.Size([50000, 3, 32, 32]) depending on your DataLoader's batch size
+        #print(all_labels.shape)  # This should print torch.Size([50000])
 
 
         for ep in range(self.epoch):
@@ -245,13 +255,13 @@ class SupContrastReplay(ContinualLearner):
                         )
 
 
-        print("self.buffer.buffer_img", self.buffer.buffer_img.shape, type(self.buffer.buffer_img))
-        print("self.buffer.buffer_label", self.buffer.buffer_label.shape, type(self.buffer.buffer_label), self.buffer.buffer_label)
+        #print("self.buffer.buffer_img", self.buffer.buffer_img.shape, type(self.buffer.buffer_img))
+        #print("self.buffer.buffer_label", self.buffer.buffer_label.shape, type(self.buffer.buffer_label), self.buffer.buffer_label)
 
         self.buffer.buffer_img = all_images.to(device)
         self.buffer.buffer_label = all_labels.to(device)
 
-        print("self.buffer.buffer_img", self.buffer.buffer_img.shape, type(self.buffer.buffer_img))
-        print("self.buffer.buffer_label", self.buffer.buffer_label.shape, type(self.buffer.buffer_label), self.buffer.buffer_label)
+        #print("self.buffer.buffer_img", self.buffer.buffer_img.shape, type(self.buffer.buffer_img))
+        #print("self.buffer.buffer_label", self.buffer.buffer_label.shape, type(self.buffer.buffer_label), self.buffer.buffer_label)
         
         self.after_train()
