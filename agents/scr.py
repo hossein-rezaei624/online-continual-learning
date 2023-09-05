@@ -72,7 +72,6 @@ class SupContrastReplay(ContinualLearner):
         else:
             merged_dataset = train_dataset
             merged_loader = train_loader
-            temp_update = 1
 
         #print(f"Number of unique classes: {len(unique_classes)}", unique_classes)
 
@@ -180,6 +179,7 @@ class SupContrastReplay(ContinualLearner):
         
         # Take the last 'top_n' indices (i.e., the top values)
         top_indices = sorted_indices[:top_n]
+        print("top_indicesssss", top_indices)
         
         # If you want these indices in ascending order, you can sort them
         top_indices_sorted = np.sort(top_indices)
@@ -238,8 +238,7 @@ class SupContrastReplay(ContinualLearner):
                         self.opt.step()
 
                 # update mem
-                if temp_update == 1:
-                    self.buffer.update(batch_x, batch_y)
+                self.buffer.update(batch_x, batch_y)
                 if i % 100 == 1 and self.verbose:
                         print(
                             '==>>> it: {}, avg. loss: {:.6f}, '
