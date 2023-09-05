@@ -122,12 +122,8 @@ class ContinualLearner(torch.nn.Module, metaclass=abc.ABCMeta):
             exemplar_means = {}
             cls_exemplar = {cls: [] for cls in self.old_labels}
             buffer_filled = self.buffer.current_index
-            temp_hossein = []
             for x, y in zip(self.buffer.buffer_img[:buffer_filled], self.buffer.buffer_label[:buffer_filled]):
                 cls_exemplar[y.item()].append(x)
-                print("x.shapeeeee", type(x))
-                temp_hossein = x
-            print("temp_hossein.shapeeee", (temp_hossein))
             for cls, exemplar in cls_exemplar.items():
                 features = []
                 # Extract feature for each exemplar in p_y
@@ -137,7 +133,7 @@ class ContinualLearner(torch.nn.Module, metaclass=abc.ABCMeta):
                     feature.data = feature.data / feature.data.norm()  # Normalize
                     features.append(feature)
                 if len(features) == 0:
-                    mu_y = maybe_cuda(torch.normal(0, 1, size=tuple(self.model.features(temp_hossein.unsqueeze(0)).detach().size())), self.cuda)
+                    mu_y = maybe_cuda(torch.normal(0, 1, size=tuple(self.model.features(exemplar[0].unsqueeze(0)).detach().size())), self.cuda)
                     mu_y = mu_y.squeeze()
                 else:
                     features = torch.stack(features)
