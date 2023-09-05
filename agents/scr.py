@@ -179,7 +179,7 @@ class SupContrastReplay(ContinualLearner):
         
         # Take the last 'top_n' indices (i.e., the top values)
         top_indices = sorted_indices[:2]
-        print("top_indicesssss", top_indices.shape, top_indices)
+        print("top_indicesssss", top_indices.shape, top_indices, type(top_indices))
         
         # If you want these indices in ascending order, you can sort them
         top_indices_sorted = np.sort(top_indices)
