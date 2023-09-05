@@ -179,9 +179,9 @@ class SupContrastReplay(ContinualLearner):
         sorted_indices_2 = np.argsort(Variability.numpy())
         
         # Take the last 'top_n' indices (i.e., the top values)
-        top_indices_1 = sorted_indices_1[:int(0.9*top_n)]
-        top_indices_2 = sorted_indices_1[-int(0.05*top_n):]
-        top_indices_3 = sorted_indices_2[-(top_n - (int(0.9*top_n) + int(0.05*top_n))):]
+        top_indices_1 = sorted_indices_1[:int(0.98*top_n)]
+        top_indices_2 = sorted_indices_1[-int(0.01*top_n):]
+        top_indices_3 = sorted_indices_2[-(top_n - (int(0.98*top_n) + int(0.01*top_n))):]
         
         #print("top_indicesssss", top_indices.shape, top_indices, type(top_indices))
 
