@@ -232,7 +232,7 @@ class SupContrastReplay(ContinualLearner):
                     if mem_x.size(0) > 0:
                         mem_x = maybe_cuda(mem_x, self.cuda)
                         mem_y = maybe_cuda(mem_y, self.cuda)
-                        #print("mem_x.shape", mem_x.shape)
+                        print("mem_x.shape", mem_x.shape)
                         #print("batch_x.shape", batch_x.shape)
                         combined_batch = torch.cat((mem_x, batch_x))
                         combined_labels = torch.cat((mem_y, batch_y))
