@@ -125,6 +125,8 @@ class ContinualLearner(torch.nn.Module, metaclass=abc.ABCMeta):
             for x, y in zip(self.buffer.buffer_img[:buffer_filled], self.buffer.buffer_label[:buffer_filled]):
                 cls_exemplar[y.item()].append(x)            
             for cls, exemplar in cls_exemplar.items():
+                print("cls", cls)
+                print("exemplar", exemplar)
                 features = []
                 # Extract feature for each exemplar in p_y
                 for ex in exemplar:
