@@ -39,12 +39,6 @@ class SupContrastReplay(ContinualLearner):
         train_dataset = dataset_transform(x_train, y_train, transform=transforms_match[self.data])
         train_loader = data.DataLoader(train_dataset, batch_size=self.batch, shuffle=False, num_workers=0,
                                        drop_last=True)
-        # set up model
-        self.model = self.model.train()
-
-        # setup tracker
-        losses = AverageMeter()
-        acc_batch = AverageMeter()
         
         unique_classes = set()
         
@@ -81,7 +75,7 @@ class SupContrastReplay(ContinualLearner):
         criterion_ = nn.CrossEntropyLoss()
         optimizer_ = optim.SGD(Model_Carto.parameters(), lr=0.1,
                               momentum=0.9, weight_decay=5e-4)
-        ##scheduler_ = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer_, T_max=200)
+        scheduler_ = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer_, T_max=200)
         
         #mapping = {26:0, 86:1, 2:2, 55:3, 75:4, 93:5, 16:6, 73:7, 54:8, 95:9,
          #         53:10, 92:11, 78:12, 13:13, 7:14, 30:15, 22:16, 24:17, 33:18, 8:19,
@@ -149,7 +143,7 @@ class SupContrastReplay(ContinualLearner):
             #print(conf_tensor.shape)
             
             Carto.append(conf_tensor.numpy())
-            ##scheduler_.step()
+            scheduler_.step()
 
         Carto_tensor = torch.tensor(np.array(Carto))
         #print(Carto_tensor.shape)
@@ -211,6 +205,13 @@ class SupContrastReplay(ContinualLearner):
         #print(all_images.shape)  # This should print something like torch.Size([50000, 3, 32, 32]) depending on your DataLoader's batch size
         #print(all_labels.shape)  # This should print torch.Size([50000])
 
+        # set up model
+        self.model = self.model.train()
+
+        # setup tracker
+        losses = AverageMeter()
+        acc_batch = AverageMeter()
+        
         for ep in range(self.epoch):
             for i, batch_data in enumerate(train_loader):
                 # batch update
