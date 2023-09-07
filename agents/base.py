@@ -121,13 +121,13 @@ class ContinualLearner(torch.nn.Module, metaclass=abc.ABCMeta):
         if self.params.trick['ncm_trick'] or self.params.agent in ['ICARL', 'SCR', 'SCP']:
             exemplar_means = {}
             cls_exemplar = {cls: [] for cls in self.old_labels}
-            print("self.old_labels", self.old_labels)
+            #print("self.old_labels", self.old_labels)
             buffer_filled = self.buffer.current_index
             for x, y in zip(self.buffer.buffer_img[:buffer_filled], self.buffer.buffer_label[:buffer_filled]):
                 cls_exemplar[y.item()].append(x)            
             for cls, exemplar in cls_exemplar.items():
-                print("cls", cls)
-                print("exemplar", len(exemplar))
+                #print("cls", cls)
+                #print("exemplar", len(exemplar))
                 features = []
                 # Extract feature for each exemplar in p_y
                 for ex in exemplar:
