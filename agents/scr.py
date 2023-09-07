@@ -31,26 +31,9 @@ class SupContrastReplay(ContinualLearner):
 
         )
         self.soft_ = nn.Softmax(dim=1)
-
-
-    def set_random_seeds(self, seed_value=0, device='cuda'):
-        """Set seeds for all random number generators to ensure reproducibility."""
-        np.random.seed(seed_value)
-        torch.manual_seed(seed_value)
-        random.seed(seed_value)
-        
-        if device == 'cuda':
-            torch.cuda.manual_seed(seed_value)
-            torch.cuda.manual_seed_all(seed_value)
-            # Ensure that the GPU is deterministic
-            torch.backends.cudnn.deterministic = True
-            torch.backends.cudnn.benchmark = False
     
     
-    def train_learner(self, x_train, y_train):
-        # Set the random seed
-        self.set_random_seeds(42)
-        
+    def train_learner(self, x_train, y_train):        
         self.before_train(x_train, y_train)
         #print("y_trainnnnnnn", y_train.shape, type(y_train), y_train)
         #print("x_trainnnnnnn", x_train.shape, type(x_train))
@@ -209,7 +192,7 @@ class SupContrastReplay(ContinualLearner):
         
         subset_data = torch.utils.data.Subset(merged_dataset, top_indices_sorted)
         #print("subset_dataaaaaaaa", subset_data)
-        trainloader_C = torch.utils.data.DataLoader(subset_data, batch_size=self.batch, shuffle=False)
+        trainloader_C = torch.utils.data.DataLoader(subset_data, batch_size=self.batch, shuffle=False, num_workers=0)
 
         images_list = []
         labels_list = []
