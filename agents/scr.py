@@ -14,6 +14,7 @@ import torch.optim as optim
 import torch.nn as nn
 import matplotlib.pyplot as plt
 from torch.utils.data import ConcatDataset
+import random
 
 class SupContrastReplay(ContinualLearner):
     def __init__(self, model, opt, params):
@@ -31,9 +32,24 @@ class SupContrastReplay(ContinualLearner):
         )
         self.soft_ = nn.Softmax(dim=1)
 
+
+    def set_random_seeds(seed_value=0, device='cuda'):
+        """Set seeds for all random number generators to ensure reproducibility."""
+        np.random.seed(seed_value)
+        torch.manual_seed(seed_value)
+        random.seed(seed_value)
+        
+        if device == 'cuda':
+            torch.cuda.manual_seed(seed_value)
+            torch.cuda.manual_seed_all(seed_value)
+            # Ensure that the GPU is deterministic
+            torch.backends.cudnn.deterministic = True
+            torch.backends.cudnn.benchmark = False
+    
+    
     def train_learner(self, x_train, y_train):
-        torch.backends.cudnn.deterministic = True
-        torch.backends.cudnn.benchmark = False
+        # Set the random seed
+        set_random_seeds(42)
         
         self.before_train(x_train, y_train)
         #print("y_trainnnnnnn", y_train.shape, type(y_train), y_train)
