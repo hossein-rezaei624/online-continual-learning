@@ -248,7 +248,6 @@ class SupContrastReplay(ContinualLearner):
 
                 # update mem
                 if count_ == self.buffer.buffer_label.shape[0]:
-                    print("aaaaaaaaaaa")
                     self.buffer.update(batch_x, batch_y)
                 if i % 100 == 1 and self.verbose:
                         print(
