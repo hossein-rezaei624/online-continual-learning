@@ -229,7 +229,7 @@ class SupContrastReplay(ContinualLearner):
                     #mem_x, mem_y = self.buffer.retrieve()
                     #print("in the loop mem_y.shape:", mem_y.shape)
                     #print("mem_x.shape", mem_x.shape)
-                    print("mem_y", mem_y)
+                    #print("mem_y", mem_y)
 
                     if mem_x.size(0) > 0:
                         mem_x = maybe_cuda(mem_x, self.cuda)
@@ -248,6 +248,7 @@ class SupContrastReplay(ContinualLearner):
 
                 # update mem
                 if count_ == self.buffer.buffer_label.shape[0]:
+                    print("aaaaaaaaaaa")
                     self.buffer.update(batch_x, batch_y)
                 if i % 100 == 1 and self.verbose:
                         print(
@@ -259,8 +260,8 @@ class SupContrastReplay(ContinualLearner):
         #print("self.buffer.buffer_img", self.buffer.buffer_img.shape, type(self.buffer.buffer_img))
         #print("self.buffer.buffer_label", self.buffer.buffer_label.shape, type(self.buffer.buffer_label), self.buffer.buffer_label)
 
-        self.buffer.buffer_img = all_images.to(device)
-        self.buffer.buffer_label = all_labels.to(device)
+        ##self.buffer.buffer_img = all_images.to(device)
+        ##self.buffer.buffer_label = all_labels.to(device)
 
         #print("self.buffer.buffer_img", self.buffer.buffer_img.shape, type(self.buffer.buffer_img))
         #print("self.buffer.buffer_label", self.buffer.buffer_label.shape, type(self.buffer.buffer_label), self.buffer.buffer_label)
