@@ -224,6 +224,7 @@ class SupContrastReplay(ContinualLearner):
                     #print("in the loop batch_y:", batch_y)
                     #print("buffer.current_index innn", self.buffer.current_index)
                     #print("self.buffer.buffer_label in:", self.buffer.buffer_label, "self.buffer.buffer_label.shape in:", self.buffer.buffer_label.shape)
+                    print("self.buffer.buffer_label", self.buffer.buffer_label)
                     mem_x, mem_y = self.buffer.retrieve(x=batch_x, y=batch_y)
                     #mem_x, mem_y = self.buffer.retrieve()
                     #print("in the loop mem_y.shape:", mem_y.shape)
