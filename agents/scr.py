@@ -106,7 +106,7 @@ class SupContrastReplay(ContinualLearner):
             correct = 0
             total = 0
             confidence_epoch = []
-            for batch_idx, (inputs, targets) in enumerate(train_loader):
+            for batch_idx, (inputs, targets) in enumerate(merged_loader):
                 inputs, targets = inputs.to(device), targets.to(device)
 
                 #print("targets", targets)
@@ -194,7 +194,7 @@ class SupContrastReplay(ContinualLearner):
         #print("top_indices_sorted", top_indices_sorted, top_indices_sorted.shape)
         print("top_indices_sorted.shape", top_indices_sorted.shape)
         
-        subset_data = torch.utils.data.Subset(train_dataset, top_indices_sorted)
+        subset_data = torch.utils.data.Subset(merged_dataset, top_indices_sorted)
         #print("subset_dataaaaaaaa", subset_data)
         trainloader_C = torch.utils.data.DataLoader(subset_data, batch_size=self.batch, shuffle=False)
 
@@ -247,8 +247,7 @@ class SupContrastReplay(ContinualLearner):
                         self.opt.step()
 
                 # update mem
-                if count_ == self.buffer.buffer_label.shape[0]:
-                    self.buffer.update(batch_x, batch_y)
+                self.buffer.update(batch_x, batch_y)
                 if i % 100 == 1 and self.verbose:
                         print(
                             '==>>> it: {}, avg. loss: {:.6f}, '
