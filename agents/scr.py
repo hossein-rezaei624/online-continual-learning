@@ -7,6 +7,8 @@ from utils.setup_elements import transforms_match, input_size_match
 from utils.utils import maybe_cuda, AverageMeter
 from kornia.augmentation import RandomResizedCrop, RandomHorizontalFlip, ColorJitter, RandomGrayscale
 import torch.nn as nn
+import numpy as np
+import random
 
 class SupContrastReplay(ContinualLearner):
     def __init__(self, model, opt, params):
