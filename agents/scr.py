@@ -25,25 +25,8 @@ class SupContrastReplay(ContinualLearner):
 
         )
 
-
-    def set_random_seeds(self, seed_value=0, device='cuda'):
-        """Set seeds for all random number generators to ensure reproducibility."""
-        np.random.seed(seed_value)
-        torch.manual_seed(seed_value)
-        random.seed(seed_value)
-        
-        if device == 'cuda':
-            torch.cuda.manual_seed(seed_value)
-            torch.cuda.manual_seed_all(seed_value)
-            # Ensure that the GPU is deterministic
-            torch.backends.cudnn.deterministic = True
-            torch.backends.cudnn.benchmark = False
-
     
     def train_learner(self, x_train, y_train):
-        # Set the random seed
-        self.set_random_seeds(42)
-        
         self.before_train(x_train, y_train)
         # set up loader
         train_dataset = dataset_transform(x_train, y_train, transform=transforms_match[self.data])
