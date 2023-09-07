@@ -46,7 +46,7 @@ class SupContrastReplay(ContinualLearner):
         losses = AverageMeter()
         acc_batch = AverageMeter()
         
-        unique_classes = set()
+        '''unique_classes = set()
         
         count_ = np.sum(self.buffer.buffer_label.cpu().numpy() == 0)
         # Assuming each batch's labels are in the second element
@@ -210,7 +210,7 @@ class SupContrastReplay(ContinualLearner):
         
         #print(all_images.shape)  # This should print something like torch.Size([50000, 3, 32, 32]) depending on your DataLoader's batch size
         #print(all_labels.shape)  # This should print torch.Size([50000])
-
+'''
 
         for ep in range(self.epoch):
             for i, batch_data in enumerate(train_loader):
