@@ -106,7 +106,7 @@ class SupContrastReplay(ContinualLearner):
             correct = 0
             total = 0
             confidence_epoch = []
-            for batch_idx, (inputs, targets) in enumerate(merged_loader):
+            for batch_idx, (inputs, targets) in enumerate(train_loader):
                 inputs, targets = inputs.to(device), targets.to(device)
 
                 #print("targets", targets)
