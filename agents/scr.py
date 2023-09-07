@@ -33,7 +33,7 @@ class SupContrastReplay(ContinualLearner):
         self.soft_ = nn.Softmax(dim=1)
 
 
-    def set_random_seeds(seed_value=0, device='cuda'):
+    def set_random_seeds(self, seed_value=0, device='cuda'):
         """Set seeds for all random number generators to ensure reproducibility."""
         np.random.seed(seed_value)
         torch.manual_seed(seed_value)
@@ -49,7 +49,7 @@ class SupContrastReplay(ContinualLearner):
     
     def train_learner(self, x_train, y_train):
         # Set the random seed
-        set_random_seeds(42)
+        self.set_random_seeds(42)
         
         self.before_train(x_train, y_train)
         #print("y_trainnnnnnn", y_train.shape, type(y_train), y_train)
