@@ -33,7 +33,7 @@ class SupContrastReplay(ContinualLearner):
         self.soft_ = nn.Softmax(dim=1)
     
     
-    def train_learner(self, x_train, y_train):        
+    def train_learner(self, x_train, y_train, task_number):        
         self.before_train(x_train, y_train)
         #print("y_trainnnnnnn", y_train.shape, type(y_train), y_train)
         #print("x_trainnnnnnn", x_train.shape, type(x_train))
@@ -209,9 +209,9 @@ class SupContrastReplay(ContinualLearner):
 
 
 
+        print("task_numberrrrrrrrrr", task_number)
 
-
-        def allocate_tasks(buffer_size):
+        '''def allocate_tasks(buffer_size):
     M = [0] * buffer_size  # Initialize buffer with zeroes (or any other placeholder value)
     tasks = list(range(1, 11))  # Represent tasks as numbers 1 through 10
 
@@ -231,7 +231,7 @@ class SupContrastReplay(ContinualLearner):
 
         print(M)  # Print the buffer after each step to visualize
 
-allocate_tasks(20)  # Example with buffer of size 20
+allocate_tasks(20)  # Example with buffer of size 20'''
 
 
 
