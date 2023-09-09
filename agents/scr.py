@@ -209,29 +209,28 @@ class SupContrastReplay(ContinualLearner):
 
 
 
-        print("task_numberrrrrrrrrr", task_number)
+        #print("task_numberrrrrrrrrr", task_number)
 
-        '''def allocate_tasks(buffer_size):
-    M = [0] * buffer_size  # Initialize buffer with zeroes (or any other placeholder value)
-    tasks = list(range(1, 11))  # Represent tasks as numbers 1 through 10
-
-    for i in range(10):
-        space = buffer_size
-        pointer = 0  # This will keep track of where to insert in M
-        
-        for j in range(i+1):  
-            portion = space // (i + 1 - j)  # Use integer division for portion size
+    def allocate_tasks(buffer_size):
+        M = [0] * buffer_size  # Initialize buffer with zeroes (or any other placeholder value)
+        tasks = list(range(1, 11))  # Represent tasks as numbers 1 through 10
+    
+        for i in range(self.params.num_tasks):
+            space = self.params.mem_size
+            pointer = 0  # This will keep track of where to insert in M
             
-            # Fill the buffer
-            for k in range(portion):
-                M[pointer] = tasks[j]
-                pointer += 1
+            for j in range(i+1):  
+                portion = space // (i + 1 - j)  # Use integer division for portion size
                 
-            space -= portion
-
-        print(M)  # Print the buffer after each step to visualize
-
-allocate_tasks(20)  # Example with buffer of size 20'''
+                # Fill the buffer
+                for k in range(portion):
+                    M[pointer] = tasks[j]
+                    pointer += 1
+                    
+                space -= portion
+    
+            print(M)  # Print the buffer after each step to visualize
+    
 
 
 
