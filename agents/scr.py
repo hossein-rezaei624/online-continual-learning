@@ -207,6 +207,37 @@ class SupContrastReplay(ContinualLearner):
         #print(all_images.shape)  # This should print something like torch.Size([50000, 3, 32, 32]) depending on your DataLoader's batch size
         #print(all_labels.shape)  # This should print torch.Size([50000])
 
+
+
+
+
+        def allocate_tasks(buffer_size):
+    M = [0] * buffer_size  # Initialize buffer with zeroes (or any other placeholder value)
+    tasks = list(range(1, 11))  # Represent tasks as numbers 1 through 10
+
+    for i in range(10):
+        space = buffer_size
+        pointer = 0  # This will keep track of where to insert in M
+        
+        for j in range(i+1):  
+            portion = space // (i + 1 - j)  # Use integer division for portion size
+            
+            # Fill the buffer
+            for k in range(portion):
+                M[pointer] = tasks[j]
+                pointer += 1
+                
+            space -= portion
+
+        print(M)  # Print the buffer after each step to visualize
+
+allocate_tasks(20)  # Example with buffer of size 20
+
+
+
+
+
+        
         # set up model
         self.model = self.model.train()
 
@@ -249,7 +280,8 @@ class SupContrastReplay(ContinualLearner):
                         self.opt.step()
 
                 # update mem
-                self.buffer.update(batch_x, batch_y)
+                if count_ == self.buffer.buffer_label.shape[0]:
+                    self.buffer.update(batch_x, batch_y)
                 if i % 100 == 1 and self.verbose:
                         print(
                             '==>>> it: {}, avg. loss: {:.6f}, '
