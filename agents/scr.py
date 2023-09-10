@@ -50,7 +50,7 @@ class SupContrastReplay(ContinualLearner):
         for _, labels in train_loader:
             unique_classes.update(labels.numpy())
         
-        if count_ != self.buffer.buffer_label.shape[0]:
+        '''if count_ != self.buffer.buffer_label.shape[0]:
             unique_classes.update(self.buffer.buffer_label.cpu().numpy())
             #print("self.buffer.buffer_img.cpu().numpy().shape", self.buffer.buffer_img.cpu().numpy().shape)
             #print("self.buffer.buffer_img.permute(0, 3, 1, 2).cpu().numpy().shape", self.buffer.buffer_img.permute(0, 3, 1, 2).cpu().numpy().shape)
@@ -69,7 +69,7 @@ class SupContrastReplay(ContinualLearner):
             merged_dataset = train_dataset
             merged_loader = train_loader
 
-        #print(f"Number of unique classes: {len(unique_classes)}", unique_classes)
+        #print(f"Number of unique classes: {len(unique_classes)}", unique_classes)'''
 
         device = "cuda"
         Model_Carto = ResNet18(len(unique_classes))
@@ -102,7 +102,7 @@ class SupContrastReplay(ContinualLearner):
             correct = 0
             total = 0
             confidence_epoch = []
-            for batch_idx, (inputs, targets) in enumerate(merged_loader):
+            for batch_idx, (inputs, targets) in enumerate(train_loader):
                 inputs, targets = inputs.to(device), targets.to(device)
 
                 #print("targets", targets)
@@ -190,7 +190,7 @@ class SupContrastReplay(ContinualLearner):
         #print("top_indices_sorted", top_indices_sorted, top_indices_sorted.shape)
         print("top_indices_sorted.shape", top_indices_sorted.shape)
         
-        subset_data = torch.utils.data.Subset(merged_dataset, top_indices_sorted)
+        subset_data = torch.utils.data.Subset(train_dataset, top_indices_sorted)
         #print("subset_dataaaaaaaa", subset_data)
         trainloader_C = torch.utils.data.DataLoader(subset_data, batch_size=self.batch, shuffle=False, num_workers=0)
 
@@ -211,25 +211,23 @@ class SupContrastReplay(ContinualLearner):
 
         #print("task_numberrrrrrrrrr", task_number)
 
-    def allocate_tasks(buffer_size):
-        M = [0] * buffer_size  # Initialize buffer with zeroes (or any other placeholder value)
-        tasks = list(range(1, 11))  # Represent tasks as numbers 1 through 10
+        if task_number > 1:
     
-        for i in range(self.params.num_tasks):
-            space = self.params.mem_size
-            pointer = 0  # This will keep track of where to insert in M
-            
-            for j in range(i+1):  
-                portion = space // (i + 1 - j)  # Use integer division for portion size
+            for i in range(self.params.num_tasks):
+                space = self.params.mem_size
+                pointer = 0  # This will keep track of where to insert in M
                 
-                # Fill the buffer
-                for k in range(portion):
-                    M[pointer] = tasks[j]
-                    pointer += 1
+                for j in range(i+1):  
+                    portion = space // (i + 1 - j)  # Use integer division for portion size
                     
-                space -= portion
-    
-            print(M)  # Print the buffer after each step to visualize
+                    # Fill the buffer
+                    for k in range(portion):
+                        M[pointer] = tasks[j]
+                        pointer += 1
+                        
+                    space -= portion
+        
+                print(M)  # Print the buffer after each step to visualize
     
 
 
@@ -291,8 +289,9 @@ class SupContrastReplay(ContinualLearner):
         #print("self.buffer.buffer_img", self.buffer.buffer_img.shape, type(self.buffer.buffer_img))
         #print("self.buffer.buffer_label", self.buffer.buffer_label.shape, type(self.buffer.buffer_label), self.buffer.buffer_label)
 
-        self.buffer.buffer_img = all_images.to(device)
-        self.buffer.buffer_label = all_labels.to(device)
+        if count_ == self.buffer.buffer_label.shape[0]:
+            self.buffer.buffer_img = all_images.to(device)
+            self.buffer.buffer_label = all_labels.to(device)
 
         #print("self.buffer.buffer_img", self.buffer.buffer_img.shape, type(self.buffer.buffer_img))
         #print("self.buffer.buffer_label", self.buffer.buffer_label.shape, type(self.buffer.buffer_label), self.buffer.buffer_label)
