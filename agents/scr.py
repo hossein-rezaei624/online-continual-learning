@@ -214,8 +214,8 @@ class SupContrastReplay(ContinualLearner):
                 # Fill the buffer
                 for k in range(portion):
                     if task_number != j:
-                        self.buffer.buffer_img[pointer] = self.buffer.buffer_img[k]
-                        self.buffer.buffer_label[pointer] = self.buffer.buffer_label[k]
+                        self.buffer.buffer_img[pointer] = self.buffer.buffer_img[j*self.params.mem_size/task_number + k]
+                        self.buffer.buffer_label[pointer] = self.buffer.buffer_label[j*self.params.mem_size/task_number + k]
                         pointer += 1
                     else:
                         self.buffer.buffer_img[pointer] = all_images.to(device)[k]
