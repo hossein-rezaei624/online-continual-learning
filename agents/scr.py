@@ -223,26 +223,6 @@ class SupContrastReplay(ContinualLearner):
 
         #print("task_numberrrrrrrrrr", task_number)
 
-        if task_number > 0:
-    
-            space = self.params.mem_size
-            pointer = 0  # This will keep track of where to insert in M
-            
-            for j in range(task_number+1):  
-                portion = space // (task_number + 1 - j)  # Use integer division for portion size
-                
-                # Fill the buffer
-                for k in range(portion):
-                    if task_number != j:
-                        self.buffer.buffer_img[pointer] = self.buffer.buffer_img[j*self.params.mem_size//task_number + k]
-                        self.buffer.buffer_label[pointer] = self.buffer.buffer_label[j*self.params.mem_size//task_number + k]
-                        pointer += 1
-                    else:
-                        self.buffer.buffer_img[pointer] = all_images.to(device)[k]
-                        self.buffer.buffer_label[pointer] = all_labels.to(device)[k]
-                        pointer += 1
-                    
-                space -= portion
 
 
         
@@ -288,14 +268,34 @@ class SupContrastReplay(ContinualLearner):
                         self.opt.step()
 
                 # update mem
-                #if count_ == self.buffer.buffer_label.shape[0]:
-                self.buffer.update(batch_x, batch_y)
+                if count_ == self.buffer.buffer_label.shape[0]:
+                    self.buffer.update(batch_x, batch_y)
                 if i % 100 == 1 and self.verbose:
                         print(
                             '==>>> it: {}, avg. loss: {:.6f}, '
                                 .format(i, losses.avg(), acc_batch.avg())
                         )
 
+        if task_number > 0:
+    
+            space = self.params.mem_size
+            pointer = 0  # This will keep track of where to insert in M
+            
+            for j in range(task_number+1):  
+                portion = space // (task_number + 1 - j)  # Use integer division for portion size
+                
+                # Fill the buffer
+                for k in range(portion):
+                    if task_number != j:
+                        self.buffer.buffer_img[pointer] = self.buffer.buffer_img[j*self.params.mem_size//task_number + k]
+                        self.buffer.buffer_label[pointer] = self.buffer.buffer_label[j*self.params.mem_size//task_number + k]
+                        pointer += 1
+                    else:
+                        self.buffer.buffer_img[pointer] = all_images.to(device)[k]
+                        self.buffer.buffer_label[pointer] = all_labels.to(device)[k]
+                        pointer += 1
+                    
+                space -= portion
 
         #print("self.buffer.buffer_img", self.buffer.buffer_img.shape, type(self.buffer.buffer_img))
         #print("self.buffer.buffer_label", self.buffer.buffer_label.shape, type(self.buffer.buffer_label), self.buffer.buffer_label)
