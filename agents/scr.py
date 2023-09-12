@@ -33,7 +33,7 @@ class SupContrastReplay(ContinualLearner):
         self.soft_ = nn.Softmax(dim=1)
     
     
-    def train_learner(self, x_train, y_train):        
+    def train_learner(self, x_train, y_train, task_number):        
         self.before_train(x_train, y_train)
         #print("y_trainnnnnnn", y_train.shape, type(y_train), y_train)
         #print("x_trainnnnnnn", x_train.shape, type(x_train))
@@ -50,7 +50,7 @@ class SupContrastReplay(ContinualLearner):
         for _, labels in train_loader:
             unique_classes.update(labels.numpy())
         
-        if count_ != self.buffer.buffer_label.shape[0]:
+        '''if count_ != self.buffer.buffer_label.shape[0]:
             unique_classes.update(self.buffer.buffer_label.cpu().numpy())
             #print("self.buffer.buffer_img.cpu().numpy().shape", self.buffer.buffer_img.cpu().numpy().shape)
             #print("self.buffer.buffer_img.permute(0, 3, 1, 2).cpu().numpy().shape", self.buffer.buffer_img.permute(0, 3, 1, 2).cpu().numpy().shape)
@@ -69,7 +69,7 @@ class SupContrastReplay(ContinualLearner):
             merged_dataset = train_dataset
             merged_loader = train_loader
 
-        #print(f"Number of unique classes: {len(unique_classes)}", unique_classes)
+        #print(f"Number of unique classes: {len(unique_classes)}", unique_classes)'''
 
         device = "cuda"
         Model_Carto = ResNet18(len(unique_classes))
@@ -95,14 +95,14 @@ class SupContrastReplay(ContinualLearner):
         
         # Training
         Carto = []
-        for epoch_ in range(30):
+        for epoch_ in range(18):
             print('\nEpoch: %d' % epoch_)
             Model_Carto.train()
             train_loss = 0
             correct = 0
             total = 0
             confidence_epoch = []
-            for batch_idx, (inputs, targets) in enumerate(merged_loader):
+            for batch_idx, (inputs, targets) in enumerate(train_loader):
                 inputs, targets = inputs.to(device), targets.to(device)
 
                 #print("targets", targets)
@@ -168,8 +168,10 @@ class SupContrastReplay(ContinualLearner):
 
 
         # Number of top values you're interested in
-        top_n = self.params.mem_size
-        
+        top_n = (self.params.mem_size//(task_number+1)) + 1
+
+
+
         # Find the indices that would sort the array
         sorted_indices_1 = np.argsort(Confidence_mean.numpy())
         sorted_indices_2 = np.argsort(Variability.numpy())
@@ -181,16 +183,26 @@ class SupContrastReplay(ContinualLearner):
         
         #print("top_indicesssss", top_indices.shape, top_indices, type(top_indices))
 
-        top_indices_12 = np.concatenate((top_indices_1, top_indices_2))
-        top_indices_123 = np.concatenate((top_indices_12, top_indices_3))
+        top_indices_12 = np.concatenate((top_indices_2, top_indices_3))
+        top_indices_123 = np.concatenate((top_indices_12, top_indices_1))
         
-        # If you want these indices in ascending order, you can sort them
-        top_indices_sorted = np.sort(top_indices_123)
+        top_indices_sorted = top_indices_123
+        
+
+    
+        
+        # Take the last 'top_n' indices (i.e., the top values)
+        ##top_indices_1 = sorted_indices_1[:top_n]
+        
+        #top_indices_sorted = top_indices_1[::-1]
+        ##top_indices_sorted = top_indices_1
         
         #print("top_indices_sorted", top_indices_sorted, top_indices_sorted.shape)
         print("top_indices_sorted.shape", top_indices_sorted.shape)
+
         
-        subset_data = torch.utils.data.Subset(merged_dataset, top_indices_sorted)
+        
+        subset_data = torch.utils.data.Subset(train_dataset, top_indices_sorted)
         #print("subset_dataaaaaaaa", subset_data)
         trainloader_C = torch.utils.data.DataLoader(subset_data, batch_size=self.batch, shuffle=False, num_workers=0)
 
@@ -207,6 +219,33 @@ class SupContrastReplay(ContinualLearner):
         #print(all_images.shape)  # This should print something like torch.Size([50000, 3, 32, 32]) depending on your DataLoader's batch size
         #print(all_labels.shape)  # This should print torch.Size([50000])
 
+
+
+        #print("task_numberrrrrrrrrr", task_number)
+
+        if task_number > 0:
+    
+            space = self.params.mem_size
+            pointer = 0  # This will keep track of where to insert in M
+            
+            for j in range(task_number+1):  
+                portion = space // (task_number + 1 - j)  # Use integer division for portion size
+                
+                # Fill the buffer
+                for k in range(portion):
+                    if task_number != j:
+                        self.buffer.buffer_img[pointer] = self.buffer.buffer_img[j*self.params.mem_size//task_number + k]
+                        self.buffer.buffer_label[pointer] = self.buffer.buffer_label[j*self.params.mem_size//task_number + k]
+                        pointer += 1
+                    else:
+                        self.buffer.buffer_img[pointer] = all_images.to(device)[k]
+                        self.buffer.buffer_label[pointer] = all_labels.to(device)[k]
+                        pointer += 1
+                    
+                space -= portion
+
+
+        
         # set up model
         self.model = self.model.train()
 
@@ -249,7 +288,8 @@ class SupContrastReplay(ContinualLearner):
                         self.opt.step()
 
                 # update mem
-                self.buffer.update(batch_x, batch_y)
+                if count_ == self.buffer.buffer_label.shape[0]:
+                    self.buffer.update(batch_x, batch_y)
                 if i % 100 == 1 and self.verbose:
                         print(
                             '==>>> it: {}, avg. loss: {:.6f}, '
@@ -260,8 +300,9 @@ class SupContrastReplay(ContinualLearner):
         #print("self.buffer.buffer_img", self.buffer.buffer_img.shape, type(self.buffer.buffer_img))
         #print("self.buffer.buffer_label", self.buffer.buffer_label.shape, type(self.buffer.buffer_label), self.buffer.buffer_label)
 
-        self.buffer.buffer_img = all_images.to(device)
-        self.buffer.buffer_label = all_labels.to(device)
+        if count_ == self.buffer.buffer_label.shape[0]:
+            self.buffer.buffer_img = all_images.to(device)
+            self.buffer.buffer_label = all_labels.to(device)
 
         #print("self.buffer.buffer_img", self.buffer.buffer_img.shape, type(self.buffer.buffer_img))
         #print("self.buffer.buffer_label", self.buffer.buffer_label.shape, type(self.buffer.buffer_label), self.buffer.buffer_label)
