@@ -1,4 +1,4 @@
-import torch
+import torch #new strategy where we do fair.
 from torch.utils import data
 from utils.buffer.buffer import Buffer
 from agents.base import ContinualLearner
