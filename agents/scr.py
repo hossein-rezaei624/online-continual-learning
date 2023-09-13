@@ -315,5 +315,6 @@ class SupContrastReplay(ContinualLearner):
                 self.buffer.buffer_img[i] = all_images.to(device)[counter]
                 counter +=1
 
+        print("counter", counter)
         
         self.after_train()
