@@ -168,8 +168,8 @@ class SupContrastReplay(ContinualLearner):
 
 
         # Number of top values you're interested in
-        top_n = (self.params.mem_size//(task_number+1)) + 1
-
+        #top_n = (self.params.mem_size//(task_number+1)) + 1
+        top_n = self.params.mem_size
 
 
         # Find the indices that would sort the array
@@ -308,14 +308,12 @@ class SupContrastReplay(ContinualLearner):
 
 
         print("unique_classes", unique_classes)
+        counter = 0
         for i in range(self.buffer.buffer_label.shape[0]):
             if self.buffer.buffer_label[i].item() in unique_classes:
-                print("yesyes")
-            print("self.buffer.buffer_label[i]", self.buffer.buffer_label[i])
-            print("self.buffer.buffer_label[i].item()", self.buffer.buffer_label[i].item())
-
-
-
+                self.buffer.buffer_label[i] = all_labels.to(device)[counter]
+                self.buffer.buffer_img[i] = all_images.to(device)[counter]
+                counter +=1
 
         
         self.after_train()
