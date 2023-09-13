@@ -41,8 +41,6 @@ class SupContrastReplay(ContinualLearner):
         train_dataset = dataset_transform(x_train, y_train, transform=transforms_match[self.data])
         train_loader = data.DataLoader(train_dataset, batch_size=self.batch, shuffle=False, num_workers=0,
                                        drop_last=True)
-        train_loader1 = data.DataLoader(train_dataset, batch_size=128, shuffle=False, num_workers=0,
-                                       drop_last=True)
         
         unique_classes = set()
         
@@ -77,7 +75,7 @@ class SupContrastReplay(ContinualLearner):
         Model_Carto = ResNet18(len(unique_classes))
         Model_Carto = Model_Carto.to(device)
         criterion_ = nn.CrossEntropyLoss()
-        optimizer_ = optim.SGD(Model_Carto.parameters(), lr=0.1,
+        optimizer_ = optim.SGD(Model_Carto.parameters(), lr=0.01,
                               momentum=0.9, weight_decay=5e-4)
         scheduler_ = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer_, T_max=200)
         
@@ -104,7 +102,7 @@ class SupContrastReplay(ContinualLearner):
             correct = 0
             total = 0
             confidence_epoch = []
-            for batch_idx, (inputs, targets) in enumerate(train_loader1):
+            for batch_idx, (inputs, targets) in enumerate(train_loader):
                 inputs, targets = inputs.to(device), targets.to(device)
 
                 #print("targets", targets)
