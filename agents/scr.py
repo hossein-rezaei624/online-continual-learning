@@ -169,7 +169,7 @@ class SupContrastReplay(ContinualLearner):
 
         # Number of top values you're interested in
         #top_n = (self.params.mem_size//(task_number+1)) + 1
-        top_n = (self.params.mem_size//(task_number+1)) + 500
+        top_n = (self.params.mem_size//(task_number+1)) + 50
 
 
         # Find the indices that would sort the array
@@ -177,24 +177,24 @@ class SupContrastReplay(ContinualLearner):
         sorted_indices_2 = np.argsort(Variability.numpy())
         
         # Take the last 'top_n' indices (i.e., the top values)
-        ##top_indices_1 = sorted_indices_1[:int(0.98*top_n)]
-        ##top_indices_2 = sorted_indices_1[-int(0.01*top_n):]
-        ##top_indices_3 = sorted_indices_2[-(top_n - (int(0.98*top_n) + int(0.01*top_n))):]
+        top_indices_1 = sorted_indices_1[:int(0.95*top_n)]
+        top_indices_2 = sorted_indices_1[-int(0.025*top_n):]
+        top_indices_3 = sorted_indices_2[-(top_n - (int(0.95*top_n) + int(0.025*top_n))):]
         
         #print("top_indicesssss", top_indices.shape, top_indices, type(top_indices))
 
-        ##top_indices_12 = np.concatenate((top_indices_2, top_indices_3))
-        ##top_indices_123 = np.concatenate((top_indices_12, top_indices_1))
+        top_indices_12 = np.concatenate((top_indices_2, top_indices_3))
+        top_indices_123 = np.concatenate((top_indices_12, top_indices_1))
         
-        ##top_indices_sorted = top_indices_123
+        top_indices_sorted = top_indices_123
         
 
     
         
         # Take the last 'top_n' indices (i.e., the top values)
-        top_indices_1 = sorted_indices_1[:top_n]
+        #top_indices_1 = sorted_indices_1[:top_n]
         
-        top_indices_sorted = top_indices_1[::-1]
+        #top_indices_sorted = top_indices_1[::-1]
         #top_indices_sorted = top_indices_1
         
         #print("top_indices_sorted", top_indices_sorted, top_indices_sorted.shape)
