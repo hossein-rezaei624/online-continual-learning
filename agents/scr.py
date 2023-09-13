@@ -309,9 +309,10 @@ class SupContrastReplay(ContinualLearner):
 
         print("unique_classes", unique_classes)
         for i in range(self.buffer.buffer_label.shape[0]):
-            if self.buffer.buffer_label[i] in unique_classes:
+            if self.buffer.buffer_label[i].item() in unique_classes:
                 print("yesyes")
             print("self.buffer.buffer_label[i]", self.buffer.buffer_label[i])
+            print("self.buffer.buffer_label[i].item()", self.buffer.buffer_label[i].item())
 
 
 
