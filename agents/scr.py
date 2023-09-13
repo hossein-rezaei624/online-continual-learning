@@ -169,7 +169,7 @@ class SupContrastReplay(ContinualLearner):
 
         # Number of top values you're interested in
         #top_n = (self.params.mem_size//(task_number+1)) + 1
-        top_n = self.params.mem_size
+        top_n = (self.params.mem_size//(task_number+1)) + 500
 
 
         # Find the indices that would sort the array
@@ -192,7 +192,7 @@ class SupContrastReplay(ContinualLearner):
     
         
         # Take the last 'top_n' indices (i.e., the top values)
-        top_indices_1 = sorted_indices_1[-top_n:]
+        top_indices_1 = sorted_indices_1[:top_n]
         
         top_indices_sorted = top_indices_1[::-1]
         #top_indices_sorted = top_indices_1
