@@ -307,9 +307,9 @@ class SupContrastReplay(ContinualLearner):
         #print("self.buffer.buffer_label", self.buffer.buffer_label.shape, type(self.buffer.buffer_label), self.buffer.buffer_label)
 
 
-
-        for i in range(self.buffer.buffer_label.shape[0]):
-            s
+        print("unique_classes", unique_classes)
+        #for i in range(self.buffer.buffer_label.shape[0]):
+            #s
 
 
 
