@@ -169,7 +169,10 @@ class SupContrastReplay(ContinualLearner):
 
         # Number of top values you're interested in
         #top_n = (self.params.mem_size//(task_number+1)) + 1
-        top_n = (self.params.mem_size//(task_number+1)) + 50
+        if task_number == 0:
+            top_n = self.params.mem_size
+        else:
+            top_n = (self.params.mem_size//(task_number+1)) + 50
 
 
         # Find the indices that would sort the array
