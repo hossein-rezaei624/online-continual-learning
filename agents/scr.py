@@ -75,7 +75,7 @@ class SupContrastReplay(ContinualLearner):
         Model_Carto = ResNet18(len(unique_classes))
         Model_Carto = Model_Carto.to(device)
         criterion_ = nn.CrossEntropyLoss()
-        optimizer_ = optim.SGD(Model_Carto.parameters(), lr=0.001,
+        optimizer_ = optim.SGD(Model_Carto.parameters(), lr=0.01,
                               momentum=0.9, weight_decay=5e-4)
         scheduler_ = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer_, T_max=200)
         
@@ -192,10 +192,10 @@ class SupContrastReplay(ContinualLearner):
     
         
         # Take the last 'top_n' indices (i.e., the top values)
-        top_indices_1 = sorted_indices_1[:top_n]
+        top_indices_1 = sorted_indices_1[-top_n:]
         
-        #top_indices_sorted = top_indices_1[::-1]
-        top_indices_sorted = top_indices_1
+        top_indices_sorted = top_indices_1[::-1]
+        #top_indices_sorted = top_indices_1
         
         #print("top_indices_sorted", top_indices_sorted, top_indices_sorted.shape)
         print("top_indices_sorted.shape", top_indices_sorted.shape)
