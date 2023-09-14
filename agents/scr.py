@@ -192,7 +192,7 @@ class SupContrastReplay(ContinualLearner):
     
         
         # Take the last 'top_n' indices (i.e., the top values)
-        top_indices_1 = sorted_indices_2[-top_n:]
+        top_indices_1 = sorted_indices_1[-top_n:]
         
         top_indices_sorted = top_indices_1[::-1]
         #top_indices_sorted = top_indices_1
