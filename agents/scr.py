@@ -75,7 +75,7 @@ class SupContrastReplay(ContinualLearner):
         Model_Carto = ResNet18(len(unique_classes))
         Model_Carto = Model_Carto.to(device)
         criterion_ = nn.CrossEntropyLoss()
-        optimizer_ = optim.SGD(Model_Carto.parameters(), lr=1.0,
+        optimizer_ = optim.SGD(Model_Carto.parameters(), lr=0.00001,
                               momentum=0.9, weight_decay=5e-4)
         scheduler_ = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer_, T_max=200)
         
