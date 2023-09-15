@@ -121,7 +121,7 @@ class SupContrastReplay(ContinualLearner):
         
         # Training
         Carto = []
-        for epoch_ in range(7):
+        for epoch_ in range(6):
             print('\nEpoch: %d' % epoch_)
             Model_Carto.train()
             train_loss = 0
@@ -228,7 +228,7 @@ class SupContrastReplay(ContinualLearner):
 
         
         
-        subset_data = torch.utils.data.Subset(train_dataset, top_indices_sorted)
+        subset_data = torch.utils.data.Subset(trainset, top_indices_sorted)
         #print("subset_dataaaaaaaa", subset_data)
         trainloader_C = torch.utils.data.DataLoader(subset_data, batch_size=self.batch, shuffle=False, num_workers=0)
 
@@ -280,7 +280,7 @@ class SupContrastReplay(ContinualLearner):
         acc_batch = AverageMeter()
         
         for ep in range(self.epoch):
-            for i, batch_data in enumerate(train_loader):
+            for i, batch_data in enumerate(subset_loader_train):
                 # batch update
                 batch_x, batch_y = batch_data
                 batch_x = maybe_cuda(batch_x, self.cuda)
