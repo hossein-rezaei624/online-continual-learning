@@ -61,7 +61,7 @@ class SupContrastReplay(ContinualLearner):
         
 
         transform_train = transforms.Compose([transforms.ToTensor(),])
-        trainset = torchvision.datasets.CIFAR100(root='./data', train=True, download=True, transform=transforms_match[self.data])
+        trainset = torchvision.datasets.CIFAR100(root='./data', train=True, download=True, transform=transform_train)
         subset_indices_train = [idx for idx, (_, target) in enumerate(trainset) if target in sets[task_number]]
         subset_loader_train = torch.utils.data.DataLoader(torch.utils.data.Subset(trainset, subset_indices_train),
                                                           batch_size=10, shuffle=False, num_workers=0, drop_last=True)
@@ -228,7 +228,7 @@ class SupContrastReplay(ContinualLearner):
 
         
         
-        subset_data = torch.utils.data.Subset(trainset, top_indices_sorted)
+        subset_data = torch.utils.data.Subset(train_dataset, top_indices_sorted)
         #print("subset_dataaaaaaaa", subset_data)
         trainloader_C = torch.utils.data.DataLoader(subset_data, batch_size=self.batch, shuffle=False, num_workers=0)
 
@@ -280,7 +280,7 @@ class SupContrastReplay(ContinualLearner):
         acc_batch = AverageMeter()
         
         for ep in range(self.epoch):
-            for i, batch_data in enumerate(subset_loader_train):
+            for i, batch_data in enumerate(train_loader):
                 # batch update
                 batch_x, batch_y = batch_data
                 batch_x = maybe_cuda(batch_x, self.cuda)
