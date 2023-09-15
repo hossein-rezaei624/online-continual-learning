@@ -121,7 +121,7 @@ class SupContrastReplay(ContinualLearner):
         
         # Training
         Carto = []
-        for epoch_ in range(6):
+        for epoch_ in range(4):
             print('\nEpoch: %d' % epoch_)
             Model_Carto.train()
             train_loss = 0
