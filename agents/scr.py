@@ -8,7 +8,7 @@ from utils.utils import maybe_cuda, AverageMeter
 from kornia.augmentation import RandomResizedCrop, RandomHorizontalFlip, ColorJitter, RandomGrayscale
 import torch.nn as nn
 
-from models.resnet1 import *
+from models.resnet import ResNet18
 import numpy as np
 import torch.optim as optim
 import torch.nn as nn
@@ -104,7 +104,7 @@ class SupContrastReplay(ContinualLearner):
         #print(f"Number of unique classes: {len(unique_classes)}", unique_classes)'''
 
         device = "cuda"
-        Model_Carto = ResNet18()
+        Model_Carto = ResNet18(len(unique_classes))
         Model_Carto = Model_Carto.to(device)
         criterion_ = nn.CrossEntropyLoss()
         optimizer_ = optim.SGD(Model_Carto.parameters(), lr=0.1,
@@ -224,10 +224,10 @@ class SupContrastReplay(ContinualLearner):
     
         
         # Take the last 'top_n' indices (i.e., the top values)
-        top_indices_1 = sorted_indices_1[-top_n:]
+        top_indices_1 = sorted_indices_1[:top_n]
         
-        top_indices_sorted = top_indices_1[::-1]
-        #top_indices_sorted = top_indices_1
+        #top_indices_sorted = top_indices_1[::-1]
+        top_indices_sorted = top_indices_1
         
         #print("top_indices_sorted", top_indices_sorted, top_indices_sorted.shape)
         print("top_indices_sorted.shape", top_indices_sorted.shape)
