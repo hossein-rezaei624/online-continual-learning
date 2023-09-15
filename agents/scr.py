@@ -66,7 +66,7 @@ class SupContrastReplay(ContinualLearner):
         subset_loader_train = torch.utils.data.DataLoader(torch.utils.data.Subset(trainset, subset_indices_train),
                                                           batch_size=10, shuffle=False, num_workers=0, drop_last=True)
         
-
+        print("sets[task_number]", sets[task_number])
         
         unique_classes = set()
         
