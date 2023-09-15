@@ -15,6 +15,7 @@ import torch.nn as nn
 import matplotlib.pyplot as plt
 from torch.utils.data import ConcatDataset
 import random
+import torchvision.transforms as transforms
 
 class SupContrastReplay(ContinualLearner):
     def __init__(self, model, opt, params):
