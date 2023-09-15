@@ -41,6 +41,16 @@ class SupContrastReplay(ContinualLearner):
         train_dataset = dataset_transform(x_train, y_train, transform=transforms_match[self.data])
         train_loader = data.DataLoader(train_dataset, batch_size=self.batch, shuffle=False, num_workers=0,
                                        drop_last=True)
+
+
+
+        transform_train = transforms.Compose([transforms.ToTensor(),])
+        trainset = torchvision.datasets.CIFAR100(root='./data', train=True, download=True, transform=transform_train)
+        subset_indices_train = [idx for idx, (_, target) in enumerate(trainset) if target in [26, 86, 2, 55, 75, 93, 16, 73, 54, 95]]
+        subset_loader_train = torch.utils.data.DataLoader(torch.utils.data.Subset(trainset, subset_indices_train),
+                                                          batch_size=10, shuffle=False, num_workers=0, drop_last=True)
+        
+
         
         unique_classes = set()
         
@@ -102,7 +112,7 @@ class SupContrastReplay(ContinualLearner):
             correct = 0
             total = 0
             confidence_epoch = []
-            for batch_idx, (inputs, targets) in enumerate(train_loader):
+            for batch_idx, (inputs, targets) in enumerate(subset_loader_train):
                 inputs, targets = inputs.to(device), targets.to(device)
 
                 #print("targets", targets)
