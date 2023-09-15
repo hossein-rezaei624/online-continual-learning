@@ -104,7 +104,7 @@ class SupContrastReplay(ContinualLearner):
         #print(f"Number of unique classes: {len(unique_classes)}", unique_classes)'''
 
         device = "cuda"
-        Model_Carto = ResNet18()
+        Model_Carto = Reduced_ResNet18(len(unique_classes))
         Model_Carto = Model_Carto.to(device)
         criterion_ = nn.CrossEntropyLoss()
         optimizer_ = optim.SGD(Model_Carto.parameters(), lr=0.1,
