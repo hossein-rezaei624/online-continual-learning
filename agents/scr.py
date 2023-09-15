@@ -266,7 +266,7 @@ class SupContrastReplay(ContinualLearner):
         acc_batch = AverageMeter()
         
         for ep in range(self.epoch):
-            for i, batch_data in enumerate(train_loader):
+            for i, batch_data in enumerate(subset_loader_train):
                 # batch update
                 batch_x, batch_y = batch_data
                 batch_x = maybe_cuda(batch_x, self.cuda)
