@@ -199,59 +199,6 @@ class SupContrastReplay(ContinualLearner):
         plt.savefig('scatter_plot.png')
 
 
-        # Number of top values you're interested in
-        #top_n = (self.params.mem_size//(task_number+1)) + 1
-        top_n = (self.params.mem_size//(task_number+1)) + 30
-
-
-        # Find the indices that would sort the array
-        sorted_indices_1 = np.argsort(Confidence_mean.numpy())
-        sorted_indices_2 = np.argsort(Variability.numpy())
-        
-        # Take the last 'top_n' indices (i.e., the top values)
-        top_indices_1 = sorted_indices_1[:(top_n - (int(0.33*top_n) + int(0.33*top_n)))] #hard to learn
-        top_indices_2 = sorted_indices_1[-int(0.33*top_n):] #easy to learn
-        top_indices_3 = sorted_indices_2[-int(0.33*top_n):] #ambigiuous
-        
-        #print("top_indicesssss", top_indices.shape, top_indices, type(top_indices))
-
-        top_indices_12 = np.concatenate((top_indices_2, top_indices_3))
-        top_indices_123 = np.concatenate((top_indices_12, top_indices_1))
-        
-        top_indices_sorted = top_indices_123
-        
-
-    
-        
-        # Take the last 'top_n' indices (i.e., the top values)
-        #top_indices_1 = sorted_indices_1[:top_n]
-        
-        #top_indices_sorted = top_indices_1[::-1]
-        #top_indices_sorted = top_indices_1
-        
-        #print("top_indices_sorted", top_indices_sorted, top_indices_sorted.shape)
-        print("top_indices_sorted.shape", top_indices_sorted.shape)
-
-        
-        
-        subset_data = torch.utils.data.Subset(train_dataset, top_indices_sorted)
-        #print("subset_dataaaaaaaa", subset_data)
-        trainloader_C = torch.utils.data.DataLoader(subset_data, batch_size=self.batch, shuffle=False, num_workers=0)
-
-        images_list = []
-        labels_list = []
-        
-        for images, labels in trainloader_C:  # Assuming train_loader is your DataLoader
-            images_list.append(images)
-            labels_list.append(labels)
-        
-        all_images = torch.cat(images_list, dim=0)
-        all_labels = torch.cat(labels_list, dim=0)
-        
-        #print(all_images.shape)  # This should print something like torch.Size([50000, 3, 32, 32]) depending on your DataLoader's batch size
-        #print(all_labels.shape)  # This should print torch.Size([50000])
-
-
 
         #print("task_numberrrrrrrrrr", task_number)
 
@@ -339,6 +286,67 @@ class SupContrastReplay(ContinualLearner):
         #print("self.buffer.buffer_label", self.buffer.buffer_label.shape, type(self.buffer.buffer_label), self.buffer.buffer_label)
 
 
+        counter__ = 0
+        for i in range(self.buffer.buffer_label.shape[0]):
+            if self.buffer.buffer_label[i].item() in unique_classes:
+                counter__ +=1
+
+
+        # Number of top values you're interested in
+        #top_n = (self.params.mem_size//(task_number+1)) + 1
+        top_n = counter__
+
+
+        # Find the indices that would sort the array
+        sorted_indices_1 = np.argsort(Confidence_mean.numpy())
+        sorted_indices_2 = np.argsort(Variability.numpy())
+        
+        # Take the last 'top_n' indices (i.e., the top values)
+        top_indices_1 = sorted_indices_1[:(top_n - (int(0.33*top_n) + int(0.33*top_n)))] #hard to learn
+        top_indices_2 = sorted_indices_1[-int(0.33*top_n):] #easy to learn
+        top_indices_3 = sorted_indices_2[-int(0.33*top_n):] #ambigiuous
+        
+        #print("top_indicesssss", top_indices.shape, top_indices, type(top_indices))
+
+        top_indices_12 = np.concatenate((top_indices_1, top_indices_2))
+        top_indices_123 = np.concatenate((top_indices_12, top_indices_3))
+        
+        top_indices_sorted = top_indices_123
+        
+
+    
+        
+        # Take the last 'top_n' indices (i.e., the top values)
+        #top_indices_1 = sorted_indices_1[:top_n]
+        
+        #top_indices_sorted = top_indices_1[::-1]
+        #top_indices_sorted = top_indices_1
+        
+        #print("top_indices_sorted", top_indices_sorted, top_indices_sorted.shape)
+        print("top_indices_sorted.shape", top_indices_sorted.shape)
+
+        
+        
+        subset_data = torch.utils.data.Subset(train_dataset, top_indices_sorted)
+        #print("subset_dataaaaaaaa", subset_data)
+        trainloader_C = torch.utils.data.DataLoader(subset_data, batch_size=self.batch, shuffle=False, num_workers=0)
+
+        images_list = []
+        labels_list = []
+        
+        for images, labels in trainloader_C:  # Assuming train_loader is your DataLoader
+            images_list.append(images)
+            labels_list.append(labels)
+        
+        all_images = torch.cat(images_list, dim=0)
+        all_labels = torch.cat(labels_list, dim=0)
+        
+        #print(all_images.shape)  # This should print something like torch.Size([50000, 3, 32, 32]) depending on your DataLoader's batch size
+        #print(all_labels.shape)  # This should print torch.Size([50000])
+
+
+        
+
         print("unique_classes", unique_classes)
         counter = 0
         for i in range(self.buffer.buffer_label.shape[0]):
@@ -350,3 +358,4 @@ class SupContrastReplay(ContinualLearner):
         print("counter", counter)
         
         self.after_train()
+
