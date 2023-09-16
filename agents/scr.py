@@ -308,8 +308,8 @@ class SupContrastReplay(ContinualLearner):
         
         #print("top_indicesssss", top_indices.shape, top_indices, type(top_indices))
 
-        top_indices_12 = np.concatenate((top_indices_1, top_indices_2))
-        top_indices_123 = np.concatenate((top_indices_12, top_indices_3))
+        top_indices_12 = np.concatenate((top_indices_2, top_indices_3))
+        top_indices_123 = np.concatenate((top_indices_12, top_indices_1))
         
         top_indices_sorted = top_indices_123
         
