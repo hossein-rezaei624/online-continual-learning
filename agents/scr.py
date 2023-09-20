@@ -364,8 +364,8 @@ class SupContrastReplay(ContinualLearner):
             if counter_class == full:
                 break
         
-        all_images_ = torch.tensor(images_list_)
-        all_labels_ = torch.tensor(labels_list_)
+        all_images_ = torch.stack(images_list_)
+        all_labels_ = torch.stack(labels_list_)
         print("all_images_.shapeall_images_.shape",all_images_.shape)
         print("all_labels_.shapeall_labels_.shape",all_labels_.shape)
 
