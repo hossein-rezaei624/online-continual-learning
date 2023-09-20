@@ -366,7 +366,6 @@ class SupContrastReplay(ContinualLearner):
                 counter_class[mapping[all_labels[-i].item()]] += 1
                 labels_list_.append(all_labels[-i])
                 images_list_.append(all_images[-i])
-                print("innerrrr")
             if counter_class == full:
                 print("yessssss")
                 break
