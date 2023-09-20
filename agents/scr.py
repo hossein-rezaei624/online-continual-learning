@@ -352,7 +352,7 @@ class SupContrastReplay(ContinualLearner):
 
         num_per_class = top_n//len(unique_classes)
         counter_class = [0 for _ in range(len(unique_classes))]
-        full = [math.ceil(num_per_class) for _ in range(len(unique_classes))]
+        full = [math.ceil(top_n/len(unique_classes)) for _ in range(len(unique_classes))]
 
         images_list_ = []
         labels_list_ = []
