@@ -340,8 +340,6 @@ class SupContrastReplay(ContinualLearner):
         for images, labels in trainloader_C:  # Assuming train_loader is your DataLoader
             images_list.append(images)
             labels_list.append(labels)
-            print("labelslabels", labels)
-            print("imagesimages", images)
         
         all_images = torch.cat(images_list, dim=0)
         all_labels = torch.cat(labels_list, dim=0)
@@ -363,13 +361,13 @@ class SupContrastReplay(ContinualLearner):
                 counter_class[mapping[all_labels[i].item()]] += 1
                 labels_list_.append(all_labels[i])
                 images_list_.append(all_images[i])
-                print("all_labels[i]all_labels[i]", all_labels[i])
-                print("all_images[i]all_images[i]", all_images[i])
             if counter_class == full:
                 break
         
-        all_images_ = torch.cat(images_list_, dim=0)
-        all_labels_ = torch.cat(labels_list_, dim=0)
+        all_images_ = torch.tensor(np.ndarray(images_list_))
+        all_labels_ = torch.tensor(np.ndarray(labels_list_))
+        print("all_images_.shapeall_images_.shape",all_images_.shape)
+        print("all_labels_.shapeall_labels_.shape",all_labels_.shape)
 
         
         print("unique_classes", unique_classes)
