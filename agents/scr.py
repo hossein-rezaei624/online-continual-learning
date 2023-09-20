@@ -355,9 +355,9 @@ class SupContrastReplay(ContinualLearner):
 
         images_list_ = []
         labels_list_ = []
-        print("all_labels.shape[0]all_labels.shape[0]", all_labels.shape[0])
-        print("counter_class[mapping[26]]counter_class[mapping[26]]", counter_class[mapping[26]])
-        for i in range(all_labels.shape[0]): 
+        
+        for i in range(all_labels.shape[0]):
+            print("all_labels[i]all_labels[i]", all_labels[i])
             if counter_class[mapping[all_labels[i]]] < (num_per_class + 1):
                 counter_class[mapping[all_labels[i]]] += 1
                 labels_list_.append(all_labels[i])
