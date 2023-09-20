@@ -127,7 +127,7 @@ class SupContrastReplay(ContinualLearner):
         
         # Training
         Carto = []
-        for epoch_ in range(6):
+        for epoch_ in range(2):
             print('\nEpoch: %d' % epoch_)
             Model_Carto.train()
             train_loss = 0
@@ -355,7 +355,8 @@ class SupContrastReplay(ContinualLearner):
 
         images_list_ = []
         labels_list_ = []
-        
+        print("all_labels.shape[0]all_labels.shape[0]", all_labels.shape[0])
+        print("counter_class[mapping[26]]counter_class[mapping[26]]", counter_class[mapping[26]])
         for i in range(all_labels.shape[0]): 
             if counter_class[mapping[all_labels[i]]] < (num_per_class + 1):
                 counter_class[mapping[all_labels[i]]] += 1
