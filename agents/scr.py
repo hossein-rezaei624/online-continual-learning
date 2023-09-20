@@ -302,32 +302,38 @@ class SupContrastReplay(ContinualLearner):
         sorted_indices_2 = np.argsort(Variability.numpy())
         
         # Take the last 'top_n' indices (i.e., the top values)
-        top_indices_1 = sorted_indices_1[:(top_n - (int(0.33*top_n) + int(0.33*top_n)))] #hard to learn
-        top_indices_2 = sorted_indices_1[-int(0.33*top_n):] #easy to learn
-        top_indices_3 = sorted_indices_2[-int(0.33*top_n):] #ambigiuous
+        #top_indices_1 = sorted_indices_1[:(top_n - (int(0.33*top_n) + int(0.33*top_n)))] #hard to learn
+        #top_indices_2 = sorted_indices_1[-int(0.33*top_n):] #easy to learn
+        #top_indices_3 = sorted_indices_2[-int(0.33*top_n):] #ambigiuous
         
         #print("top_indicesssss", top_indices.shape, top_indices, type(top_indices))
 
-        top_indices_12 = np.concatenate((top_indices_2, top_indices_3))
-        top_indices_123 = np.concatenate((top_indices_12, top_indices_1))
+        #top_indices_12 = np.concatenate((top_indices_2, top_indices_3))
+        #top_indices_123 = np.concatenate((top_indices_12, top_indices_1))
         
-        top_indices_sorted = top_indices_123
-        
+        #top_indices_sorted = top_indices_123
 
-    
+        
+        
+        num_per_class = top_n//len(unique_classes)
+        #for i in range(top_n):
+         #   if 
+
+        
         
         # Take the last 'top_n' indices (i.e., the top values)
-        #top_indices_1 = sorted_indices_1[:top_n]
+        top_indices_1 = sorted_indices_1[:top_n]
         
         #top_indices_sorted = top_indices_1[::-1]
-        #top_indices_sorted = top_indices_1
+        top_indices_sorted = top_indices_1
         
         #print("top_indices_sorted", top_indices_sorted, top_indices_sorted.shape)
         print("top_indices_sorted.shape", top_indices_sorted.shape)
 
         
-        
+        print("top_indices_sortedtop_indices_sorted", top_indices_sorted)
         subset_data = torch.utils.data.Subset(train_dataset, top_indices_sorted)
+        #subset_data = torch.utils.data.Subset(train_dataset, [0, 5])
         #print("subset_dataaaaaaaa", subset_data)
         trainloader_C = torch.utils.data.DataLoader(subset_data, batch_size=self.batch, shuffle=False, num_workers=0)
 
