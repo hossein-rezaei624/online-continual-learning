@@ -340,7 +340,6 @@ class SupContrastReplay(ContinualLearner):
         for images, labels in trainloader_C:  # Assuming train_loader is your DataLoader
             images_list.append(images)
             labels_list.append(labels)
-            print("labelslabels", type(labels), labels)
         
         all_images = torch.cat(images_list, dim=0)
         all_labels = torch.cat(labels_list, dim=0)
