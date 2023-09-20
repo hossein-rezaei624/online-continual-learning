@@ -315,24 +315,22 @@ class SupContrastReplay(ContinualLearner):
 
         
         
-        num_per_class = top_n//len(unique_classes)
-        #for i in range(top_n):
-         #   if 
-
-        
-        
         # Take the last 'top_n' indices (i.e., the top values)
-        top_indices_1 = sorted_indices_1[:top_n]
+        #top_indices_1 = sorted_indices_1[:top_n]
         
         #top_indices_sorted = top_indices_1[::-1]
-        top_indices_sorted = top_indices_1
+        #top_indices_sorted = top_indices_1
+
+
+        top_indices_sorted = sorted_indices_2
+        #top_indices_sorted = sorted_indices_2[::-1]
+
         
         #print("top_indices_sorted", top_indices_sorted, top_indices_sorted.shape)
         print("top_indices_sorted.shape", top_indices_sorted.shape)
 
         
-        ##subset_data = torch.utils.data.Subset(train_dataset, top_indices_sorted)
-        subset_data = torch.utils.data.Subset(train_dataset, [500, 499, 0])
+        subset_data = torch.utils.data.Subset(train_dataset, top_indices_sorted)
         #print("subset_dataaaaaaaa", subset_data)
         trainloader_C = torch.utils.data.DataLoader(subset_data, batch_size=self.batch, shuffle=False, num_workers=0)
 
@@ -348,17 +346,34 @@ class SupContrastReplay(ContinualLearner):
         
         #print(all_images.shape)  # This should print something like torch.Size([50000, 3, 32, 32]) depending on your DataLoader's batch size
         #print(all_labels.shape)  # This should print torch.Size([50000])
-        print("all_labelsall_labels", all_labels)
+        #print("all_labelsall_labels", all_labels)
 
+
+        num_per_class = top_n//len(unique_classes)
+        counter_class = [0 for _ in range(len(unique_classes))]
+        full = [num_per_class for _ in range(len(unique_classes))]
+
+        images_list_ = []
+        labels_list_ = []
+        
+        for i in range(all_labels.shape[0]): 
+            if counter_class[mapping[all_labels[i]]] < (num_per_class + 1):
+                counter_class[mapping[all_labels[i]]] += 1
+                labels_list_.append(all_labels[i])
+                images_list_.append(all_images[i])
+            if counter_class == full:
+                break
+        
+        all_images_ = torch.cat(images_list_, dim=0)
+        all_labels_ = torch.cat(labels_list_, dim=0)
 
         
-
         print("unique_classes", unique_classes)
         counter = 0
         for i in range(self.buffer.buffer_label.shape[0]):
             if self.buffer.buffer_label[i].item() in unique_classes:
-                self.buffer.buffer_label[i] = all_labels.to(device)[counter]
-                self.buffer.buffer_img[i] = all_images.to(device)[counter]
+                self.buffer.buffer_label[i] = all_labels_.to(device)[counter]
+                self.buffer.buffer_img[i] = all_images_.to(device)[counter]
                 counter +=1
 
         print("counter", counter)
