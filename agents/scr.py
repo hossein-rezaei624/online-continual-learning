@@ -331,9 +331,8 @@ class SupContrastReplay(ContinualLearner):
         print("top_indices_sorted.shape", top_indices_sorted.shape)
 
         
-        print("top_indices_sortedtop_indices_sorted", top_indices_sorted)
-        subset_data = torch.utils.data.Subset(train_dataset, top_indices_sorted)
-        #subset_data = torch.utils.data.Subset(train_dataset, [0, 5])
+        ##subset_data = torch.utils.data.Subset(train_dataset, top_indices_sorted)
+        subset_data = torch.utils.data.Subset(train_dataset, [0, 5])
         #print("subset_dataaaaaaaa", subset_data)
         trainloader_C = torch.utils.data.DataLoader(subset_data, batch_size=self.batch, shuffle=False, num_workers=0)
 
@@ -349,6 +348,7 @@ class SupContrastReplay(ContinualLearner):
         
         #print(all_images.shape)  # This should print something like torch.Size([50000, 3, 32, 32]) depending on your DataLoader's batch size
         #print(all_labels.shape)  # This should print torch.Size([50000])
+        print("all_labelsall_labels", all_labels)
 
 
         
