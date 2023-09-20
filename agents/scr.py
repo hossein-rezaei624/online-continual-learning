@@ -17,6 +17,7 @@ from torch.utils.data import ConcatDataset
 import random
 import torchvision.transforms as transforms
 import torchvision
+import math
 
 class SupContrastReplay(ContinualLearner):
     def __init__(self, model, opt, params):
@@ -351,7 +352,7 @@ class SupContrastReplay(ContinualLearner):
 
         num_per_class = top_n//len(unique_classes)
         counter_class = [0 for _ in range(len(unique_classes))]
-        full = [num_per_class for _ in range(len(unique_classes))]
+        full = [math.ceil(num_per_class) for _ in range(len(unique_classes))]
 
         images_list_ = []
         labels_list_ = []
