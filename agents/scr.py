@@ -127,7 +127,7 @@ class SupContrastReplay(ContinualLearner):
         
         # Training
         Carto = []
-        for epoch_ in range(2):
+        for epoch_ in range(6):
             print('\nEpoch: %d' % epoch_)
             Model_Carto.train()
             train_loss = 0
@@ -344,8 +344,8 @@ class SupContrastReplay(ContinualLearner):
         all_images = torch.cat(images_list, dim=0)
         all_labels = torch.cat(labels_list, dim=0)
         
-        print(all_images.shape)  # This should print something like torch.Size([50000, 3, 32, 32]) depending on your DataLoader's batch size
-        print(all_labels.shape)  # This should print torch.Size([50000])
+        #print(all_images.shape)  # This should print something like torch.Size([50000, 3, 32, 32]) depending on your DataLoader's batch size
+        #print(all_labels.shape)  # This should print torch.Size([50000])
         #print("all_labelsall_labels", all_labels)
 
 
@@ -366,8 +366,8 @@ class SupContrastReplay(ContinualLearner):
         
         all_images_ = torch.stack(images_list_)
         all_labels_ = torch.stack(labels_list_)
-        print("all_images_.shapeall_images_.shape",all_images_.shape)
-        print("all_labels_.shapeall_labels_.shape",all_labels_.shape)
+        #print("all_images_.shapeall_images_.shape",all_images_.shape)
+        #print("all_labels_.shapeall_labels_.shape",all_labels_.shape)
 
         
         print("unique_classes", unique_classes)
