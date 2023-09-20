@@ -383,6 +383,8 @@ class SupContrastReplay(ContinualLearner):
                 counter +=1
 
         print("counter", counter)
+
+        print("number of unique_classes[0]", np.sum(self.buffer.buffer_label.cpu().numpy() == unique_classes[0]))
         
         self.after_train()
 
