@@ -332,7 +332,7 @@ class SupContrastReplay(ContinualLearner):
 
         
         ##subset_data = torch.utils.data.Subset(train_dataset, top_indices_sorted)
-        subset_data = torch.utils.data.Subset(train_dataset, [0, 499, 500])
+        subset_data = torch.utils.data.Subset(train_dataset, [500, 499, 0])
         #print("subset_dataaaaaaaa", subset_data)
         trainloader_C = torch.utils.data.DataLoader(subset_data, batch_size=self.batch, shuffle=False, num_workers=0)
 
