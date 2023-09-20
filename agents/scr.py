@@ -323,7 +323,7 @@ class SupContrastReplay(ContinualLearner):
         #top_indices_sorted = top_indices_1
 
 
-        top_indices_sorted = sorted_indices_2
+        top_indices_sorted = sorted_indices_1
         #top_indices_sorted = sorted_indices_2[::-1]
 
         
@@ -362,6 +362,11 @@ class SupContrastReplay(ContinualLearner):
                 counter_class[mapping[all_labels[i].item()]] += 1
                 labels_list_.append(all_labels[i])
                 images_list_.append(all_images[i])
+            if i != 0 and counter_class[mapping[all_labels[-i].item()]] < (num_per_class + 1):
+                counter_class[mapping[all_labels[-i].item()]] += 1
+                labels_list_.append(all_labels[-i])
+                images_list_.append(all_images[-i])
+                print("innerrrr")
             if counter_class == full:
                 print("yessssss")
                 break
