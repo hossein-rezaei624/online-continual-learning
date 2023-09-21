@@ -19,6 +19,32 @@ import torchvision.transforms as transforms
 import torchvision
 import math
 
+from torch.utils.data import Dataset
+import pickle
+
+
+def load_mini_imagenet_cache(file_path):
+    with open(file_path, 'rb') as f:
+        data_cache = pickle.load(f)
+    return data_cache
+
+class MiniImageNetDataset(Dataset):
+    def __init__(self, data_cache, transform=None):
+        self.data = data_cache['data']
+        self.labels = data_cache['labels']
+        self.transform = transform
+
+    def __len__(self):
+        return len(self.data)
+
+    def __getitem__(self, index):
+        image = self.data[index]
+        label = self.labels[index]
+        if self.transform:
+            image = self.transform(image) 
+        return image, label
+
+
 class SupContrastReplay(ContinualLearner):
     def __init__(self, model, opt, params):
         super(SupContrastReplay, self).__init__(model, opt, params)
@@ -79,6 +105,14 @@ class SupContrastReplay(ContinualLearner):
             [1, 96, 28, 29, 34, 81, 19, 18, 69, 89],
             [46, 10, 0, 7, 68, 99, 92, 30, 63, 64]
         ]
+
+
+        transform_train = transforms.Compose([transforms.ToTensor(),])
+        train_cache = load_mini_imagenet_cache('datasets/mini_imagenet/mini-imagenet-cache-train.pkl')
+        trainset = MiniImageNetDataset(train_cache, transform=transform_train)
+        subset_indices_train = [idx for idx, (_, target) in enumerate(trainset) if target in sets[task_number]]
+        subset_loader_train = torch.utils.data.DataLoader(torch.utils.data.Subset(trainset, subset_indices_train),
+                                                          batch_size=10, shuffle=False, num_workers=0, drop_last=True)
 
 
         ##transform_train = transforms.Compose([transforms.ToTensor(),])
@@ -149,7 +183,7 @@ class SupContrastReplay(ContinualLearner):
             correct = 0
             total = 0
             confidence_epoch = []
-            for batch_idx, (inputs, targets) in enumerate(train_loader):
+            for batch_idx, (inputs, targets) in enumerate(subset_loader_train):
                 inputs, targets = inputs.to(device), targets.to(device)
 
                 #print("targets", targets)
