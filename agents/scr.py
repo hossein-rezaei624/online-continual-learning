@@ -32,11 +32,15 @@ class MiniImageNetDataset(Dataset):
     def __init__(self, data_cache, transform=None):
         self.data = data_cache['image_data']
         
+        # Create an integer mapping for class labels
+        self.label_map = {label: idx for idx, label in enumerate(data_cache['class_dict'].keys())}
+        
         # Convert class_dict to label format
-        self.labels = [None] * len(self.data)  # Creating an empty list of labels
+        self.labels = [-1] * len(self.data)  # Initializing with a placeholder value
         for label, indices in data_cache['class_dict'].items():
+            int_label = self.label_map[label]  # Getting the integer label
             for idx in indices:
-                self.labels[idx] = label  # Assigning the label to the corresponding indices
+                self.labels[idx] = int_label  # Assigning the integer label to the corresponding indices
                 
         self.transform = transform
 
