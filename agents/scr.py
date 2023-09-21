@@ -46,18 +46,18 @@ class SupContrastReplay(ContinualLearner):
                                        drop_last=True)
 
 
-        sets = [
-            [26, 86, 2, 55, 75, 93, 16, 73, 54, 95],
-            [53, 92, 78, 13, 7, 30, 22, 24, 33, 8],
-            [43, 62, 3, 71, 45, 48, 6, 99, 82, 76],
-            [60, 80, 90, 68, 51, 27, 18, 56, 63, 74],
-            [1, 61, 42, 41, 4, 15, 17, 40, 38, 5],
-            [91, 59, 0, 34, 28, 50, 11, 35, 23, 52],
-            [10, 31, 66, 57, 79, 85, 32, 84, 14, 89],
-            [19, 29, 49, 97, 98, 69, 20, 94, 72, 77],
-            [25, 37, 81, 46, 39, 65, 58, 12, 88, 70],
-            [87, 36, 21, 83, 9, 96, 67, 64, 47, 44]
-        ]
+##        sets = [
+##            [26, 86, 2, 55, 75, 93, 16, 73, 54, 95],
+##            [53, 92, 78, 13, 7, 30, 22, 24, 33, 8],
+##            [43, 62, 3, 71, 45, 48, 6, 99, 82, 76],
+##            [60, 80, 90, 68, 51, 27, 18, 56, 63, 74],
+##            [1, 61, 42, 41, 4, 15, 17, 40, 38, 5],
+##            [91, 59, 0, 34, 28, 50, 11, 35, 23, 52],
+##            [10, 31, 66, 57, 79, 85, 32, 84, 14, 89],
+##            [19, 29, 49, 97, 98, 69, 20, 94, 72, 77],
+##            [25, 37, 81, 46, 39, 65, 58, 12, 88, 70],
+##            [87, 36, 21, 83, 9, 96, 67, 64, 47, 44]
+##        ]
 
 ##        sets = [
 ##            [2, 8],
@@ -67,13 +67,27 @@ class SupContrastReplay(ContinualLearner):
 ##            [0, 5]
 ##        ]
 
-        transform_train = transforms.Compose([transforms.ToTensor(),])
-        trainset = torchvision.datasets.CIFAR100(root='./data', train=True, download=True, transform=transform_train)
-        subset_indices_train = [idx for idx, (_, target) in enumerate(trainset) if target in sets[task_number]]
-        subset_loader_train = torch.utils.data.DataLoader(torch.utils.data.Subset(trainset, subset_indices_train),
+        sets = [
+            [49, 45, 14, 76, 73, 36, 21, 24, 84, 13],
+            [15, 82, 59, 35, 32, 55, 97, 41, 43, 77],
+            [54, 11, 42, 87, 95, 80, 33, 93, 83, 5],
+            [86, 48, 47, 67, 79, 65, 57, 12, 38, 60],
+            [72, 17, 26, 56, 25, 94, 51, 37, 50, 3],
+            [9, 31, 22, 4, 40, 75, 23, 78, 53, 16],
+            [62, 66, 85, 39, 71, 52, 2, 6, 90, 91],
+            [74, 27, 8, 88, 98, 70, 44, 20, 58, 61],
+            [1, 96, 28, 29, 34, 81, 19, 18, 69, 89],
+            [46, 10, 0, 7, 68, 99, 92, 30, 63, 64]
+        ]
+
+
+        ##transform_train = transforms.Compose([transforms.ToTensor(),])
+        ##trainset = torchvision.datasets.CIFAR100(root='./data', train=True, download=True, transform=transform_train)
+        ##subset_indices_train = [idx for idx, (_, target) in enumerate(trainset) if target in sets[task_number]]
+        ##subset_loader_train = torch.utils.data.DataLoader(torch.utils.data.Subset(trainset, subset_indices_train),
                                                           batch_size=10, shuffle=False, num_workers=0, drop_last=True)
         
-        print("sets[task_number]", sets[task_number])
+        ##print("sets[task_number]", sets[task_number])
         
         unique_classes = set()
         
@@ -135,7 +149,7 @@ class SupContrastReplay(ContinualLearner):
             correct = 0
             total = 0
             confidence_epoch = []
-            for batch_idx, (inputs, targets) in enumerate(subset_loader_train):
+            for batch_idx, (inputs, targets) in enumerate(train_loader):
                 inputs, targets = inputs.to(device), targets.to(device)
 
                 #print("targets", targets)
