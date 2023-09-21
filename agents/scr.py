@@ -109,6 +109,8 @@ class SupContrastReplay(ContinualLearner):
 
         transform_train = transforms.Compose([transforms.ToTensor(),])
         train_cache = load_mini_imagenet_cache('datasets/mini_imagenet/mini-imagenet-cache-train.pkl')
+        print(train_cache.keys())
+
         trainset = MiniImageNetDataset(train_cache, transform=transform_train)
         subset_indices_train = [idx for idx, (_, target) in enumerate(trainset) if target in sets[task_number]]
         subset_loader_train = torch.utils.data.DataLoader(torch.utils.data.Subset(trainset, subset_indices_train),
