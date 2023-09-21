@@ -30,8 +30,14 @@ def load_mini_imagenet_cache(file_path):
 
 class MiniImageNetDataset(Dataset):
     def __init__(self, data_cache, transform=None):
-        self.data = data_cache['data']
-        self.labels = data_cache['labels']
+        self.data = data_cache['image_data']
+        
+        # Convert class_dict to label format
+        self.labels = [None] * len(self.data)  # Creating an empty list of labels
+        for label, indices in data_cache['class_dict'].items():
+            for idx in indices:
+                self.labels[idx] = label  # Assigning the label to the corresponding indices
+                
         self.transform = transform
 
     def __len__(self):
