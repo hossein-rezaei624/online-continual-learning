@@ -78,8 +78,8 @@ class SupContrastReplay(ContinualLearner):
         #print("x_trainnnnnnn", x_train.shape, type(x_train))
         # set up loader
         train_dataset = dataset_transform(x_train, y_train, transform=transforms_match[self.data])
-        print("x_train", x_train, type(x_train), x_train.shape)
-        print("y_train", y_train, type(y_train), y_train.shape)
+        print("x_train[0]", x_train[0].reshape((3, 32, 32)), type(x_train[0]), x_train[0].shape)
+        print("y_train[0]", y_train[0], type(y_train[0]), y_train[0].shape)
         a, b = train_dataset[0]
         print("image of data 0 is:", a, type(a), a.shape)
         print("label of data 0 is:", b, type(b), b.shape)
