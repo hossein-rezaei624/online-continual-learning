@@ -78,7 +78,7 @@ class SupContrastReplay(ContinualLearner):
         #print("x_trainnnnnnn", x_train.shape, type(x_train))
         # set up loader
         train_dataset = dataset_transform(x_train, y_train, transform=transforms_match[self.data])
-        print("x_train[0]", x_train[0].reshape((3, 32, 32)), type(x_train[0]), x_train[0].shape)
+        print("x_train[0]", x_train[0], type(x_train[0]), x_train[0].shape)
         print("y_train[0]", y_train[0], type(y_train[0]), y_train[0].shape)
         a, b = train_dataset[0]
         print("image of data 0 is:", a, type(a), a.shape)
@@ -134,7 +134,7 @@ class SupContrastReplay(ContinualLearner):
         trainset = torchvision.datasets.CIFAR100(root='./data', train=True, download=True, transform=transform_train)
         a_ , b_ = trainset[0]
         print("from dataset, the image 0 is:", a_, type(a_), a_.shape)
-        print("from dataset, the label 0 is:", b_, type(b_), b_.shape)
+        print("from dataset, the label 0 is:", b_, type(b_))
         ##subset_indices_train = [idx for idx, (_, target) in enumerate(trainset) if target in sets[task_number]]
         ##subset_loader_train = torch.utils.data.DataLoader(torch.utils.data.Subset(trainset, subset_indices_train),
         ##                                                  batch_size=10, shuffle=False, num_workers=0, drop_last=True)
