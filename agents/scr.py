@@ -78,6 +78,9 @@ class SupContrastReplay(ContinualLearner):
         #print("x_trainnnnnnn", x_train.shape, type(x_train))
         # set up loader
         train_dataset = dataset_transform(x_train, y_train, transform=transforms_match[self.data])
+        print("x_train", x_train, type(x_train))
+        print("y_train", y_train, type(y_train))
+        print("train_dataset", train_dataset, type(train_dataset))
         train_loader = data.DataLoader(train_dataset, batch_size=self.batch, shuffle=False, num_workers=0,
                                        drop_last=True)
 
