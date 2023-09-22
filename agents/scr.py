@@ -92,18 +92,18 @@ class SupContrastReplay(ContinualLearner):
                 break
 
 
-##        sets = [
-##            [26, 86, 2, 55, 75, 93, 16, 73, 54, 95],
-##            [53, 92, 78, 13, 7, 30, 22, 24, 33, 8],
-##            [43, 62, 3, 71, 45, 48, 6, 99, 82, 76],
-##            [60, 80, 90, 68, 51, 27, 18, 56, 63, 74],
-##            [1, 61, 42, 41, 4, 15, 17, 40, 38, 5],
-##            [91, 59, 0, 34, 28, 50, 11, 35, 23, 52],
-##            [10, 31, 66, 57, 79, 85, 32, 84, 14, 89],
-##            [19, 29, 49, 97, 98, 69, 20, 94, 72, 77],
-##            [25, 37, 81, 46, 39, 65, 58, 12, 88, 70],
-##            [87, 36, 21, 83, 9, 96, 67, 64, 47, 44]
-##        ]
+        sets = [
+            [26, 86, 2, 55, 75, 93, 16, 73, 54, 95],
+            [53, 92, 78, 13, 7, 30, 22, 24, 33, 8],
+            [43, 62, 3, 71, 45, 48, 6, 99, 82, 76],
+            [60, 80, 90, 68, 51, 27, 18, 56, 63, 74],
+            [1, 61, 42, 41, 4, 15, 17, 40, 38, 5],
+            [91, 59, 0, 34, 28, 50, 11, 35, 23, 52],
+            [10, 31, 66, 57, 79, 85, 32, 84, 14, 89],
+            [19, 29, 49, 97, 98, 69, 20, 94, 72, 77],
+            [25, 37, 81, 46, 39, 65, 58, 12, 88, 70],
+            [87, 36, 21, 83, 9, 96, 67, 64, 47, 44]
+        ]
 
 ##        sets = [
 ##            [2, 8],
@@ -140,11 +140,13 @@ class SupContrastReplay(ContinualLearner):
         a_ , b_ = trainset[0]
         print("from dataset, the image 0 is:", a_, type(a_), a_.shape)
         print("from dataset, the label 0 is:", b_, type(b_))
-        subset_loader_train = torch.utils.data.DataLoader(trainset, batch_size=10, shuffle=False, num_workers=0, drop_last=True)
-        ##subset_indices_train = [idx for idx, (_, target) in enumerate(trainset) if target in sets[task_number]]
-        ##subset_loader_train = torch.utils.data.DataLoader(torch.utils.data.Subset(trainset, subset_indices_train),
-        ##                                                  batch_size=10, shuffle=False, num_workers=0, drop_last=True)
-        
+        subset_indices_train = [idx for idx, (_, target) in enumerate(trainset) if target in sets[task_number]]
+        subset_loader_train = torch.utils.data.DataLoader(torch.utils.data.Subset(trainset, subset_indices_train),
+                                                          batch_size=10, shuffle=False, num_workers=0, drop_last=True)
+        for bat_, (inp_, tar_) in enumerate(subset_loader_train):
+            print("train loader before:", bat_, "image:", inp_[0], "label:", tar_[0])
+            if bat_ == 0:
+                break
         ##print("sets[task_number]", sets[task_number])
         
         unique_classes = set()
