@@ -39,8 +39,7 @@ def load_task_with_labels(x, y, labels):
 class dataset_transform(data.Dataset):
     def __init__(self, x, y, transform=None):
         self.x = x
-        #self.y = torch.from_numpy(y).type(torch.LongTensor)
-        self.y = y
+        self.y = torch.from_numpy(y).type(torch.LongTensor)
         self.transform = transform  # save the transform
 
     def __len__(self):
@@ -48,11 +47,11 @@ class dataset_transform(data.Dataset):
 
     def __getitem__(self, idx):
         
-        x = self.x[idx]
-        x = Image.fromarray(x)
         # return the augmented image
         if self.transform:
-            x = self.transform(self.x[idx])            
+            x = self.transform(self.x[idx])    
+        else:
+            x = self.x[idx]
 
         return x.float(), self.y[idx]
 
