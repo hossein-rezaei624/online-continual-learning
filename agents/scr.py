@@ -84,7 +84,7 @@ class SupContrastReplay(ContinualLearner):
         count_ = np.sum(self.buffer.buffer_label.cpu().numpy() == 0)
         # Assuming each batch's labels are in the second element
         
-        for _, labels in train_loader:
+        for _, labels, indices in train_loader:
             unique_classes.update(labels.numpy())
         print("unique_classessss", unique_classes)
         
@@ -110,7 +110,7 @@ class SupContrastReplay(ContinualLearner):
             correct = 0
             total = 0
             confidence_epoch = []
-            for batch_idx, (inputs, targets) in enumerate(train_loader):
+            for batch_idx, (inputs, targets, indices) in enumerate(train_loader):
                 inputs, targets = inputs.to(device), targets.to(device)                
                 
                 targets = torch.tensor([mapping[val.item()] for val in targets]).to(device)
@@ -168,7 +168,7 @@ class SupContrastReplay(ContinualLearner):
         for ep in range(self.epoch):
             for i, batch_data in enumerate(train_loader):
                 # batch update
-                batch_x, batch_y = batch_data
+                batch_x, batch_y, indices = batch_data
                 batch_x = maybe_cuda(batch_x, self.cuda)
                 batch_y = maybe_cuda(batch_y, self.cuda)
 
@@ -250,7 +250,7 @@ class SupContrastReplay(ContinualLearner):
         images_list = []
         labels_list = []
         
-        for images, labels in trainloader_C:  # Assuming train_loader is your DataLoader
+        for images, labels, indices in trainloader_C:  # Assuming train_loader is your DataLoader
             images_list.append(images)
             labels_list.append(labels)
         
