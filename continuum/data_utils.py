@@ -2,6 +2,7 @@ import numpy as np
 import torch
 from torch.utils import data
 from utils.setup_elements import transforms_match
+from PIL import Image
 
 def create_task_composition(class_nums, num_tasks, fixed_order=False):
     classes_per_task = class_nums // num_tasks
@@ -46,11 +47,12 @@ class dataset_transform(data.Dataset):
         return len(self.y)#self.x.shape[0]  # return 1 as we have only one image
 
     def __getitem__(self, idx):
+        
+        x = self.x[idx]
+        x = Image.fromarray(x)
         # return the augmented image
         if self.transform:
-            x = self.transform(self.x[idx])
-        else:
-            x = self.x[idx]
+            x = self.transform(self.x[idx])            
 
         return x.float(), self.y[idx]
 
