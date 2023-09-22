@@ -102,7 +102,8 @@ class SupContrastReplay(ContinualLearner):
         #print(mapping)
         
         # Training
-        Carto = []
+        ##Carto = []
+        Carto = torch.zeros((6, len(y_train)))
         for epoch_ in range(6):
             print('\nEpoch: %d' % epoch_)
             Model_Carto.train()
@@ -136,17 +137,24 @@ class SupContrastReplay(ContinualLearner):
                 total += targets.size(0)
                 correct += predicted.eq(targets).sum().item()
         
+                conf_tensor = torch.tensor(confidence_batch)
+                Carto[epoch_, indices] = conf_tensor
+                
             print("Accuracy:", 100.*correct/total, ", and:", correct, "/", total, " ,loss:", train_loss/(batch_idx+1))
-            conf_tensor = torch.tensor(confidence_epoch)
-            conf_tensor = conf_tensor.reshape(conf_tensor.shape[0]*conf_tensor.shape[1])
-            conf_tensor = conf_tensor[:total]
+            ##conf_tensor = torch.tensor(confidence_epoch)
+            ##conf_tensor = conf_tensor.reshape(conf_tensor.shape[0]*conf_tensor.shape[1])
+            ##conf_tensor = conf_tensor[:total]
             
-            Carto.append(conf_tensor.numpy())
+            ##Carto.append(conf_tensor.numpy())
+
             scheduler_.step()
 
-        Carto_tensor = torch.tensor(np.array(Carto))
-        Confidence_mean = Carto_tensor.mean(dim=0)
-        Variability = Carto_tensor.std(dim = 0)
+        ##Carto_tensor = torch.tensor(np.array(Carto))
+        ##Confidence_mean = Carto_tensor.mean(dim=0)
+        ##Variability = Carto_tensor.std(dim = 0)
+
+        Confidence_mean = Carto.mean(dim=0)
+        Variability = Carto.std(dim=0)
         
         plt.scatter(Variability, Confidence_mean, s = 2)
         
