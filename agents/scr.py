@@ -85,8 +85,8 @@ class SupContrastReplay(ContinualLearner):
         print("label of data 0 is:", b, type(b), b.shape)
         train_loader = data.DataLoader(train_dataset, batch_size=self.batch, shuffle=False, num_workers=0,
                                        drop_last=True)
-        ___, kk, ll = train_loader[0]
-        print("train loader before:", ___, "image:", kk[0], "label:", ll[0])
+        kk, ll = train_loader[0]
+        print("train loader before:", "image:", kk[0], "label:", ll[0])
 
 
 ##        sets = [
