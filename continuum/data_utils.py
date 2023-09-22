@@ -38,7 +38,8 @@ def load_task_with_labels(x, y, labels):
 class dataset_transform(data.Dataset):
     def __init__(self, x, y, transform=None):
         self.x = x
-        self.y = torch.from_numpy(y).type(torch.LongTensor)
+        #self.y = torch.from_numpy(y).type(torch.LongTensor)
+        self.y = y
         self.transform = transform  # save the transform
 
     def __len__(self):
