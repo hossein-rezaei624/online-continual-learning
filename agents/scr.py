@@ -83,7 +83,7 @@ class SupContrastReplay(ContinualLearner):
         a, b = train_dataset[0]
         print("image of data 0 is:", a, type(a), a.shape)
         print("label of data 0 is:", b, type(b), b.shape)
-        train_loader = data.DataLoader(train_dataset, batch_size=self.batch, shuffle=False, num_workers=0,
+        train_loader = data.DataLoader(train_dataset, batch_size=self.batch, shuffle=True, num_workers=0,
                                        drop_last=True)
         
         for bat, (inp, tar) in enumerate(train_loader):
@@ -142,8 +142,8 @@ class SupContrastReplay(ContinualLearner):
         subset_loader_train = torch.utils.data.DataLoader(torch.utils.data.Subset(trainset, subset_indices_train),
                                                           batch_size=10, shuffle=False, num_workers=0, drop_last=True)
                 
-        for bat_, (inp_, tar_) in enumerate(subset_loader_train):
-            print("train loader before:", "label:", tar_)
+     ##   for bat_, (inp_, tar_) in enumerate(subset_loader_train):
+     ##       print("train loader before:", "label:", tar_)
 
         ##print("sets[task_number]", sets[task_number])
         
