@@ -138,7 +138,7 @@ class SupContrastReplay(ContinualLearner):
                 correct += predicted.eq(targets).sum().item()
         
                 conf_tensor = torch.tensor(confidence_batch)
-                Carto[epoch_, indices] = conf_tensor
+                Carto[epoch_, indices_1] = conf_tensor
                 
             print("Accuracy:", 100.*correct/total, ", and:", correct, "/", total, " ,loss:", train_loss/(batch_idx+1))
             ##conf_tensor = torch.tensor(confidence_epoch)
