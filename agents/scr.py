@@ -103,26 +103,25 @@ class SupContrastReplay(ContinualLearner):
 ##            [0, 5]
 ##        ]
 
-        sets = [
-            [49, 45, 14, 76, 73, 36, 21, 24, 84, 13],
-            [15, 82, 59, 35, 32, 55, 97, 41, 43, 77],
-            [54, 11, 42, 87, 95, 80, 33, 93, 83, 5],
-            [86, 48, 47, 67, 79, 65, 57, 12, 38, 60],
-            [72, 17, 26, 56, 25, 94, 51, 37, 50, 3],
-            [9, 31, 22, 4, 40, 75, 23, 78, 53, 16],
-            [62, 66, 85, 39, 71, 52, 2, 6, 90, 91],
-            [74, 27, 8, 88, 98, 70, 44, 20, 58, 61],
-            [1, 96, 28, 29, 34, 81, 19, 18, 69, 89],
-            [46, 10, 0, 7, 68, 99, 92, 30, 63, 64]
-        ]
+##        sets = [
+##            [49, 45, 14, 76, 73, 36, 21, 24, 84, 13],
+##            [15, 82, 59, 35, 32, 55, 97, 41, 43, 77],
+##            [54, 11, 42, 87, 95, 80, 33, 93, 83, 5],
+##            [86, 48, 47, 67, 79, 65, 57, 12, 38, 60],
+##            [72, 17, 26, 56, 25, 94, 51, 37, 50, 3],
+##            [9, 31, 22, 4, 40, 75, 23, 78, 53, 16],
+##            [62, 66, 85, 39, 71, 52, 2, 6, 90, 91],
+##            [74, 27, 8, 88, 98, 70, 44, 20, 58, 61],
+##            [1, 96, 28, 29, 34, 81, 19, 18, 69, 89],
+##            [46, 10, 0, 7, 68, 99, 92, 30, 63, 64]
+##        ]
 
 
-        transform_train = transforms.Compose([transforms.ToTensor(),])
-        train_cache = load_mini_imagenet_cache('datasets/mini_imagenet/mini-imagenet-cache-train.pkl')
-
-        trainset = MiniImageNetDataset(train_cache, transform=transform_train)
-        subset_indices_train = [idx for idx, (_, target) in enumerate(trainset) if target in sets[task_number]]
-        subset_loader_train = torch.utils.data.DataLoader(torch.utils.data.Subset(trainset, subset_indices_train),
+##        transform_train = transforms.Compose([transforms.ToTensor(),])
+##        train_cache = load_mini_imagenet_cache('datasets/mini_imagenet/mini-imagenet-cache-train.pkl')
+##        trainset = MiniImageNetDataset(train_cache, transform=transform_train)
+##        subset_indices_train = [idx for idx, (_, target) in enumerate(trainset) if target in sets[task_number]]
+##        subset_loader_train = torch.utils.data.DataLoader(torch.utils.data.Subset(trainset, subset_indices_train),
                                                           batch_size=10, shuffle=False, num_workers=0, drop_last=True)
 
 
@@ -194,7 +193,7 @@ class SupContrastReplay(ContinualLearner):
             correct = 0
             total = 0
             confidence_epoch = []
-            for batch_idx, (inputs, targets) in enumerate(subset_loader_train):
+            for batch_idx, (inputs, targets) in enumerate(train_loader):
                 inputs, targets = inputs.to(device), targets.to(device)
 
                 #print("targets", targets)
