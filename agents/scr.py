@@ -141,10 +141,8 @@ class SupContrastReplay(ContinualLearner):
         subset_indices_train = [idx for idx, (_, target) in enumerate(trainset) if target in sets[task_number]]
         subset_loader_train = torch.utils.data.DataLoader(torch.utils.data.Subset(trainset, subset_indices_train),
                                                           batch_size=10, shuffle=False, num_workers=0, drop_last=True)
-        
-        aaff = torch.utils.data.DataLoader(trainset, batch_size=10, shuffle=False, num_workers=0, drop_last=True)
-        
-        for bat_, (inp_, tar_) in enumerate(aaff):
+                
+        for bat_, (inp_, tar_) in enumerate(subset_loader_train):
             print("train loader before:", "label:", tar_)
 
         ##print("sets[task_number]", sets[task_number])
