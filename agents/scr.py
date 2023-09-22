@@ -87,9 +87,7 @@ class SupContrastReplay(ContinualLearner):
                                        drop_last=True)
         
         for bat, (inp, tar) in enumerate(train_loader):
-            print("train loader before:", bat, "image:", inp[0], "label:", tar[0])
-            if bat == 0:
-                break
+            print("train loader before:", tar)
 
 
         sets = [
@@ -144,9 +142,8 @@ class SupContrastReplay(ContinualLearner):
         subset_loader_train = torch.utils.data.DataLoader(torch.utils.data.Subset(trainset, subset_indices_train),
                                                           batch_size=10, shuffle=False, num_workers=0, drop_last=True)
         for bat_, (inp_, tar_) in enumerate(subset_loader_train):
-            print("train loader before:", bat_, "image:", inp_[0], "label:", tar_[0])
-            if bat_ == 0:
-                break
+            print("train loader before:", "label:", tar_)
+
         ##print("sets[task_number]", sets[task_number])
         
         unique_classes = set()
