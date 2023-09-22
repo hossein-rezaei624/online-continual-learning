@@ -86,8 +86,8 @@ class SupContrastReplay(ContinualLearner):
         train_loader = data.DataLoader(train_dataset, batch_size=self.batch, shuffle=True, num_workers=0,
                                        drop_last=True)
         
-        for bat, (inp, tar) in enumerate(train_loader):
-            print("train loader before:", tar)
+     ##   for bat, (inp, tar) in enumerate(train_loader):
+     ##       print("train loader before:", tar)
 
 
         sets = [
@@ -133,14 +133,14 @@ class SupContrastReplay(ContinualLearner):
 ##                                                          batch_size=10, shuffle=False, num_workers=0, drop_last=True)
 
 
-        transform_train = transforms.Compose([transforms.ToTensor(),])
-        trainset = torchvision.datasets.CIFAR100(root='./data', train=True, download=True, transform=transform_train)
-        a_ , b_ = trainset[0]
-        print("from dataset, the image 0 is:", a_, type(a_), a_.shape)
-        print("from dataset, the label 0 is:", b_, type(b_))
-        subset_indices_train = [idx for idx, (_, target) in enumerate(trainset) if target in sets[task_number]]
-        subset_loader_train = torch.utils.data.DataLoader(torch.utils.data.Subset(trainset, subset_indices_train),
-                                                          batch_size=10, shuffle=False, num_workers=0, drop_last=True)
+##        transform_train = transforms.Compose([transforms.ToTensor(),])
+##        trainset = torchvision.datasets.CIFAR100(root='./data', train=True, download=True, transform=transform_train)
+##        a_ , b_ = trainset[0]
+##        print("from dataset, the image 0 is:", a_, type(a_), a_.shape)
+##        print("from dataset, the label 0 is:", b_, type(b_))
+##        subset_indices_train = [idx for idx, (_, target) in enumerate(trainset) if target in sets[task_number]]
+##        subset_loader_train = torch.utils.data.DataLoader(torch.utils.data.Subset(trainset, subset_indices_train),
+##                                                          batch_size=10, shuffle=False, num_workers=0, drop_last=True)
                 
      ##   for bat_, (inp_, tar_) in enumerate(subset_loader_train):
      ##       print("train loader before:", "label:", tar_)
