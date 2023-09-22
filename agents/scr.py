@@ -76,7 +76,7 @@ class SupContrastReplay(ContinualLearner):
         self.before_train(x_train, y_train)
         # set up loader
         train_dataset = dataset_transform(x_train, y_train, transform=transforms_match[self.data])
-        train_loader = data.DataLoader(train_dataset, batch_size=self.batch, shuffle=False, num_workers=0,
+        train_loader = data.DataLoader(train_dataset, batch_size=self.batch, shuffle=True, num_workers=0,
                                        drop_last=True)
         
         unique_classes = set()
@@ -86,6 +86,7 @@ class SupContrastReplay(ContinualLearner):
         
         for _, labels in train_loader:
             unique_classes.update(labels.numpy())
+        print("unique_classessss", unique_classes)
         
 
         device = "cuda"
