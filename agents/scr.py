@@ -130,7 +130,7 @@ class SupContrastReplay(ContinualLearner):
 ##                                                          batch_size=10, shuffle=False, num_workers=0, drop_last=True)
 
 
-        ##transform_train = transforms.Compose([transforms.ToTensor(),])
+        transform_train = transforms.Compose([transforms.ToTensor(),])
         trainset = torchvision.datasets.CIFAR100(root='./data', train=True, download=True, transform=transform_train)
         a_ , b_ = trainset[0]
         print("from dataset, the image 0 is:", a_, type(a_), a_.shape)
