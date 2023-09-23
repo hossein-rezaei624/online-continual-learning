@@ -243,8 +243,8 @@ class SupContrastReplay(ContinualLearner):
         #top_indices_sorted = top_indices_1
 
 
-        top_indices_sorted = sorted_indices_1
-        #top_indices_sorted = sorted_indices_1[::-1]
+        #top_indices_sorted = sorted_indices_1
+        top_indices_sorted = sorted_indices_1[::-1]
 
         
         #print("top_indices_sorted", top_indices_sorted, top_indices_sorted.shape)
