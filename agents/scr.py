@@ -23,37 +23,6 @@ from torch.utils.data import Dataset
 import pickle
 
 
-def load_mini_imagenet_cache(file_path):
-    with open(file_path, 'rb') as f:
-        data_cache = pickle.load(f)
-    return data_cache
-
-class MiniImageNetDataset(Dataset):
-    def __init__(self, data_cache, transform=None):
-        self.data = data_cache['image_data']
-        
-        # Create an integer mapping for class labels
-        self.label_map = {label: idx for idx, label in enumerate(data_cache['class_dict'].keys())}
-        
-        # Convert class_dict to label format
-        self.labels = [-1] * len(self.data)  # Initializing with a placeholder value
-        for label, indices in data_cache['class_dict'].items():
-            int_label = self.label_map[label]  # Getting the integer label
-            for idx in indices:
-                self.labels[idx] = int_label  # Assigning the integer label to the corresponding indices
-                
-        self.transform = transform
-
-    def __len__(self):
-        return len(self.data)
-
-    def __getitem__(self, index):
-        image = self.data[index]
-        label = self.labels[index]
-        if self.transform:
-            image = self.transform(image) 
-        return image, label
-
 
 class SupContrastReplay(ContinualLearner):
     def __init__(self, model, opt, params):
@@ -294,8 +263,8 @@ class SupContrastReplay(ContinualLearner):
         counter = 0
         for i in range(self.buffer.buffer_label.shape[0]):
             if self.buffer.buffer_label[i].item() in unique_classes:
-                self.buffer.buffer_label[i] = all_labels.to(device)[counter]
-                self.buffer.buffer_img[i] = all_images.to(device)[counter]
+                self.buffer.buffer_label[i] = all_labels_.to(device)[counter]
+                self.buffer.buffer_img[i] = all_images_.to(device)[counter]
                 counter +=1
 
         print("counter", counter)
