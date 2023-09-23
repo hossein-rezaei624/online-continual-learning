@@ -294,8 +294,8 @@ class SupContrastReplay(ContinualLearner):
         counter = 0
         for i in range(self.buffer.buffer_label.shape[0]):
             if self.buffer.buffer_label[i].item() in unique_classes:
-                self.buffer.buffer_label[i] = all_labels_.to(device)[counter]
-                self.buffer.buffer_img[i] = all_images_.to(device)[counter]
+                self.buffer.buffer_label[i] = all_labels.to(device)[counter]
+                self.buffer.buffer_img[i] = all_images.to(device)[counter]
                 counter +=1
 
         print("counter", counter)
