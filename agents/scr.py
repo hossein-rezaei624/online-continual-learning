@@ -51,7 +51,6 @@ class SupContrastReplay(ContinualLearner):
         for _, labels, indices_1 in train_loader:
             unique_classes.update(labels.numpy())
         print("unique_classessss", unique_classes)
-        print("len(unique_classes)", len(unique_classes))
         
 
         device = "cuda"
@@ -76,8 +75,9 @@ class SupContrastReplay(ContinualLearner):
             confidence_epoch = []
             for batch_idx, (inputs, targets, indices_1) in enumerate(train_loader):
                 inputs, targets = inputs.to(device), targets.to(device)                
-                
+                print("targets", targets)
                 targets = torch.tensor([mapping[val.item()] for val in targets]).to(device)
+                print("targets", targets)
                 
                 optimizer_.zero_grad()
                 outputs = Model_Carto(inputs)
