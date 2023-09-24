@@ -54,7 +54,7 @@ class SupContrastReplay(ContinualLearner):
             ima.append(images)
             labe.append(labels)
         
-        print(ima[100][0])
+        print(len(ima), lima[0].shape)
         all_ima = torch.cat(ima, dim=0)
         all_labe = torch.cat(labe, dim=0)
 
