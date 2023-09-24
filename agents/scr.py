@@ -1,4 +1,4 @@
-import torch #new strategy where we do fair...
+import torch
 from torch.utils import data
 from utils.buffer.buffer import Buffer
 from agents.base import ContinualLearner
@@ -45,17 +45,13 @@ class SupContrastReplay(ContinualLearner):
         self.before_train(x_train, y_train)
         # set up loader
         train_dataset = dataset_transform(x_train, y_train, transform=transforms_match[self.data])
-        train_loader = data.DataLoader(train_dataset, batch_size=self.batch, shuffle=True, num_workers=0,
-                                       drop_last=True)
+        train_loader = data.DataLoader(train_dataset, batch_size=self.batch, shuffle=True, num_workers=0, drop_last=True)
         
         unique_classes = set()
-        
-        count_ = np.sum(self.buffer.buffer_label.cpu().numpy() == 0)
-        # Assuming each batch's labels are in the second element
-        
         for _, labels, indices_1 in train_loader:
             unique_classes.update(labels.numpy())
         print("unique_classessss", unique_classes)
+        print("len(unique_classes)", len(unique_classes))
         
 
         device = "cuda"
@@ -68,10 +64,8 @@ class SupContrastReplay(ContinualLearner):
         
 
         mapping = {value: index for index, value in enumerate(unique_classes)}
-        #print(mapping)
         
         # Training
-        ##Carto = []
         Carto = torch.zeros((6, len(y_train)))
         for epoch_ in range(6):
             print('\nEpoch: %d' % epoch_)
@@ -92,11 +86,7 @@ class SupContrastReplay(ContinualLearner):
         
                 for i in range(targets.shape[0]):
                   confidence_batch.append(soft_[i,targets[i]].item())
-                if (targets.shape[0] != self.batch):
-                  for j in range(self.batch - targets.shape[0]):
-                    confidence_batch.append(0)
-                confidence_epoch.append(confidence_batch)
-        
+                        
                 loss = criterion_(outputs, targets)
                 loss.backward()
                 optimizer_.step()
@@ -110,28 +100,18 @@ class SupContrastReplay(ContinualLearner):
                 Carto[epoch_, indices_1] = conf_tensor
                 
             print("Accuracy:", 100.*correct/total, ", and:", correct, "/", total, " ,loss:", train_loss/(batch_idx+1))
-            ##conf_tensor = torch.tensor(confidence_epoch)
-            ##conf_tensor = conf_tensor.reshape(conf_tensor.shape[0]*conf_tensor.shape[1])
-            ##conf_tensor = conf_tensor[:total]
-            
-            ##Carto.append(conf_tensor.numpy())
 
             scheduler_.step()
 
-        ##Carto_tensor = torch.tensor(np.array(Carto))
-        ##Confidence_mean = Carto_tensor.mean(dim=0)
-        ##Variability = Carto_tensor.std(dim = 0)
 
         Confidence_mean = Carto.mean(dim=0)
         Variability = Carto.std(dim=0)
         
         plt.scatter(Variability, Confidence_mean, s = 2)
         
-        # Add Axes Labels
         plt.xlabel("Variability") 
         plt.ylabel("Confidence") 
         
-        # Display        
         plt.savefig('scatter_plot.png')
 
 
@@ -156,8 +136,6 @@ class SupContrastReplay(ContinualLearner):
                     if mem_x.size(0) > 0:
                         mem_x = maybe_cuda(mem_x, self.cuda)
                         mem_y = maybe_cuda(mem_y, self.cuda)
-                        #print("mem_x.shape", mem_x.shape)
-                        #print("batch_x.shape", batch_x.shape)
                         combined_batch = torch.cat((mem_x, batch_x))
                         combined_labels = torch.cat((mem_y, batch_y))
                         combined_batch_aug = self.transform(combined_batch)
@@ -181,31 +159,12 @@ class SupContrastReplay(ContinualLearner):
             if self.buffer.buffer_label[i].item() in unique_classes:
                 counter__ +=1
 
-
-        # Number of top values you're interested in
-        #top_n = (self.params.mem_size//(task_number+1)) + 1
         top_n = counter__
-
 
         # Find the indices that would sort the array
         sorted_indices_1 = np.argsort(Confidence_mean.numpy())
         sorted_indices_2 = np.argsort(Variability.numpy())
         
-        # Take the last 'top_n' indices (i.e., the top values)
-        #top_indices_1 = sorted_indices_1[:(top_n - (int(0.33*top_n) + int(0.33*top_n)))] #hard to learn
-        #top_indices_2 = sorted_indices_1[-int(0.33*top_n):] #easy to learn
-        #top_indices_3 = sorted_indices_2[-int(0.33*top_n):] #ambigiuous
-        
-        #print("top_indicesssss", top_indices.shape, top_indices, type(top_indices))
-
-        #top_indices_12 = np.concatenate((top_indices_2, top_indices_3))
-        #top_indices_123 = np.concatenate((top_indices_12, top_indices_1))
-        
-        #top_indices_sorted = top_indices_123
-
-        
-        
-        # Take the last 'top_n' indices (i.e., the top values)
         #top_indices_1 = sorted_indices_1[:top_n]
         
         #top_indices_sorted = top_indices_1[::-1]
