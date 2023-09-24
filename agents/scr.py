@@ -50,7 +50,6 @@ class SupContrastReplay(ContinualLearner):
         unique_classes = set()
         for _, labels, indices_1 in train_loader:
             unique_classes.update(labels.numpy())
-        print("unique_classessss", unique_classes)
         
 
         device = "cuda"
@@ -75,9 +74,7 @@ class SupContrastReplay(ContinualLearner):
             confidence_epoch = []
             for batch_idx, (inputs, targets, indices_1) in enumerate(train_loader):
                 inputs, targets = inputs.to(device), targets.to(device)                
-                print("targets", targets)
                 targets = torch.tensor([mapping[val.item()] for val in targets]).to(device)
-                print("targets", targets)
                 
                 optimizer_.zero_grad()
                 outputs = Model_Carto(inputs)
@@ -130,9 +127,7 @@ class SupContrastReplay(ContinualLearner):
                 batch_y = maybe_cuda(batch_y, self.cuda)
 
                 for j in range(self.mem_iters):
-
                     mem_x, mem_y = self.buffer.retrieve(x=batch_x, y=batch_y)
-
                     if mem_x.size(0) > 0:
                         mem_x = maybe_cuda(mem_x, self.cuda)
                         mem_y = maybe_cuda(mem_y, self.cuda)
@@ -165,22 +160,17 @@ class SupContrastReplay(ContinualLearner):
         sorted_indices_1 = np.argsort(Confidence_mean.numpy())
         sorted_indices_2 = np.argsort(Variability.numpy())
         
-        #top_indices_1 = sorted_indices_1[:top_n]
+        top_indices_1 = sorted_indices_1[:top_n]
         
         #top_indices_sorted = top_indices_1[::-1]
-        #top_indices_sorted = top_indices_1
+        top_indices_sorted = top_indices_1
 
 
-        top_indices_sorted = sorted_indices_1
-        #top_indices_sorted = sorted_indices_1[::-1]
-
-        
-        #print("top_indices_sorted", top_indices_sorted, top_indices_sorted.shape)
-        print("top_indices_sorted.shape", top_indices_sorted.shape)
+        ##top_indices_sorted = sorted_indices_1
+        ##top_indices_sorted = sorted_indices_1[::-1]
 
         
         subset_data = torch.utils.data.Subset(train_dataset, top_indices_sorted)
-        #print("subset_dataaaaaaaa", subset_data)
         trainloader_C = torch.utils.data.DataLoader(subset_data, batch_size=self.batch, shuffle=False, num_workers=0)
 
         images_list = []
@@ -194,7 +184,7 @@ class SupContrastReplay(ContinualLearner):
         all_labels = torch.cat(labels_list, dim=0)
 
 
-        num_per_class = top_n//len(unique_classes)
+        '''num_per_class = top_n//len(unique_classes)
         counter_class = [0 for _ in range(len(unique_classes))]
         full = [math.ceil(top_n/len(unique_classes)) for _ in range(len(unique_classes))]
 
@@ -215,19 +205,16 @@ class SupContrastReplay(ContinualLearner):
         all_images_ = torch.stack(images_list_)
         all_labels_ = torch.stack(labels_list_)
         #print("all_images_.shapeall_images_.shape",all_images_.shape)
-        print("all_labels_.shapeeee",all_labels_.shape)
+        print("all_labels_.shapeeee",all_labels_.shape)'''
 
         
-        print("unique_classes", unique_classes)
         counter = 0
         for i in range(self.buffer.buffer_label.shape[0]):
             if self.buffer.buffer_label[i].item() in unique_classes:
-                self.buffer.buffer_label[i] = all_labels_.to(device)[counter]
-                self.buffer.buffer_img[i] = all_images_.to(device)[counter]
+                self.buffer.buffer_label[i] = all_labels.to(device)[counter]
+                self.buffer.buffer_img[i] = all_images.to(device)[counter]
                 counter +=1
 
         print("counter", counter)
 
-        
         self.after_train()
-
