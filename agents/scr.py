@@ -45,7 +45,20 @@ class SupContrastReplay(ContinualLearner):
         self.before_train(x_train, y_train)
         # set up loader
         train_dataset = dataset_transform(x_train, y_train, transform=transforms_match[self.data])
-        train_loader = data.DataLoader(train_dataset, batch_size=self.batch, shuffle=True, num_workers=0, drop_last=True)
+        train_loader = data.DataLoader(train_dataset, batch_size=self.batch, shuffle=False, num_workers=0, drop_last=True)
+
+
+        ima = []
+        labe = []
+        for images, labels, indices_1 in train_loader:  # Assuming train_loader is your DataLoader
+            ima.append(images)
+            labe.append(labels)
+        
+        print(ima[100][0])
+        all_ima = torch.cat(ima, dim=0)
+        all_labe = torch.cat(labe, dim=0)
+
+
         
         unique_classes = set()
         for _, labels, indices_1 in train_loader:
@@ -171,7 +184,7 @@ class SupContrastReplay(ContinualLearner):
 
         
         subset_data = torch.utils.data.Subset(train_dataset, top_indices_sorted)
-        trainloader_C = torch.utils.data.DataLoader(subset_data, batch_size=self.batch, shuffle=False, num_workers=0)
+        trainloader_C = torch.utils.data.DataLoader(subset_data, batch_size=self.batch, shuffle=True, num_workers=0)
 
         images_list = []
         labels_list = []
