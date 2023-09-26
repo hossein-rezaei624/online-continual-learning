@@ -39,6 +39,7 @@ class SupContrastReplay(ContinualLearner):
 
         )
         self.soft_ = nn.Softmax(dim=1)
+        self.data_ = params.data
     
     
     def train_learner(self, x_train, y_train, task_number):        
@@ -55,7 +56,7 @@ class SupContrastReplay(ContinualLearner):
 
         device = "cuda"
         Model_Carto = ResNet18(len(unique_classes))
-        if params.data == 'mini_imagenet':
+        if self.data_ == 'mini_imagenet':
             Model_Carto.linear = nn.Linear(640)
         Model_Carto = Model_Carto.to(device)
         criterion_ = nn.CrossEntropyLoss()
