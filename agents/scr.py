@@ -9,6 +9,7 @@ from kornia.augmentation import RandomResizedCrop, RandomHorizontalFlip, ColorJi
 import torch.nn as nn
 
 from models.resnet import ResNet18
+from models import resnet1
 import numpy as np
 import torch.optim as optim
 import torch.nn as nn
@@ -39,7 +40,6 @@ class SupContrastReplay(ContinualLearner):
 
         )
         self.soft_ = nn.Softmax(dim=1)
-        self.data_ = params.data
     
     
     def train_learner(self, x_train, y_train, task_number):        
@@ -55,7 +55,7 @@ class SupContrastReplay(ContinualLearner):
         
 
         device = "cuda"
-        Model_Carto = ResNet18(len(unique_classes))
+        Model_Carto = resnet1.ResNet18(len(unique_classes))
         Model_Carto = Model_Carto.to(device)
         criterion_ = nn.CrossEntropyLoss()
         optimizer_ = optim.SGD(Model_Carto.parameters(), lr=0.1,
