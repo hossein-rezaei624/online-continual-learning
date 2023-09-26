@@ -56,8 +56,6 @@ class SupContrastReplay(ContinualLearner):
 
         device = "cuda"
         Model_Carto = ResNet18(len(unique_classes))
-        if self.data_ == 'mini_imagenet':
-            Model_Carto.linear = nn.Linear(640, len(unique_classes), bias=True)
         Model_Carto = Model_Carto.to(device)
         criterion_ = nn.CrossEntropyLoss()
         optimizer_ = optim.SGD(Model_Carto.parameters(), lr=0.1,
