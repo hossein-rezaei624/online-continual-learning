@@ -24,7 +24,6 @@ from torch.utils.data import Dataset
 import pickle
 
 
-
 class SupContrastReplay(ContinualLearner):
     def __init__(self, model, opt, params):
         super(SupContrastReplay, self).__init__(model, opt, params)
@@ -174,7 +173,7 @@ class SupContrastReplay(ContinualLearner):
 
         ##top_indices_sorted = sorted_indices_1 #hard to learn
         
-        ##top_indices_sorted = sorted_indices_1[::-1] #easy to learn
+        top_indices_sorted = sorted_indices_1[::-1] #easy to learn
 
         ##top_indices_sorted = sorted_indices_2[::-1] #ambigiuous
 
@@ -193,7 +192,26 @@ class SupContrastReplay(ContinualLearner):
         all_labels = torch.cat(labels_list, dim=0)
 
 
-        num_per_class = top_n//len(unique_classes)
+        # Extract the first 10 images
+        images = [all_images[i][0] for i in range(25)]
+        labels = [all_labels[i][1] for i in range(25)]
+        
+        # Make a grid from these images
+        grid = torchvision.utils.make_grid(images, nrow=5)  # 5 images per row
+        
+        torchvision.utils.save_image(grid, 'grid_image.png')
+        
+
+        # Extract the first 10 images
+        images = [all_images[-i][0] for i in range(25)]
+        labels = [all_labels[-i][1] for i in range(25)]
+        
+        # Make a grid from these images
+        grid = torchvision.utils.make_grid(images, nrow=5)  # 5 images per row
+        
+        torchvision.utils.save_image(grid, 'grid_image1.png')
+
+        '''num_per_class = top_n//len(unique_classes)
         counter_class = [0 for _ in range(len(unique_classes))]
         full = [math.ceil(top_n/len(unique_classes)) for _ in range(len(unique_classes))]
 
@@ -214,7 +232,7 @@ class SupContrastReplay(ContinualLearner):
         all_images_ = torch.stack(images_list_)
         all_labels_ = torch.stack(labels_list_)
         #print("all_images_.shapeall_images_.shape",all_images_.shape)
-        print("all_labels_.shapeeee",all_labels_.shape)
+        print("all_labels_.shapeeee",all_labels_.shape)'''
 
         
         counter = 0
