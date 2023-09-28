@@ -202,7 +202,7 @@ class SupContrastReplay(ContinualLearner):
         ##full = [math.ceil(top_n/len(unique_classes)) for _ in range(len(unique_classes))]
         condition = [num_per_class for _ in range(len(unique_classes))]
         print("condition", condition)
-        diff = top_n - num_per_class
+        diff = top_n - num_per_class*len(unique_classes)
         print("diff", diff)
         for o in range(diff):
             condition[o] += 1
