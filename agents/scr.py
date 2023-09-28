@@ -213,15 +213,15 @@ class SupContrastReplay(ContinualLearner):
         labels_list_ = []
         
         for i in range(all_labels.shape[0]):
-            if counter_class[mapping[all_labels[i].item()]] < (num_per_class + 1):
+            if counter_class[mapping[all_labels[i].item()]] < condition[mapping[all_labels[i].item()]]:
                 counter_class[mapping[all_labels[i].item()]] += 1
                 labels_list_.append(all_labels[i])
                 images_list_.append(all_images[i])
-            if counter_class == full:
+            if counter_class == condition:
                 print("yessssss")
                 break
 
-        print("counter_class", counter_class)
+        print("counter_class after", counter_class)
         ##print("full", full)
         all_images_ = torch.stack(images_list_)
         all_labels_ = torch.stack(labels_list_)
