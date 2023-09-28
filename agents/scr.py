@@ -194,8 +194,20 @@ class SupContrastReplay(ContinualLearner):
 
 
         num_per_class = top_n//len(unique_classes)
+        print("top_n", top_n)
+        print("len(unique_classes)", len(unique_classes))
+        print("num_per_class", num_per_class)
         counter_class = [0 for _ in range(len(unique_classes))]
-        full = [math.ceil(top_n/len(unique_classes)) for _ in range(len(unique_classes))]
+        print("counter_class", counter_class)
+        ##full = [math.ceil(top_n/len(unique_classes)) for _ in range(len(unique_classes))]
+        condition = [num_per_class for _ in range(len(unique_classes))]
+        print("condition", condition)
+        diff = top_n - num_per_class
+        print("diff", diff)
+        for o in range(diff):
+            condition[o] += 1
+
+        print("condition after", condition)
 
         images_list_ = []
         labels_list_ = []
@@ -210,7 +222,7 @@ class SupContrastReplay(ContinualLearner):
                 break
 
         print("counter_class", counter_class)
-        print("full", full)
+        ##print("full", full)
         all_images_ = torch.stack(images_list_)
         all_labels_ = torch.stack(labels_list_)
         #print("all_images_.shapeall_images_.shape",all_images_.shape)
