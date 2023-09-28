@@ -193,21 +193,21 @@ class SupContrastReplay(ContinualLearner):
 
 
         # Extract the first 10 images
-        images = [all_images[i] for i in range(25)]
-        labels = [all_labels[i] for i in range(25)]
+        images = [all_images[i] for i in range(250)]
+        labels = [all_labels[i] for i in range(250)]
         
         # Make a grid from these images
-        grid = torchvision.utils.make_grid(images, nrow=5)  # 5 images per row
+        grid = torchvision.utils.make_grid(images, nrow=10)  # 5 images per row
         
         torchvision.utils.save_image(grid, 'grid_image.png')
         
 
         # Extract the first 10 images
-        images = [all_images[-i] for i in range(25)]
-        labels = [all_labels[-i] for i in range(25)]
+        images = [all_images[-i] for i in range(250)]
+        labels = [all_labels[-i] for i in range(250)]
         
         # Make a grid from these images
-        grid = torchvision.utils.make_grid(images, nrow=5)  # 5 images per row
+        grid = torchvision.utils.make_grid(images, nrow=10)  # 5 images per row
         
         torchvision.utils.save_image(grid, 'grid_image1.png')
 
