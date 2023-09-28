@@ -192,26 +192,8 @@ class SupContrastReplay(ContinualLearner):
         all_labels = torch.cat(labels_list, dim=0)
 
 
-        # Extract the first 10 images
-        images = [all_images[i] for i in range(225)]
-        labels = [all_labels[i] for i in range(225)]
-        
-        # Make a grid from these images
-        grid = torchvision.utils.make_grid(images, nrow=15)  # 5 images per row
-        
-        torchvision.utils.save_image(grid, 'grid_image.png')
-        
 
-        # Extract the first 10 images
-        images = [all_images[-i] for i in range(225)]
-        labels = [all_labels[-i] for i in range(225)]
-        
-        # Make a grid from these images
-        grid = torchvision.utils.make_grid(images, nrow=15)  # 5 images per row
-        
-        torchvision.utils.save_image(grid, 'grid_image1.png')
-
-        '''num_per_class = top_n//len(unique_classes)
+        num_per_class = top_n//len(unique_classes)
         counter_class = [0 for _ in range(len(unique_classes))]
         full = [math.ceil(top_n/len(unique_classes)) for _ in range(len(unique_classes))]
 
@@ -232,7 +214,7 @@ class SupContrastReplay(ContinualLearner):
         all_images_ = torch.stack(images_list_)
         all_labels_ = torch.stack(labels_list_)
         #print("all_images_.shapeall_images_.shape",all_images_.shape)
-        print("all_labels_.shapeeee",all_labels_.shape)'''
+        print("all_labels_.shapeeee",all_labels_.shape)
 
         
         counter = 0
