@@ -68,6 +68,7 @@ class SupContrastReplay(ContinualLearner):
 
         # Initializing the dictionaries
         class_confidence_sum = {val: 0.0 for val in unique_classes}
+        print("class_confidence_sum", class_confidence_sum)
         class_count = {val: 0 for val in unique_classes}
         
         # Training
