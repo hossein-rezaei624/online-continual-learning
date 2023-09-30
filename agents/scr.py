@@ -41,7 +41,7 @@ class SupContrastReplay(ContinualLearner):
         self.soft_ = nn.Softmax(dim=1)
     
     
-    def distribute_samples(probabilities, M):
+    def distribute_samples(self, probabilities, M):
         # Normalize the probabilities
         total_probability = sum(probabilities.values())
         normalized_probabilities = {k: v / total_probability for k, v in probabilities.items()}
@@ -236,7 +236,7 @@ class SupContrastReplay(ContinualLearner):
 
         updated_class_avg_confidence = {k: 1 - v for k, v in class_avg_confidence.items()}
 
-        dist = distribute_samples(updated_class_avg_confidence, top_n)
+        dist = self.distribute_samples(updated_class_avg_confidence, top_n)
 
 
         
