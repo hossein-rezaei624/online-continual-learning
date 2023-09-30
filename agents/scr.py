@@ -261,6 +261,8 @@ class SupContrastReplay(ContinualLearner):
                 ##print("yesssss")
                 break
 
+        print("counter_class", counter_class)
+        
         all_images_ = torch.stack(images_list_)
         all_labels_ = torch.stack(labels_list_)
 
