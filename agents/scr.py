@@ -190,9 +190,9 @@ class SupContrastReplay(ContinualLearner):
         #top_indices_sorted = top_indices_1[::-1] #ambiguous
 
 
-        top_indices_sorted = sorted_indices_1 #hard to learn
+        ##top_indices_sorted = sorted_indices_1 #hard to learn
         
-        ##top_indices_sorted = sorted_indices_1[::-1] #easy to learn
+        top_indices_sorted = sorted_indices_1[::-1] #easy to learn
 
         ##top_indices_sorted = sorted_indices_2[::-1] #ambiguous
 
@@ -235,7 +235,7 @@ class SupContrastReplay(ContinualLearner):
 
         all_images_ = torch.stack(images_list_)
         all_labels_ = torch.stack(labels_list_)
-
+        print("all_labels_[:50]", all_labels_[:50])
 
         indices = torch.randperm(all_images_.size(0))
         shuffled_images = all_images_[indices]
