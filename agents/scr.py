@@ -41,6 +41,29 @@ class SupContrastReplay(ContinualLearner):
         self.soft_ = nn.Softmax(dim=1)
     
     
+    def distribute_samples(probabilities, M):
+        # Normalize the probabilities
+        total_probability = sum(probabilities.values())
+        normalized_probabilities = {k: v / total_probability for k, v in probabilities.items()}
+    
+        # Calculate the number of samples for each class
+        samples = {k: round(v * M) for k, v in normalized_probabilities.items()}
+        
+        # Check if there's any discrepancy due to rounding and correct it
+        discrepancy = M - sum(samples.values())
+        for key in samples:
+            if discrepancy == 0:
+                break
+            if discrepancy > 0:
+                samples[key] += 1
+                discrepancy -= 1
+            else:
+                samples[key] -= 1
+                discrepancy += 1
+    
+        return samples
+
+    
     def train_learner(self, x_train, y_train, task_number):        
         self.before_train(x_train, y_train)
         # set up loader
@@ -117,7 +140,7 @@ class SupContrastReplay(ContinualLearner):
         for cls in range(len(unique_classes)):
             class_avg_confidence[cls] = class_confidence_sum[cls] / class_count[cls]
 
-        print("class_avg_confidence", class_avg_confidence)
+        ##print("class_avg_confidence", class_avg_confidence)
 
         Confidence_mean = Carto.mean(dim=0)
         Variability = Carto.std(dim=0)
@@ -188,11 +211,11 @@ class SupContrastReplay(ContinualLearner):
         #top_indices_sorted = top_indices_1[::-1] #ambiguous
 
 
-        top_indices_sorted = sorted_indices_1 #hard to learn
+        ##top_indices_sorted = sorted_indices_1 #hard to learn
         
         ##top_indices_sorted = sorted_indices_1[::-1] #easy to learn
 
-        ##top_indices_sorted = sorted_indices_2[::-1] #ambiguous
+        top_indices_sorted = sorted_indices_2[::-1] #ambiguous
 
         
         subset_data = torch.utils.data.Subset(train_dataset, top_indices_sorted)
@@ -210,13 +233,20 @@ class SupContrastReplay(ContinualLearner):
 
 
         ##print("top_n", top_n)
+
+        updated_class_avg_confidence = {k: 1 - v for k, v in class_avg_confidence.items()}
+
+        dist = distribute_samples(updated_class_avg_confidence, top_n)
+
+
         
         num_per_class = top_n//len(unique_classes)
         counter_class = [0 for _ in range(len(unique_classes))]
-        condition = [num_per_class for _ in range(len(unique_classes))]
-        diff = top_n - num_per_class*len(unique_classes)
-        for o in range(diff):
-            condition[o] += 1
+        condition = [value for k, value in dist.items()]
+        print("condition", condition)
+        ##diff = top_n - num_per_class*len(unique_classes)
+        ##for o in range(diff):
+          ##  condition[o] += 1
 
 
         images_list_ = []
@@ -233,7 +263,6 @@ class SupContrastReplay(ContinualLearner):
 
         all_images_ = torch.stack(images_list_)
         all_labels_ = torch.stack(labels_list_)
-        print("all_labels_[:50]", all_labels_[:50])
 
         indices = torch.randperm(all_images_.size(0))
         shuffled_images = all_images_[indices]
