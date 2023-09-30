@@ -65,11 +65,10 @@ class SupContrastReplay(ContinualLearner):
         mapping = {value: index for index, value in enumerate(unique_classes)}
 
 
-
         # Initializing the dictionaries
-        class_confidence_sum = {val: 0.0 for val in unique_classes}
+        class_confidence_sum = {ind: 0.0 for ind, val in enumerate(unique_classes)}
         print("class_confidence_sum", class_confidence_sum)
-        class_count = {val: 0 for val in unique_classes}
+        class_count = {ind: 0.0 for ind, val in enumerate(unique_classes)}
         
         # Training
         Carto = torch.zeros((6, len(y_train)))
