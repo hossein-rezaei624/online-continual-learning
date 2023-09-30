@@ -63,6 +63,12 @@ class SupContrastReplay(ContinualLearner):
         
 
         mapping = {value: index for index, value in enumerate(unique_classes)}
+
+
+
+        # Initializing the dictionaries
+        class_confidence_sum = {val: 0.0 for val in unique_classes}
+        class_count = {val: 0 for val in unique_classes}
         
         # Training
         Carto = torch.zeros((6, len(y_train)))
@@ -82,8 +88,12 @@ class SupContrastReplay(ContinualLearner):
                 soft_ = self.soft_(outputs)
                 confidence_batch = []
         
+                # Accumulate confidences and counts
                 for i in range(targets.shape[0]):
-                  confidence_batch.append(soft_[i,targets[i]].item())
+                    confidence_batch.append(soft_[i,targets[i]].item())
+                    actual_class = targets[i].item()
+                    class_confidence_sum[actual_class] += soft_[i, targets[i]].item()
+                    class_count[actual_class] += 1
                         
                 loss = criterion_(outputs, targets)
                 loss.backward()
@@ -101,6 +111,13 @@ class SupContrastReplay(ContinualLearner):
 
             scheduler_.step()
 
+
+        # Calculating the average confidence for each class
+        class_avg_confidence = {}
+        for cls in unique_classes:
+            class_avg_confidence[cls] = class_confidence_sum[cls] / class_count[cls]
+
+        print("class_avg_confidence", class_avg_confidence)
 
         Confidence_mean = Carto.mean(dim=0)
         Variability = Carto.std(dim=0)
