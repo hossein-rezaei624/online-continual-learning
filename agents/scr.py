@@ -140,7 +140,7 @@ class SupContrastReplay(ContinualLearner):
         for cls in range(len(unique_classes)):
             class_avg_confidence[cls] = class_confidence_sum[cls] / class_count[cls]
 
-        ##print("class_avg_confidence", class_avg_confidence)
+        print("class_avg_confidence", class_avg_confidence)
 
         Confidence_mean = Carto.mean(dim=0)
         Variability = Carto.std(dim=0)
