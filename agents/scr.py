@@ -63,6 +63,9 @@ class SupContrastReplay(ContinualLearner):
         
 
         mapping = {value: index for index, value in enumerate(unique_classes)}
+        print("mapping", mapping)
+        reverse_mapping = {index: value for value, index in mapping.items()}
+        print("reverse_mapping", reverse_mapping)
 
 
         # Initializing the dictionaries
