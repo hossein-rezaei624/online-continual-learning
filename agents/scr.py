@@ -117,8 +117,6 @@ class SupContrastReplay(ContinualLearner):
                     actual_class = targets[i].item()
                     class_confidence_sum[actual_class] += soft_[i, targets[i]].item()
                     class_count[actual_class] += 1
-                    print("actual_class", actual_class)
-                    print("class_count", class_count)
                         
                 loss = criterion_(outputs, targets)
                 loss.backward()
