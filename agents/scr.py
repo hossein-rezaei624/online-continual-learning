@@ -234,7 +234,7 @@ class SupContrastReplay(ContinualLearner):
 
         ##print("top_n", top_n)
 
-        updated_class_avg_confidence = {k: 1 - v for k, v in class_avg_confidence.items()}
+        updated_class_avg_confidence = {k: v for k, v in class_avg_confidence.items()}
 
         dist = self.distribute_samples(updated_class_avg_confidence, top_n)
 
