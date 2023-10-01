@@ -226,7 +226,7 @@ class SupContrastReplay(ContinualLearner):
 
 
 
-        updated_std_by_class = {k: 1 - v.item() for k, v in std_by_class.items()}
+        updated_std_by_class = {k: v.item() for k, v in std_by_class.items()}
         print("updated_std_by_class", updated_std_by_class)
 
         dist = self.distribute_samples(updated_std_by_class, top_n)
