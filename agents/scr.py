@@ -88,10 +88,9 @@ class SupContrastReplay(ContinualLearner):
         reverse_mapping = {index: value for value, index in mapping.items()}
 
 
-        # Initializing the dictionaries
-        class_confidence_sum = {ind: 0.0 for ind, val in enumerate(unique_classes)}
-        class_count = {ind: 0.0 for ind, val in enumerate(unique_classes)}
-        print("class_count before", class_count)
+        # Initializing the dictionaries        
+        confidence_by_class = {class_id: [] for class_id, __ in enumerate(unique_classes)}
+
         
         # Training
         Carto = torch.zeros((6, len(y_train)))
@@ -114,10 +113,8 @@ class SupContrastReplay(ContinualLearner):
                 # Accumulate confidences and counts
                 for i in range(targets.shape[0]):
                     confidence_batch.append(soft_[i,targets[i]].item())
-                    actual_class = targets[i].item()
-                    class_confidence_sum[actual_class] += soft_[i, targets[i]].item()
-                    class_count[actual_class] += 1
-                        
+                    confidence_by_class[targets[i].item()].append(soft_[i, targets[i]].item())
+
                 loss = criterion_(outputs, targets)
                 loss.backward()
                 optimizer_.step()
@@ -135,14 +132,8 @@ class SupContrastReplay(ContinualLearner):
             scheduler_.step()
 
 
-        print("class_count after", class_count)
-        # Calculating the average confidence for each class
-        class_avg_confidence = {}
-        for cls in range(len(unique_classes)):
-            class_avg_confidence[cls] = class_confidence_sum[cls] / class_count[cls]
-            
-
-        print("class_avg_confidence", class_avg_confidence)
+        std_by_class = {class_id: torch.std(torch.tensor(confidences)) for class_id, confidences in confidence_by_class.items()}    
+        print("std_by_class", std_by_class)
 
         Confidence_mean = Carto.mean(dim=0)
         Variability = Carto.std(dim=0)
@@ -234,11 +225,10 @@ class SupContrastReplay(ContinualLearner):
         all_labels = torch.cat(labels_list, dim=0)
 
 
-        ##print("top_n", top_n)
 
-        updated_class_avg_confidence = {k: v for k, v in class_avg_confidence.items()}
+        updated_std_by_class = {k: v for k, v in std_by_class.items()}
 
-        dist = self.distribute_samples(updated_class_avg_confidence, top_n)
+        dist = self.distribute_samples(updated_std_by_class, top_n)
 
 
         
@@ -253,7 +243,6 @@ class SupContrastReplay(ContinualLearner):
         else:
             condition = [value for k, value in dist.items()]
         
-        print("condition", condition)
 
 
         images_list_ = []
@@ -268,7 +257,6 @@ class SupContrastReplay(ContinualLearner):
                 ##print("yesssss")
                 break
 
-        print("counter_class", counter_class)
         
         all_images_ = torch.stack(images_list_)
         all_labels_ = torch.stack(labels_list_)
