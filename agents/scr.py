@@ -131,7 +131,7 @@ class SupContrastReplay(ContinualLearner):
 
             scheduler_.step()
 
-
+        print("len(confidence_by_class[0])", len(confidence_by_class[0]))
         std_by_class = {class_id: torch.std(torch.tensor(confidences)) for class_id, confidences in confidence_by_class.items()}    
         print("std_by_class", std_by_class)
 
