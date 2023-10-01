@@ -138,6 +138,7 @@ class SupContrastReplay(ContinualLearner):
         class_avg_confidence = {}
         for cls in range(len(unique_classes)):
             class_avg_confidence[cls] = class_confidence_sum[cls] / class_count[cls]
+            print("class_count[cls]", class_count[cls])
 
         print("class_avg_confidence", class_avg_confidence)
 
