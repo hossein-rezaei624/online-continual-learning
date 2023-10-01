@@ -70,7 +70,6 @@ class SupContrastReplay(ContinualLearner):
         train_dataset = dataset_transform(x_train, y_train, transform=transforms_match[self.data])
         train_loader = data.DataLoader(train_dataset, batch_size=self.batch, shuffle=True, num_workers=0, drop_last=True)
 
-        print("len(y_train)", len(y_train))
         unique_classes = set()
         for _, labels, indices_1 in train_loader:
             unique_classes.update(labels.numpy())
@@ -242,11 +241,16 @@ class SupContrastReplay(ContinualLearner):
         
         num_per_class = top_n//len(unique_classes)
         counter_class = [0 for _ in range(len(unique_classes))]
-        condition = [value for k, value in dist.items()]
+
+        if len(y_train) == top_n:
+            condition = [num_per_class for _ in range(len(unique_classes))]
+            diff = top_n - num_per_class*len(unique_classes)
+            for o in range(diff):
+                condition[o] += 1
+        else:
+            condition = [value for k, value in dist.items()]
+        
         print("condition", condition)
-        ##diff = top_n - num_per_class*len(unique_classes)
-        ##for o in range(diff):
-          ##  condition[o] += 1
 
 
         images_list_ = []
