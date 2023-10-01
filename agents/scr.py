@@ -1,4 +1,4 @@
-import torch #Calculating the average confidence for each class
+import torch
 from torch.utils import data
 from utils.buffer.buffer import Buffer
 from agents.base import ContinualLearner
