@@ -132,7 +132,7 @@ class SupContrastReplay(ContinualLearner):
             scheduler_.step()
 
 
-        std_by_class = {class_id: torch.std(torch.tensor(confidences)) for class_id, confidences in confidence_by_class.items()}    
+        std_by_class = {class_id: torch.mean(torch.tensor(confidences)) for class_id, confidences in confidence_by_class.items()}    
         print("std_by_class", std_by_class)
 
         Confidence_mean = Carto.mean(dim=0)
