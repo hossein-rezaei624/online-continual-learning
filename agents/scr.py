@@ -133,9 +133,10 @@ class SupContrastReplay(ContinualLearner):
 
             scheduler_.step()
 
-        std_by_class = {class_id: {epoch: torch.std(torch.tensor(confidences[epoch])) for epoch in confidences} for class_id, confidences in confidence_by_class.items()}
-
-        print("std_by_classssssss", std_by_class)
+        mean_by_class = {class_id: {epoch: torch.mean(torch.tensor(confidences[epoch])) for epoch in confidences} for class_id, confidences in confidence_by_class.items()}
+        std_of_means_by_class = {class_id: torch.std(torch.tensor([mean_by_class[class_id][epoch] for epoch in range(6)])) for class_id, __ in enumerate(unique_classes)}
+        
+        print("std_of_means_by_class", std_of_means_by_class)
 
         Confidence_mean = Carto.mean(dim=0)
         Variability = Carto.std(dim=0)
@@ -228,10 +229,10 @@ class SupContrastReplay(ContinualLearner):
 
 
 
-        updated_std_by_class = {k: v.item() for k, v in std_by_class.items()}
-        print("updated_std_by_class", updated_std_by_class)
+        updated_std_of_means_by_class = {k: v.item() for k, v in std_of_means_by_class.items()}
+        print("updated_std_of_means_by_class", updated_std_of_means_by_class)
 
-        dist = self.distribute_samples(updated_std_by_class, top_n)
+        dist = self.distribute_samples(updated_std_of_means_by_class, top_n)
 
 
         
