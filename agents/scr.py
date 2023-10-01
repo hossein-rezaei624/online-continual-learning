@@ -91,6 +91,7 @@ class SupContrastReplay(ContinualLearner):
         # Initializing the dictionaries
         class_confidence_sum = {ind: 0.0 for ind, val in enumerate(unique_classes)}
         class_count = {ind: 0.0 for ind, val in enumerate(unique_classes)}
+        print("class_count before", class_count)
         
         # Training
         Carto = torch.zeros((6, len(y_train)))
@@ -138,7 +139,8 @@ class SupContrastReplay(ContinualLearner):
         class_avg_confidence = {}
         for cls in range(len(unique_classes)):
             class_avg_confidence[cls] = class_confidence_sum[cls] / class_count[cls]
-            print("class_count[cls]", class_count[cls])
+            
+        print("class_count after", class_count)
 
         print("class_avg_confidence", class_avg_confidence)
 
