@@ -51,6 +51,7 @@ class SupContrastReplay(ContinualLearner):
         
         # Check if there's any discrepancy due to rounding and correct it
         discrepancy = M - sum(samples.values())
+        print("discrepancy", discrepancy)
         for key in samples:
             if discrepancy == 0:
                 break
