@@ -52,7 +52,11 @@ class SupContrastReplay(ContinualLearner):
         # Check if there's any discrepancy due to rounding and correct it
         discrepancy = M - sum(samples.values())
         print("discrepancy", discrepancy)
-        for key in samples:
+        
+        # Sort the keys based on their values
+        sorted_keys = sorted(samples, key=samples.get, reverse=(discrepancy < 0))
+        print("sorted_keys", sorted_keys)
+        for key in sorted_keys:
             if discrepancy == 0:
                 break
             if discrepancy > 0:
@@ -61,10 +65,12 @@ class SupContrastReplay(ContinualLearner):
             else:
                 samples[key] -= 1
                 discrepancy += 1
-
+    
         print("samples after", samples)
         return samples
 
+
+    
     
     def train_learner(self, x_train, y_train, task_number):        
         self.before_train(x_train, y_train)
