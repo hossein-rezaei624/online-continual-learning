@@ -48,14 +48,13 @@ class SupContrastReplay(ContinualLearner):
     
         # Calculate the number of samples for each class
         samples = {k: round(v * M) for k, v in normalized_probabilities.items()}
-        print("samples before", samples)
+        
         # Check if there's any discrepancy due to rounding and correct it
         discrepancy = M - sum(samples.values())
-        print("discrepancy", discrepancy)
         
         # Sort the keys based on their values
         sorted_keys = sorted(samples, key=samples.get, reverse=(discrepancy < 0))
-        print("sorted_keys", sorted_keys)
+        
         for key in sorted_keys:
             if discrepancy == 0:
                 break
@@ -66,11 +65,8 @@ class SupContrastReplay(ContinualLearner):
                 samples[key] -= 1
                 discrepancy += 1
     
-        print("samples after", samples)
         return samples
 
-
-    
     
     def train_learner(self, x_train, y_train, task_number):        
         self.before_train(x_train, y_train)
@@ -144,7 +140,7 @@ class SupContrastReplay(ContinualLearner):
         mean_by_class = {class_id: {epoch: torch.mean(torch.tensor(confidences[epoch])) for epoch in confidences} for class_id, confidences in confidence_by_class.items()}
         std_of_means_by_class = {class_id: torch.std(torch.tensor([mean_by_class[class_id][epoch] for epoch in range(6)])) for class_id, __ in enumerate(unique_classes)}
         
-        print("std_of_means_by_class", std_of_means_by_class)
+        ##print("std_of_means_by_class", std_of_means_by_class)
 
         Confidence_mean = Carto.mean(dim=0)
         Variability = Carto.std(dim=0)
@@ -236,12 +232,11 @@ class SupContrastReplay(ContinualLearner):
         all_labels = torch.cat(labels_list, dim=0)
 
 
-
         updated_std_of_means_by_class = {k: v.item() for k, v in std_of_means_by_class.items()}
-        print("updated_std_of_means_by_class", updated_std_of_means_by_class)
+        
+        ##print("updated_std_of_means_by_class", updated_std_of_means_by_class)
 
         dist = self.distribute_samples(updated_std_of_means_by_class, top_n)
-
 
         
         num_per_class = top_n//len(unique_classes)
@@ -255,7 +250,6 @@ class SupContrastReplay(ContinualLearner):
         else:
             condition = [value for k, value in dist.items()]
         
-
 
         images_list_ = []
         labels_list_ = []
