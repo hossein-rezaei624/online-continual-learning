@@ -49,12 +49,15 @@ class SupContrastReplay(ContinualLearner):
         # Calculate the number of samples for each class
         samples = {k: round(v * M) for k, v in normalized_probabilities.items()}
         
+        print("samples", samples)
         # Check if there's any discrepancy due to rounding and correct it
         discrepancy = M - sum(samples.values())
         
+        print("discrepancy", discrepancy)
         # Sort the keys based on their values
-        sorted_keys = sorted(samples, key=samples.get, reverse=(discrepancy < 0))
+        sorted_keys = sorted(samples, key=samples.get, reverse=(discrepancy > 0))
         
+        print("sorted_keys", sorted_keys)
         for key in sorted_keys:
             if discrepancy == 0:
                 break
@@ -65,6 +68,7 @@ class SupContrastReplay(ContinualLearner):
                 samples[key] -= 1
                 discrepancy += 1
     
+        print("samples", samples)
         return samples
 
     
