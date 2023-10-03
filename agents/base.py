@@ -161,7 +161,7 @@ class ContinualLearner(torch.nn.Module, metaclass=abc.ABCMeta):
                     batch_x = maybe_cuda(batch_x, self.cuda)
                     batch_y = maybe_cuda(batch_y, self.cuda)
 
-                    batch_x = torchvision.transforms.functional.rotate(batch_x, 90)
+                    ##batch_x = torchvision.transforms.functional.rotate(batch_x, 90)
                     
                     if self.params.trick['ncm_trick'] or self.params.agent in ['ICARL', 'SCR', 'SCP']:
                         feature = self.model.features(batch_x)  # (batch_size, feature_size)
