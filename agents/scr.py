@@ -48,13 +48,10 @@ class SupContrastReplay(ContinualLearner):
     
         # Calculate the number of samples for each class
         samples = {k: round(v * M) for k, v in normalized_probabilities.items()}
-        
-        print("samples", samples)
+        print("samples before", samples)
         # Check if there's any discrepancy due to rounding and correct it
         discrepancy = M - sum(samples.values())
-        
         print("discrepancy", discrepancy)
-        
         for key in samples:
             if discrepancy == 0:
                 break
@@ -64,8 +61,8 @@ class SupContrastReplay(ContinualLearner):
             else:
                 samples[key] -= 1
                 discrepancy += 1
-    
-        print("samples", samples)
+
+        print("samples after", samples)
         return samples
 
     
