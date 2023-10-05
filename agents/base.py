@@ -163,13 +163,13 @@ class ContinualLearner(torch.nn.Module, metaclass=abc.ABCMeta):
                     batch_y = maybe_cuda(batch_y, self.cuda)
 
                     ##batch_x_ = torchvision.transforms.functional.rotate(batch_x, 90)
-                    batch_x_ = torch.tensor(glass_blur(batch_x.cpu())).to("cuda")
+                    batch_x_ = torch.tensor(glass_blur(batch_x[0].cpu())).to("cuda")
                     
                     # Extract the first 10 images
-                    images_1 = [batch_x_[i] for i in range(100)]
+                    images_1 = [batch_x_[i] for i in range(1)]
                     
                     # Make a grid from these images
-                    grid = torchvision.utils.make_grid(images_1, nrow=10)  # 5 images per row
+                    grid = torchvision.utils.make_grid(images_1, nrow=1)  # 5 images per row
                     
                     torchvision.utils.save_image(grid, 'grid_image.png')
                     
