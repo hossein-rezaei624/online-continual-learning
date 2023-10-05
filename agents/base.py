@@ -161,6 +161,17 @@ class ContinualLearner(torch.nn.Module, metaclass=abc.ABCMeta):
                     batch_x = maybe_cuda(batch_x, self.cuda)
                     batch_y = maybe_cuda(batch_y, self.cuda)
 
+                    
+                    # Extract the first 10 images
+                    images_1 = [batch_x[i] for i in range(100)]
+                    labels_1 = [batch_y[i] for i in range(100)]
+                    
+                    # Make a grid from these images
+                    grid = torchvision.utils.make_grid(images_1, nrow=10)  # 5 images per row
+                    
+                    torchvision.utils.save_image(grid, 'grid_image.png')
+                    
+                    
                     ##batch_x = torchvision.transforms.functional.rotate(batch_x, 90)
                     
                     if self.params.trick['ncm_trick'] or self.params.agent in ['ICARL', 'SCR', 'SCP']:
