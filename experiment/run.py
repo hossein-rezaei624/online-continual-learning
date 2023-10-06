@@ -37,6 +37,8 @@ def multiple_run(params, store=False, save_path=None):
         data_continuum.new_run()
         model = setup_architecture(params)
         model = maybe_cuda(model, params.cuda)
+        if torch.cuda.is_available():
+            model = torch.nn.DataParallel(model)
         opt = setup_opt(params.optimizer, model, params.learning_rate, params.weight_decay)
         agent = agents[params.agent](model, opt, params)
 
