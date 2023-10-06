@@ -163,7 +163,7 @@ class ContinualLearner(torch.nn.Module, metaclass=abc.ABCMeta):
                     batch_y = maybe_cuda(batch_y, self.cuda)
 
                     ##batch_x_ = torchvision.transforms.functional.rotate(batch_x, 90)
-                    batch_x_ = torch.tensor(glass_blur(batch_x[0].cpu())).to("cuda")
+                    batch_x_ = torch.tensor(shot_noise(batch_x.cpu())).to("cuda")
                     
                     # Extract the first 10 images
                     images_1 = [batch_x_[i] for i in range(1)]
