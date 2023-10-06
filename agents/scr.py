@@ -69,7 +69,7 @@ class SupContrastReplay(ContinualLearner):
         self.before_train(x_train, y_train)
         # set up loader
         train_dataset = dataset_transform(x_train, y_train, transform=transforms_match[self.data])
-        train_loader = data.DataLoader(train_dataset, batch_size=self.batch, shuffle=True, num_workers=2, drop_last=True)
+        train_loader = data.DataLoader(train_dataset, batch_size=self.batch, shuffle=True, num_workers=8, drop_last=True)
 
         unique_classes = set()
         for _, labels, indices_1 in train_loader:
