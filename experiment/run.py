@@ -13,6 +13,8 @@ import pandas as pd
 import os
 import pickle
 
+import torch
+
 
 def multiple_run(params, store=False, save_path=None):
     # Set up data stream
