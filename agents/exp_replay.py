@@ -100,12 +100,12 @@ class ExperienceReplay(ContinualLearner):
         Confidence_mean = Carto.mean(dim=0)
         Variability = Carto.std(dim=0)
         
-        plt.scatter(Variability, Confidence_mean, s = 2)
+        ##plt.scatter(Variability, Confidence_mean, s = 2)
         
-        plt.xlabel("Variability") 
-        plt.ylabel("Confidence") 
+        ##plt.xlabel("Variability") 
+        ##plt.ylabel("Confidence") 
         
-        plt.savefig('scatter_plot.png')
+        ##plt.savefig('scatter_plot.png')
         
         
         # set up model
@@ -232,7 +232,7 @@ class ExperienceReplay(ContinualLearner):
                 self.buffer.buffer_img[i] = all_images.to(device)[counter]
                 counter +=1
 
-        print("counter", counter)
+        ##print("counter", counter)
 
         
         self.after_train()
