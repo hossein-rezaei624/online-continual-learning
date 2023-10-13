@@ -222,12 +222,10 @@ class SupContrastReplay(ContinualLearner):
                         )
         
         
-        list_of_indices = []
         counter__ = 0
         for i in range(self.buffer.buffer_label.shape[0]):
             if self.buffer.buffer_label[i].item() in unique_classes:
                 counter__ +=1
-                list_of_indices.append(i)
 
         top_n = counter__
 
@@ -315,8 +313,7 @@ class SupContrastReplay(ContinualLearner):
         indices = torch.randperm(all_images_.size(0))
         shuffled_images = all_images_[indices]
         shuffled_labels = all_labels_[indices]
-        print("shuffled_labels.shape", shuffled_labels.shape)
-        print("len(list_of_indices)", len(list_of_indices))
+        ##print("shuffled_labels.shape", shuffled_labels.shape)
         
         counter = 0
         for i in range(self.buffer.buffer_label.shape[0]):
@@ -326,9 +323,5 @@ class SupContrastReplay(ContinualLearner):
                 counter +=1
 
         ##print("counter", counter)
-
-##        self.buffer.buffer_label[list_of_indices] = shuffled_labels.to(device)
-##        self.buffer.buffer_img[list_of_indices] = shuffled_images.to(device)
-
         
         self.after_train()
