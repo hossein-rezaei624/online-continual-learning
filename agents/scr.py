@@ -174,12 +174,12 @@ class SupContrastReplay(ContinualLearner):
         Confidence_mean = Carto.mean(dim=0)
         Variability = Carto.std(dim=0)
         
-        plt.scatter(Variability, Confidence_mean, s = 2)
+        ##plt.scatter(Variability, Confidence_mean, s = 2)
         
-        plt.xlabel("Variability") 
-        plt.ylabel("Confidence") 
+        ##plt.xlabel("Variability") 
+        ##plt.ylabel("Confidence") 
         
-        plt.savefig('scatter_plot.png')
+        ##plt.savefig('scatter_plot.png')
 
                 
         
@@ -315,18 +315,8 @@ class SupContrastReplay(ContinualLearner):
         indices = torch.randperm(all_images_.size(0))
         shuffled_images = all_images_[indices]
         shuffled_labels = all_labels_[indices]
-        print("shuffled_labels.shape", shuffled_labels.shape)
-        print("len(list_of_indices)", len(list_of_indices))
+        ##print("shuffled_labels.shape", shuffled_labels.shape)
         
-##        counter = 0
-##        for i in range(self.buffer.buffer_label.shape[0]):
-##            if self.buffer.buffer_label[i].item() in unique_classes:
-##                self.buffer.buffer_label[i] = shuffled_labels.to(device)[counter]
-##                self.buffer.buffer_img[i] = shuffled_images.to(device)[counter]
-##                counter +=1
-##
-##        ##print("counter", counter)
-
         self.buffer.buffer_label[list_of_indices] = shuffled_labels.to(device)
         self.buffer.buffer_img[list_of_indices] = shuffled_images.to(device)
 
