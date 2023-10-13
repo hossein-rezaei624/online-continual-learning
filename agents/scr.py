@@ -11,7 +11,8 @@ import numpy as np
 import random
 
 
-from models.resnet import ResNet18
+#from models.resnet import ResNet18
+from models.resnet1 import *
 import torch.optim as optim
 import matplotlib.pyplot as plt
 from torch.utils.data import ConcatDataset
