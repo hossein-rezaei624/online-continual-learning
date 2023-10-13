@@ -39,6 +39,62 @@ class SupContrastReplay(ContinualLearner):
         )
         self.soft_ = nn.Softmax(dim=1)
     
+
+    def distribute_samples(self, probabilities, M):
+        # Normalize the probabilities
+        total_probability = sum(probabilities.values())
+        normalized_probabilities = {k: v / total_probability for k, v in probabilities.items()}
+    
+        # Calculate the number of samples for each class
+        samples = {k: round(v * M) for k, v in normalized_probabilities.items()}
+        
+        # Check if there's any discrepancy due to rounding and correct it
+        discrepancy = M - sum(samples.values())
+        
+        for key in samples:
+            if discrepancy == 0:
+                break
+            if discrepancy > 0:
+                samples[key] += 1
+                discrepancy -= 1
+            else:
+                samples[key] -= 1
+                discrepancy += 1
+
+        return samples
+
+
+    def distribute_excess(self, lst):
+        # Calculate the total excess value
+        total_excess = sum(val - 500 for val in lst if val > 500)
+    
+        # Number of elements that are not greater than 500
+        recipients = [i for i, val in enumerate(lst) if val < 500]
+    
+        num_recipients = len(recipients)
+    
+        # Calculate the average share and remainder
+        avg_share, remainder = divmod(total_excess, num_recipients)
+    
+        lst = [val if val <= 500 else 500 for val in lst]
+        
+        # Distribute the average share
+        for idx in recipients:
+            lst[idx] += avg_share
+        
+        # Distribute the remainder
+        for idx in recipients[:remainder]:
+            lst[idx] += 1
+        
+        # Cap values greater than 500
+        for i, val in enumerate(lst):
+            if val > 500:
+                return distribute_excess(lst)
+                break
+    
+        return lst
+    
+    
     def train_learner(self, x_train, y_train):
         self.before_train(x_train, y_train)
         # set up loader
@@ -62,6 +118,12 @@ class SupContrastReplay(ContinualLearner):
         
 
         mapping = {value: index for index, value in enumerate(unique_classes)}
+        reverse_mapping = {index: value for value, index in mapping.items()}
+
+
+        # Initializing the dictionaries        
+        confidence_by_class = {class_id: {epoch: [] for epoch in range(6)} for class_id, __ in enumerate(unique_classes)}
+
         
         # Training
         Carto = torch.zeros((6, len(y_train)))
@@ -81,9 +143,13 @@ class SupContrastReplay(ContinualLearner):
                 soft_ = self.soft_(outputs)
                 confidence_batch = []
         
+                # Accumulate confidences and counts
                 for i in range(targets.shape[0]):
-                  confidence_batch.append(soft_[i,targets[i]].item())
-                        
+                    confidence_batch.append(soft_[i,targets[i]].item())
+                    
+                    # Update the dictionary with the confidence score for the current class for the current epoch
+                    confidence_by_class[targets[i].item()][epoch_].append(soft_[i, targets[i]].item())
+
                 loss = criterion_(outputs, targets)
                 loss.backward()
                 optimizer_.step()
@@ -100,6 +166,10 @@ class SupContrastReplay(ContinualLearner):
 
             scheduler_.step()
 
+        mean_by_class = {class_id: {epoch: torch.mean(torch.tensor(confidences[epoch])) for epoch in confidences} for class_id, confidences in confidence_by_class.items()}
+        std_of_means_by_class = {class_id: torch.std(torch.tensor([mean_by_class[class_id][epoch] for epoch in range(6)])) for class_id, __ in enumerate(unique_classes)}
+        
+        ##print("std_of_means_by_class", std_of_means_by_class)
 
         Confidence_mean = Carto.mean(dim=0)
         Variability = Carto.std(dim=0)
@@ -110,6 +180,7 @@ class SupContrastReplay(ContinualLearner):
         plt.ylabel("Confidence") 
         
         plt.savefig('scatter_plot.png')
+
                 
         
         # set up model
