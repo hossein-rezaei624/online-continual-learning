@@ -114,3 +114,6 @@ def Reduced_ResNet18(nclasses, nf=20, bias=True):
     Reduced ResNet18 as in GEM MIR(note that nf=20).
     """
     return ResNet(BasicBlock, [2, 2, 2, 2], nclasses, nf, bias)
+
+def ResNet18(nclasses, nf=64, bias=True):
+    return ResNet(BasicBlock, [2, 2, 2, 2], nclasses, nf, bias)
