@@ -318,17 +318,17 @@ class SupContrastReplay(ContinualLearner):
         print("shuffled_labels.shape", shuffled_labels.shape)
         print("len(list_of_indices)", len(list_of_indices))
         
-##        counter = 0
-##        for i in range(self.buffer.buffer_label.shape[0]):
-##            if self.buffer.buffer_label[i].item() in unique_classes:
-##                self.buffer.buffer_label[i] = shuffled_labels.to(device)[counter]
-##                self.buffer.buffer_img[i] = shuffled_images.to(device)[counter]
-##                counter +=1
-##
-##        ##print("counter", counter)
+        counter = 0
+        for i in range(self.buffer.buffer_label.shape[0]):
+            if self.buffer.buffer_label[i].item() in unique_classes:
+                self.buffer.buffer_label[i] = shuffled_labels.to(device)[counter]
+                self.buffer.buffer_img[i] = shuffled_images.to(device)[counter]
+                counter +=1
 
-        self.buffer.buffer_label[list_of_indices] = shuffled_labels.to(device)
-        self.buffer.buffer_img[list_of_indices] = shuffled_images.to(device)
+        ##print("counter", counter)
+
+##        self.buffer.buffer_label[list_of_indices] = shuffled_labels.to(device)
+##        self.buffer.buffer_img[list_of_indices] = shuffled_images.to(device)
 
         
         self.after_train()
