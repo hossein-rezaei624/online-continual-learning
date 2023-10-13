@@ -123,12 +123,12 @@ class SupContrastReplay(ContinualLearner):
 
 
         # Initializing the dictionaries        
-        confidence_by_class = {class_id: {epoch: [] for epoch in range(6)} for class_id, __ in enumerate(unique_classes)}
+        confidence_by_class = {class_id: {epoch: [] for epoch in range(8)} for class_id, __ in enumerate(unique_classes)}
 
         
         # Training
-        Carto = torch.zeros((6, len(y_train)))
-        for epoch_ in range(6):
+        Carto = torch.zeros((8, len(y_train)))
+        for epoch_ in range(8):
             print('\nEpoch: %d' % epoch_)
             Model_Carto.train()
             train_loss = 0
