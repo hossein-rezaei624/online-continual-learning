@@ -11,7 +11,7 @@ import numpy as np
 import random
 
 
-from models.resnet import ResNet18
+from models.resnet import Reduced_ResNet18
 import torch.optim as optim
 import matplotlib.pyplot as plt
 from torch.utils.data import ConcatDataset
@@ -109,7 +109,7 @@ class SupContrastReplay(ContinualLearner):
         
 
         device = "cuda"
-        Model_Carto = ResNet18(len(unique_classes))
+        Model_Carto = Reduced_ResNet18(len(unique_classes))
         Model_Carto = Model_Carto.to(device)
         criterion_ = nn.CrossEntropyLoss()
         optimizer_ = optim.SGD(Model_Carto.parameters(), lr=0.1,
@@ -122,12 +122,12 @@ class SupContrastReplay(ContinualLearner):
 
 
         # Initializing the dictionaries        
-        confidence_by_class = {class_id: {epoch: [] for epoch in range(3)} for class_id, __ in enumerate(unique_classes)}
+        confidence_by_class = {class_id: {epoch: [] for epoch in range(6)} for class_id, __ in enumerate(unique_classes)}
 
         
         # Training
-        Carto = torch.zeros((3, len(y_train)))
-        for epoch_ in range(3):
+        Carto = torch.zeros((6, len(y_train)))
+        for epoch_ in range(6):
             print('\nEpoch: %d' % epoch_)
             Model_Carto.train()
             train_loss = 0
@@ -167,7 +167,7 @@ class SupContrastReplay(ContinualLearner):
             scheduler_.step()
 
         mean_by_class = {class_id: {epoch: torch.mean(torch.tensor(confidences[epoch])) for epoch in confidences} for class_id, confidences in confidence_by_class.items()}
-        std_of_means_by_class = {class_id: torch.std(torch.tensor([mean_by_class[class_id][epoch] for epoch in range(3)])) for class_id, __ in enumerate(unique_classes)}
+        std_of_means_by_class = {class_id: torch.std(torch.tensor([mean_by_class[class_id][epoch] for epoch in range(6)])) for class_id, __ in enumerate(unique_classes)}
         
         ##print("std_of_means_by_class", std_of_means_by_class)
 
