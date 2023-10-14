@@ -11,7 +11,7 @@ import numpy as np
 import random
 
 
-from models.resnet import Reduced_ResNet18
+from models.resnet import ResNet18
 import torch.optim as optim
 import matplotlib.pyplot as plt
 from torch.utils.data import ConcatDataset
@@ -109,7 +109,7 @@ class SupContrastReplay(ContinualLearner):
         
 
         device = "cuda"
-        Model_Carto = Reduced_ResNet18(len(unique_classes))
+        Model_Carto = ResNet18(len(unique_classes))
         Model_Carto = Model_Carto.to(device)
         criterion_ = nn.CrossEntropyLoss()
         optimizer_ = optim.SGD(Model_Carto.parameters(), lr=0.1,
