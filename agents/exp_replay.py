@@ -15,7 +15,7 @@ class ExperienceReplay(ContinualLearner):
         self.eps_mem_batch = params.eps_mem_batch
         self.mem_iters = params.mem_iters
 
-    def train_learner(self, x_train, y_train, ii_):
+    def train_learner(self, x_train, y_train):
         self.before_train(x_train, y_train)
         # set up loader
         train_dataset = dataset_transform(x_train, y_train, transform=transforms_match[self.data])
@@ -33,7 +33,7 @@ class ExperienceReplay(ContinualLearner):
         for ep in range(self.epoch):
             for i, batch_data in enumerate(train_loader):
                 # batch update
-                batch_x, batch_y, indices1 = batch_data
+                batch_x, batch_y = batch_data
                 batch_x = maybe_cuda(batch_x, self.cuda)
                 batch_y = maybe_cuda(batch_y, self.cuda)
                 for j in range(self.mem_iters):
