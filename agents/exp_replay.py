@@ -266,7 +266,6 @@ class ExperienceReplay(ContinualLearner):
 
         top_n = counter__
         print("top_n", top_n)
-        print("list_of_indices", list_of_indices)
 
         # Find the indices that would sort the array
         sorted_indices_1 = np.argsort(Confidence_mean.numpy())
