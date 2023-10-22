@@ -15,7 +15,7 @@ class ExperienceReplay(ContinualLearner):
         self.eps_mem_batch = params.eps_mem_batch
         self.mem_iters = params.mem_iters
 
-    def train_learner(self, x_train, y_train):
+    def train_learner(self, x_train, y_train, ii_):
         self.before_train(x_train, y_train)
         # set up loader
         train_dataset = dataset_transform(x_train, y_train, transform=transforms_match[self.data])
