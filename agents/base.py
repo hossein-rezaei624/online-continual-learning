@@ -162,8 +162,9 @@ class ContinualLearner(torch.nn.Module, metaclass=abc.ABCMeta):
                     batch_x = maybe_cuda(batch_x, self.cuda)
                     batch_y = maybe_cuda(batch_y, self.cuda)
 
-                    print("batch_x.shape" ,batch_x.shape, batch_x[0][0])
-                    print(batch_x.cpu().numpy()[0][0])
+                    #print("batch_x.shape" ,batch_x.shape, batch_x[0][0])
+                    print((batch_x.cpu().numpy()[0][0]* 255).astype(np.uint8))
+                    print("batch_x.shape" ,batch_x.shape, batch_x.permute(0,2,3,1))
                     ##batch_x_ = torchvision.transforms.functional.rotate(batch_x, 90)
                     batch_x_ = torch.tensor(shot_noise(batch_x.permute(0,2,3,1).cpu().numpy())).to("cuda")
                     
