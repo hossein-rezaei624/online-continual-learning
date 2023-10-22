@@ -166,7 +166,7 @@ class ContinualLearner(torch.nn.Module, metaclass=abc.ABCMeta):
                     batch_x_ = torch.tensor(shot_noise(batch_x.cpu().numpy())).to("cuda")
                     
                     # Extract the first 10 images
-                    images_1 = [batch_x_[i] for i in range(1)]
+                    images_1 = [batch_x_[i] for i in range(10)]
                     
                     # Make a grid from these images
                     grid = torchvision.utils.make_grid(images_1, nrow=1)  # 5 images per row
