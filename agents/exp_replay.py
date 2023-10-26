@@ -82,7 +82,7 @@ class ExperienceReplay(ContinualLearner):
         # Cap values greater than 500
         for i, val in enumerate(lst):
             if val > 500:
-                return distribute_excess(lst)
+                return self.distribute_excess(lst)
                 break
     
         return lst
