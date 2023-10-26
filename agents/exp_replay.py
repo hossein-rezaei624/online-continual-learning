@@ -6,16 +6,10 @@ from continuum.data_utils import dataset_transform
 from utils.setup_elements import transforms_match
 from utils.utils import maybe_cuda, AverageMeter
 
-
-import torch.nn as nn
 from models.resnet import ResNet18
-##from models import resnet1
-import numpy as np
 import torch.optim as optim
-import torch.nn as nn
 import matplotlib.pyplot as plt
 from torch.utils.data import ConcatDataset
-import random
 import torchvision.transforms as transforms
 import torchvision
 import math
@@ -34,8 +28,7 @@ class ExperienceReplay(ContinualLearner):
 
         self.soft_ = nn.Softmax(dim=1)
 
-
-
+    
     def distribute_samples(self, probabilities, M):
         # Normalize the probabilities
         total_probability = sum(probabilities.values())
@@ -90,7 +83,8 @@ class ExperienceReplay(ContinualLearner):
     
         return lst
     
-
+    
+    
     def train_learner(self, x_train, y_train):
         self.before_train(x_train, y_train)
         # set up loader
@@ -98,7 +92,7 @@ class ExperienceReplay(ContinualLearner):
         train_loader = data.DataLoader(train_dataset, batch_size=self.batch, shuffle=True, num_workers=0,
                                        drop_last=True)
         
-        
+
         unique_classes = set()
         for _, labels, indices_1 in train_loader:
             unique_classes.update(labels.numpy())
@@ -118,12 +112,12 @@ class ExperienceReplay(ContinualLearner):
 
 
         # Initializing the dictionaries        
-        confidence_by_class = {class_id: {epoch: [] for epoch in range(6)} for class_id, __ in enumerate(unique_classes)}
+        confidence_by_class = {class_id: {epoch: [] for epoch in range(8)} for class_id, __ in enumerate(unique_classes)}
 
         
         # Training
-        Carto = torch.zeros((6, len(y_train)))
-        for epoch_ in range(6):
+        Carto = torch.zeros((8, len(y_train)))
+        for epoch_ in range(8):
             print('\nEpoch: %d' % epoch_)
             Model_Carto.train()
             train_loss = 0
@@ -163,7 +157,7 @@ class ExperienceReplay(ContinualLearner):
             scheduler_.step()
 
         mean_by_class = {class_id: {epoch: torch.mean(torch.tensor(confidences[epoch])) for epoch in confidences} for class_id, confidences in confidence_by_class.items()}
-        std_of_means_by_class = {class_id: torch.std(torch.tensor([mean_by_class[class_id][epoch] for epoch in range(6)])) for class_id, __ in enumerate(unique_classes)}
+        std_of_means_by_class = {class_id: torch.std(torch.tensor([mean_by_class[class_id][epoch] for epoch in range(8)])) for class_id, __ in enumerate(unique_classes)}
         
         ##print("std_of_means_by_class", std_of_means_by_class)
 
@@ -176,7 +170,6 @@ class ExperienceReplay(ContinualLearner):
         ##plt.ylabel("Confidence") 
         
         ##plt.savefig('scatter_plot.png')
-
         
         
         # set up model
@@ -191,7 +184,7 @@ class ExperienceReplay(ContinualLearner):
         for ep in range(self.epoch):
             for i, batch_data in enumerate(train_loader):
                 # batch update
-                batch_x, batch_y, indices_1 = batch_data
+                batch_x, batch_y = batch_data
                 batch_x = maybe_cuda(batch_x, self.cuda)
                 batch_y = maybe_cuda(batch_y, self.cuda)
                 for j in range(self.mem_iters):
@@ -261,10 +254,14 @@ class ExperienceReplay(ContinualLearner):
                             .format(i, losses_mem.avg(), acc_mem.avg())
                     )
         
+        
+        
+        list_of_indices = []
         counter__ = 0
         for i in range(self.buffer.buffer_label.shape[0]):
             if self.buffer.buffer_label[i].item() in unique_classes:
                 counter__ +=1
+                list_of_indices.append(i)
 
         top_n = counter__
 
@@ -354,14 +351,9 @@ class ExperienceReplay(ContinualLearner):
         shuffled_labels = all_labels_[indices]
         ##print("shuffled_labels.shape", shuffled_labels.shape)
         
-        counter = 0
-        for i in range(self.buffer.buffer_label.shape[0]):
-            if self.buffer.buffer_label[i].item() in unique_classes:
-                self.buffer.buffer_label[i] = shuffled_labels.to(device)[counter]
-                self.buffer.buffer_img[i] = shuffled_images.to(device)[counter]
-                counter +=1
-
-        ##print("counter", counter)
-
+        self.buffer.buffer_label[list_of_indices] = shuffled_labels.to(device)
+        self.buffer.buffer_img[list_of_indices] = shuffled_images.to(device)
+        
+        
         
         self.after_train()
