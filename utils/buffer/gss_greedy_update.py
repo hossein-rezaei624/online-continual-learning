@@ -38,9 +38,9 @@ class GSSGreedyUpdate(object):
                 outcome = torch.multinomial(torch.cat((scaled_batch_item_sim, buffer_repl_batch_sim), dim=1), 1,
                                             replacement=False)
                 # replace samples with outcome =1
-                added_indx = torch.arange(end=batch_item_sim.size(0))
+                added_indx = torch.arange(end=batch_item_sim.size(0)).to("cuda")
                 sub_index = outcome.squeeze(1).bool()
-                buffer.buffer_img[index[sub_index]] = x[added_indx[sub_index].to('cpu')].clone()
+                buffer.buffer_img[index[sub_index]] = x[added_indx[sub_index]].clone()
                 buffer.buffer_label[index[sub_index]] = y[added_indx[sub_index]].clone()
                 self.buffer_score[index[sub_index]] = batch_item_sim[added_indx[sub_index]].clone()
         else:
