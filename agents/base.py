@@ -164,16 +164,16 @@ class ContinualLearner(torch.nn.Module, metaclass=abc.ABCMeta):
                     
                     #batch_x_ = (batch_x.permute(0,2,3,1).cpu().numpy()* 255).astype(np.uint8)
                     
-                    #batch_x = torch.tensor(gaussian_noise(batch_x_).astype(float) / 255.0, dtype = batch_x.dtype).to("cuda").permute(0,3,1,2)
-                    #batch_x = torch.tensor(shot_noise(batch_x_).astype(float) / 255.0, dtype = batch_x.dtype).to("cuda").permute(0,3,1,2)
-                    #batch_x = torch.tensor(impulse_noise(batch_x_).astype(float) / 255.0, dtype = batch_x.dtype).to("cuda").permute(0,3,1,2)
-                    #batch_x = torch.tensor(defocus_blur(batch_x_).astype(float) / 255.0, dtype = batch_x.dtype).to("cuda").permute(0,3,1,2)
-                    #batch_x = torch.tensor(frost(glass_blur(batch_x_)).astype(float) / 255.0, dtype = batch_x.dtype).to("cuda").permute(0,3,1,2)
-                    #batch_x = torch.tensor(motion_blur(glass_blur(batch_x_)).astype(float) / 255.0, dtype = batch_x.dtype).to("cuda").permute(0,3,1,2)
-                    #batch_x = torch.tensor(zoom_blur(glass_blur(batch_x_)).astype(float) / 255.0, dtype = batch_x.dtype).to("cuda").permute(0,3,1,2)
-                    #batch_x = torch.tensor(elastic_transform(glass_blur(batch_x_)).astype(float) / 255.0, dtype = batch_x.dtype).to("cuda").permute(0,3,1,2)
-                    #batch_x = torch.tensor(pixelate(glass_blur(batch_x_)).astype(float) / 255.0, dtype = batch_x.dtype).to("cuda").permute(0,3,1,2)
-                    #batch_x = torch.tensor(jpeg_compression(glass_blur(batch_x_)).astype(float) / 255.0, dtype = batch_x.dtype).to("cuda").permute(0,3,1,2)
+                    batch_x1 = torch.tensor(gaussian_noise(batch_x_).astype(float) / 255.0, dtype = batch_x.dtype).to("cuda").permute(0,3,1,2)
+                    batch_x2 = torch.tensor(shot_noise(batch_x_).astype(float) / 255.0, dtype = batch_x.dtype).to("cuda").permute(0,3,1,2)
+                    batch_x3 = torch.tensor(impulse_noise(batch_x_).astype(float) / 255.0, dtype = batch_x.dtype).to("cuda").permute(0,3,1,2)
+                    batch_x4 = torch.tensor(defocus_blur(batch_x_).astype(float) / 255.0, dtype = batch_x.dtype).to("cuda").permute(0,3,1,2)
+                    batch_x5 = torch.tensor(frost(glass_blur(batch_x_)).astype(float) / 255.0, dtype = batch_x.dtype).to("cuda").permute(0,3,1,2)
+                    batch_x6 = torch.tensor(motion_blur(glass_blur(batch_x_)).astype(float) / 255.0, dtype = batch_x.dtype).to("cuda").permute(0,3,1,2)
+                    batch_x7 = torch.tensor(zoom_blur(glass_blur(batch_x_)).astype(float) / 255.0, dtype = batch_x.dtype).to("cuda").permute(0,3,1,2)
+                    batch_x8 = torch.tensor(elastic_transform(glass_blur(batch_x_)).astype(float) / 255.0, dtype = batch_x.dtype).to("cuda").permute(0,3,1,2)
+                    batch_x9 = torch.tensor(pixelate(glass_blur(batch_x_)).astype(float) / 255.0, dtype = batch_x.dtype).to("cuda").permute(0,3,1,2)
+                    batch_x10 = torch.tensor(jpeg_compression(glass_blur(batch_x_)).astype(float) / 255.0, dtype = batch_x.dtype).to("cuda").permute(0,3,1,2)
                     
                     
                     # Extract the first 10 images
