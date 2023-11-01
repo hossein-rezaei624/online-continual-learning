@@ -166,7 +166,7 @@ class ContinualLearner(torch.nn.Module, metaclass=abc.ABCMeta):
                     
                     ##batch_x_ = torchvision.transforms.functional.rotate(batch_x, 90)
                     #batch_x = torch.tensor(shot_noise(batch_x_).astype(float) / 255.0, dtype = batch_x.dtype).to("cuda").permute(0,3,1,2)
-                    #batch_x = torch.tensor(gaussian_noise(batch_x_).astype(float) / 255.0, dtype = batch_x.dtype).to("cuda").permute(0,3,1,2)
+                    batch_x = torch.tensor(gaussian_noise(batch_x_).astype(float) / 255.0, dtype = batch_x.dtype).to("cuda").permute(0,3,1,2)
                     
                     
                     # Extract the first 10 images
