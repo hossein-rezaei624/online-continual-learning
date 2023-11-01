@@ -169,6 +169,7 @@ def gaussian_blur(x, severity=1):
 def glass_blur(x, severity=1):
     
     h_img, w_img, _ = x.shape
+    print("h_img", h_img, "w_img", w_img)
     
     # sigma, max_delta, iterations
     c = [(0.7, 1, 2), (0.9, 2, 1), (1, 2, 3), (1.1, 3, 2), (1.5, 4, 2)][severity - 1]
@@ -245,6 +246,9 @@ def fog(x, severity=1):
 
 
 def frost(x, severity=1):
+
+    h_img, w_img, _ = x.shape
+    
     c = [(1, 0.4),
          (0.8, 0.6),
          (0.7, 0.7),
@@ -259,8 +263,8 @@ def frost(x, severity=1):
                 resource_filename(__name__, 'frost/frost6.jpg')][idx]
     frost = cv2.imread(filename)
     # randomly crop and convert to rgb
-    x_start, y_start = np.random.randint(0, frost.shape[0] - 224), np.random.randint(0, frost.shape[1] - 224)
-    frost = frost[x_start:x_start + 224, y_start:y_start + 224][..., [2, 1, 0]]
+    x_start, y_start = np.random.randint(0, frost.shape[0] - h_img), np.random.randint(0, frost.shape[1] - w_img)
+    frost = frost[x_start:x_start + h_img, y_start:y_start + w_img][..., [2, 1, 0]]
 
     return np.clip(c[0] * np.array(x) + c[1] * frost, 0, 255)
 
