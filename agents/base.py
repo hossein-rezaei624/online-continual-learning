@@ -171,7 +171,8 @@ class ContinualLearner(torch.nn.Module, metaclass=abc.ABCMeta):
                     batch_x_pil = to_pil(batch_x_.cpu())  # Convert to PIL image
                     
                     print("batch_x_pil.size", batch_x_pil.size)
-                    print("batch_x_pil", batch_x_pil)
+                    print("batch_x_pil.show()", batch_x_pil.show())
+                    print("batch_x_pil.mode()", batch_x_pil.mode())
                     
                     batch_x1 = torch.tensor(gaussian_noise(batch_x_pil).astype(float) / 255.0, dtype = batch_x.dtype).to("cuda").permute(2,0,1)
                     #batch_x2 = torch.tensor(shot_noise(batch_x_).astype(float) / 255.0, dtype = batch_x.dtype).to("cuda").permute(2,0,1)
