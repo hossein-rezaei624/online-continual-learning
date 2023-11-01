@@ -170,7 +170,7 @@ class ContinualLearner(torch.nn.Module, metaclass=abc.ABCMeta):
                     batch_x3 = torch.tensor(impulse_noise(batch_x_).astype(float) / 255.0, dtype = batch_x.dtype).to("cuda").permute(2,0,1)
                     batch_x4 = torch.tensor(defocus_blur(batch_x_).astype(float) / 255.0, dtype = batch_x.dtype).to("cuda").permute(2,0,1)
                     batch_x5 = torch.tensor(glass_blur(batch_x_).astype(float) / 255.0, dtype = batch_x.dtype).to("cuda").permute(2,0,1)
-                    batch_x6 = torch.tensor(motion_blur(glass_blur(batch_x_)).astype(float) / 255.0, dtype = batch_x.dtype).to("cuda").permute(2,0,1)
+                    #batch_x6 = torch.tensor(motion_blur(glass_blur(batch_x_)).astype(float) / 255.0, dtype = batch_x.dtype).to("cuda").permute(2,0,1)
                     batch_x7 = torch.tensor(zoom_blur(glass_blur(batch_x_)).astype(float) / 255.0, dtype = batch_x.dtype).to("cuda").permute(2,0,1)
                     batch_x8 = torch.tensor(elastic_transform(glass_blur(batch_x_)).astype(float) / 255.0, dtype = batch_x.dtype).to("cuda").permute(2,0,1)
                     batch_x9 = torch.tensor(pixelate(glass_blur(batch_x_)).astype(float) / 255.0, dtype = batch_x.dtype).to("cuda").permute(2,0,1)
