@@ -193,7 +193,7 @@ def defocus_blur(x, severity=1):
     channels = []
     for d in range(3):
         channels.append(cv2.filter2D(x[:, :, d], -1, kernel))
-    channels = np.array(channels).transpose((0,3,1,2))  # 3x224x224 -> 224x224x3
+    channels = np.array(channels).transpose((0,2,3,1))  # 3x224x224 -> 224x224x3
 
     return np.clip(channels, 0, 1) * 255
 
