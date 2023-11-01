@@ -101,7 +101,7 @@ class ExperienceReplay(ContinualLearner):
         for _, labels, indices_1 in train_loader:
             unique_classes.update(labels.numpy())
         
-
+        Epoch_Carto = 1
         device = "cuda"
         Model_Carto = ResNet18(len(unique_classes))
         Model_Carto = Model_Carto.to(device)
@@ -116,12 +116,12 @@ class ExperienceReplay(ContinualLearner):
 
 
         # Initializing the dictionaries        
-        confidence_by_class = {class_id: {epoch: [] for epoch in range(4)} for class_id, __ in enumerate(unique_classes)}
+        confidence_by_class = {class_id: {epoch: [] for epoch in range(Epoch_Carto)} for class_id, __ in enumerate(unique_classes)}
 
         
         # Training
-        Carto = torch.zeros((4, len(y_train)))
-        for epoch_ in range(4):
+        Carto = torch.zeros((Epoch_Carto, len(y_train)))
+        for epoch_ in range(Epoch_Carto):
             print('\nEpoch: %d' % epoch_)
             Model_Carto.train()
             train_loss = 0
@@ -161,7 +161,7 @@ class ExperienceReplay(ContinualLearner):
             scheduler_.step()
 
         mean_by_class = {class_id: {epoch: torch.mean(torch.tensor(confidences[epoch])) for epoch in confidences} for class_id, confidences in confidence_by_class.items()}
-        std_of_means_by_class = {class_id: torch.std(torch.tensor([mean_by_class[class_id][epoch] for epoch in range(4)])) for class_id, __ in enumerate(unique_classes)}
+        std_of_means_by_class = {class_id: torch.std(torch.tensor([mean_by_class[class_id][epoch] for epoch in range(Epoch_Carto)])) for class_id, __ in enumerate(unique_classes)}
         
         ##print("std_of_means_by_class", std_of_means_by_class)
 
