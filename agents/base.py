@@ -166,14 +166,14 @@ class ContinualLearner(torch.nn.Module, metaclass=abc.ABCMeta):
                     #batch_x_ = (batch_x.permute(0,2,3,1).cpu().numpy()* 255).astype(np.uint8)
 
                     # Convert tensor to PIL image
-                    #to_pil = ToPILImage()
-                    #batch_x_ = to_pil(batch_x.cpu())  # Convert to PIL image
-                    batch_x_ = torchvision.transforms.functional.to_pil_image(batch_x.cpu())
-                    print("batch_x_.shape", batch_x_.shape)
-                    print("batch_x_[0]", batch_x_[0])
-                    batch_x_ = batch_x_[0]
+                    to_pil = ToPILImage()
+                    batch_x_ = batch_x[0]  # Taking the first image from the batch
+                    batch_x_pil = to_pil(batch_x_.cpu())  # Convert to PIL image
                     
-                    batch_x1 = torch.tensor(gaussian_noise(batch_x_).astype(float) / 255.0, dtype = batch_x.dtype).to("cuda").permute(2,0,1)
+                    print("batch_x_pil.shape", batch_x_pil.shape)
+                    print("batch_x_pil", batch_x_pil)
+                    
+                    batch_x1 = torch.tensor(gaussian_noise(batch_x_pil).astype(float) / 255.0, dtype = batch_x.dtype).to("cuda").permute(2,0,1)
                     #batch_x2 = torch.tensor(shot_noise(batch_x_).astype(float) / 255.0, dtype = batch_x.dtype).to("cuda").permute(2,0,1)
                     #batch_x3 = torch.tensor(impulse_noise(batch_x_).astype(float) / 255.0, dtype = batch_x.dtype).to("cuda").permute(2,0,1)
                     #batch_x4 = torch.tensor(defocus_blur(batch_x_).astype(float) / 255.0, dtype = batch_x.dtype).to("cuda").permute(2,0,1)
