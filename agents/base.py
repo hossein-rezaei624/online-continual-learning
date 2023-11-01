@@ -174,13 +174,19 @@ class ContinualLearner(torch.nn.Module, metaclass=abc.ABCMeta):
                     batch_x8 = torch.tensor(elastic_transform(glass_blur(batch_x_)).astype(float) / 255.0, dtype = batch_x.dtype).to("cuda").permute(0,3,1,2)
                     batch_x9 = torch.tensor(pixelate(glass_blur(batch_x_)).astype(float) / 255.0, dtype = batch_x.dtype).to("cuda").permute(0,3,1,2)
                     batch_x10 = torch.tensor(jpeg_compression(glass_blur(batch_x_)).astype(float) / 255.0, dtype = batch_x.dtype).to("cuda").permute(0,3,1,2)
+
+                    all_batches = [batch_x, batch_x1, batch_x2, batch_x3, batch_x4, batch_x5, batch_x6, batch_x7, batch_x8, batch_x9, batch_x10]
+                    batch_x = torch.cat(all_batches, dim=0)
+                    batch_y = batch_y.repeat(11)
                     
+                    print("batch_x.shape", batch_x.shape)
+                    print(batch_y.shape, batch_y.shape)
                     
                     # Extract the first 10 images
-                    images_1 = [batch_x[i] for i in range(10)]
+                    images_1 = [batch_x[i] for i in range(110)]
                     
                     # Make a grid from these images
-                    grid = torchvision.utils.make_grid(images_1, nrow=1)  # 5 images per row
+                    grid = torchvision.utils.make_grid(images_1, nrow=10)  # 5 images per row
                     
                     torchvision.utils.save_image(grid, 'grid_image.png')
                     
