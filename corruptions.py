@@ -179,6 +179,8 @@ def glass_blur(x, severity=1):
                 dx, dy = np.random.randint(-c[1], c[1], size=(2,))
                 h_prime, w_prime = h + dy, w + dx
                 # swap
+                print(f"h: {h}, w: {w}, h_prime: {h_prime}, w_prime: {w_prime}")
+
                 x[h, w], x[h_prime, w_prime] = x[h_prime, w_prime], x[h, w]
 
     return np.clip(gaussian(x / 255., sigma=c[0], channel_axis=-1), 0, 1) * 255
