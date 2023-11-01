@@ -51,6 +51,55 @@ class MotionImage(WandImage):
         wandlibrary.MagickMotionBlurImage(self.wand, radius, sigma, angle)
 
 
+# modification of https://github.com/FLHerne/mapgen/blob/master/diamondsquare.py
+def plasma_fractal(mapsize=256, wibbledecay=3):
+    """
+    Generate a heightmap using diamond-square algorithm.
+    Return square 2d array, side length 'mapsize', of floats in range 0-255.
+    'mapsize' must be a power of two.
+    """
+    assert (mapsize & (mapsize - 1) == 0)
+    maparray = np.empty((mapsize, mapsize), dtype=np.float_)
+    maparray[0, 0] = 0
+    stepsize = mapsize
+    wibble = 100
+
+    def wibbledmean(array):
+        return array / 4 + wibble * np.random.uniform(-wibble, wibble, array.shape)
+
+    def fillsquares():
+        """For each square of points stepsize apart,
+           calculate middle value as mean of points + wibble"""
+        cornerref = maparray[0:mapsize:stepsize, 0:mapsize:stepsize]
+        squareaccum = cornerref + np.roll(cornerref, shift=-1, axis=0)
+        squareaccum += np.roll(squareaccum, shift=-1, axis=1)
+        maparray[stepsize // 2:mapsize:stepsize,
+        stepsize // 2:mapsize:stepsize] = wibbledmean(squareaccum)
+
+    def filldiamonds():
+        """For each diamond of points stepsize apart,
+           calculate middle value as mean of points + wibble"""
+        mapsize = maparray.shape[0]
+        drgrid = maparray[stepsize // 2:mapsize:stepsize, stepsize // 2:mapsize:stepsize]
+        ulgrid = maparray[0:mapsize:stepsize, 0:mapsize:stepsize]
+        ldrsum = drgrid + np.roll(drgrid, 1, axis=0)
+        lulsum = ulgrid + np.roll(ulgrid, -1, axis=1)
+        ltsum = ldrsum + lulsum
+        maparray[0:mapsize:stepsize, stepsize // 2:mapsize:stepsize] = wibbledmean(ltsum)
+        tdrsum = drgrid + np.roll(drgrid, 1, axis=1)
+        tulsum = ulgrid + np.roll(ulgrid, -1, axis=0)
+        ttsum = tdrsum + tulsum
+        maparray[stepsize // 2:mapsize:stepsize, 0:mapsize:stepsize] = wibbledmean(ttsum)
+
+    while stepsize >= 2:
+        fillsquares()
+        filldiamonds()
+        stepsize //= 2
+        wibble /= wibbledecay
+
+    maparray -= maparray.min()
+    return maparray / maparray.max()
+
 
 def clipped_zoom(img, zoom_factor):
     h = img.shape[0]
@@ -97,6 +146,17 @@ def speckle_noise(x, severity=1):
     x = np.array(x) / 255.
     return np.clip(x + x * np.random.normal(size=x.shape, scale=c), 0, 1) * 255
 
+
+def fgsm(x, source_net, severity=1):
+    c = [8, 16, 32, 64, 128][severity - 1]
+
+    x = V(x, requires_grad=True)
+    logits = source_net(x)
+    source_net.zero_grad()
+    loss = F.cross_entropy(logits, V(logits.data.max(1)[1].squeeze_()), size_average=False)
+    loss.backward()
+
+    return standardize(torch.clamp(unstandardize(x.data) + c / 255. * unstandardize(torch.sign(x.grad.data)), 0, 1))
 
 
 def gaussian_blur(x, severity=1):
@@ -172,6 +232,14 @@ def zoom_blur(x, severity=1):
     return np.clip(x, 0, 1) * 255
 
 
+def fog(x, severity=1):
+    c = [(1.5, 2), (2., 2), (2.5, 1.7), (2.5, 1.5), (3., 1.4)][severity - 1]
+
+    x = np.array(x) / 255.
+    max_val = x.max()
+    x += c[0] * plasma_fractal(wibbledecay=c[1])[:224, :224][..., np.newaxis]
+    return np.clip(x * max_val / (max_val + c[0]), 0, 1) * 255
+
 
 def frost(x, severity=1):
     c = [(1, 0.4),
@@ -194,6 +262,114 @@ def frost(x, severity=1):
     return np.clip(c[0] * np.array(x) + c[1] * frost, 0, 255)
 
 
+def snow(x, severity=1):
+    c = [(0.1, 0.3, 3, 0.5, 10, 4, 0.8),
+         (0.2, 0.3, 2, 0.5, 12, 4, 0.7),
+         (0.55, 0.3, 4, 0.9, 12, 8, 0.7),
+         (0.55, 0.3, 4.5, 0.85, 12, 8, 0.65),
+         (0.55, 0.3, 2.5, 0.85, 12, 12, 0.55)][severity - 1]
+
+    x = np.array(x, dtype=np.float32) / 255.
+    snow_layer = np.random.normal(size=x.shape[:2], loc=c[0], scale=c[1])  # [:2] for monochrome
+
+    snow_layer = clipped_zoom(snow_layer[..., np.newaxis], c[2])
+    snow_layer[snow_layer < c[3]] = 0
+
+    snow_layer = PILImage.fromarray((np.clip(snow_layer.squeeze(), 0, 1) * 255).astype(np.uint8), mode='L')
+    output = BytesIO()
+    snow_layer.save(output, format='PNG')
+    snow_layer = MotionImage(blob=output.getvalue())
+
+    snow_layer.motion_blur(radius=c[4], sigma=c[5], angle=np.random.uniform(-135, -45))
+
+    snow_layer = cv2.imdecode(np.fromstring(snow_layer.make_blob(), np.uint8),
+                              cv2.IMREAD_UNCHANGED) / 255.
+    snow_layer = snow_layer[..., np.newaxis]
+
+    x = c[6] * x + (1 - c[6]) * np.maximum(x, cv2.cvtColor(x, cv2.COLOR_RGB2GRAY).reshape(224, 224, 1) * 1.5 + 0.5)
+    return np.clip(x + snow_layer + np.rot90(snow_layer, k=2), 0, 1) * 255
+
+
+def spatter(x, severity=1):
+    c = [(0.65, 0.3, 4, 0.69, 0.6, 0),
+         (0.65, 0.3, 3, 0.68, 0.6, 0),
+         (0.65, 0.3, 2, 0.68, 0.5, 0),
+         (0.65, 0.3, 1, 0.65, 1.5, 1),
+         (0.67, 0.4, 1, 0.65, 1.5, 1)][severity - 1]
+    x = np.array(x, dtype=np.float32) / 255.
+
+    liquid_layer = np.random.normal(size=x.shape[:2], loc=c[0], scale=c[1])
+
+    liquid_layer = gaussian(liquid_layer, sigma=c[2])
+    liquid_layer[liquid_layer < c[3]] = 0
+    if c[5] == 0:
+        liquid_layer = (liquid_layer * 255).astype(np.uint8)
+        dist = 255 - cv2.Canny(liquid_layer, 50, 150)
+        dist = cv2.distanceTransform(dist, cv2.DIST_L2, 5)
+        _, dist = cv2.threshold(dist, 20, 20, cv2.THRESH_TRUNC)
+        dist = cv2.blur(dist, (3, 3)).astype(np.uint8)
+        dist = cv2.equalizeHist(dist)
+        ker = np.array([[-2, -1, 0], [-1, 1, 1], [0, 1, 2]])
+        dist = cv2.filter2D(dist, cv2.CV_8U, ker)
+        dist = cv2.blur(dist, (3, 3)).astype(np.float32)
+
+        m = cv2.cvtColor(liquid_layer * dist, cv2.COLOR_GRAY2BGRA)
+        m /= np.max(m, axis=(0, 1))
+        m *= c[4]
+
+        # water is pale turqouise
+        color = np.concatenate((175 / 255. * np.ones_like(m[..., :1]),
+                                238 / 255. * np.ones_like(m[..., :1]),
+                                238 / 255. * np.ones_like(m[..., :1])), axis=2)
+
+        color = cv2.cvtColor(color, cv2.COLOR_BGR2BGRA)
+        x = cv2.cvtColor(x, cv2.COLOR_BGR2BGRA)
+
+        return cv2.cvtColor(np.clip(x + m * color, 0, 1), cv2.COLOR_BGRA2BGR) * 255
+    else:
+        m = np.where(liquid_layer > c[3], 1, 0)
+        m = gaussian(m.astype(np.float32), sigma=c[4])
+        m[m < 0.8] = 0
+
+        # mud brown
+        color = np.concatenate((63 / 255. * np.ones_like(x[..., :1]),
+                                42 / 255. * np.ones_like(x[..., :1]),
+                                20 / 255. * np.ones_like(x[..., :1])), axis=2)
+
+        color *= m[..., np.newaxis]
+        x *= (1 - m[..., np.newaxis])
+
+        return np.clip(x + color, 0, 1) * 255
+
+
+def contrast(x, severity=1):
+    c = [0.4, .3, .2, .1, .05][severity - 1]
+
+    x = np.array(x) / 255.
+    means = np.mean(x, axis=(0, 1), keepdims=True)
+    return np.clip((x - means) * c + means, 0, 1) * 255
+
+
+def brightness(x, severity=1):
+    c = [.1, .2, .3, .4, .5][severity - 1]
+
+    x = np.array(x) / 255.
+    x = sk.color.rgb2hsv(x)
+    x[:, :, 2] = np.clip(x[:, :, 2] + c, 0, 1)
+    x = sk.color.hsv2rgb(x)
+
+    return np.clip(x, 0, 1) * 255
+
+
+def saturate(x, severity=1):
+    c = [(0.3, 0), (0.1, 0), (2, 0), (5, 0.1), (20, 0.2)][severity - 1]
+
+    x = np.array(x) / 255.
+    x = sk.color.rgb2hsv(x)
+    x[:, :, 1] = np.clip(x[:, :, 1] * c[0] + c[1], 0, 1)
+    x = sk.color.hsv2rgb(x)
+
+    return np.clip(x, 0, 1) * 255
 
 
 def jpeg_compression(x, severity=1):
