@@ -8,6 +8,7 @@ from continuum.data_utils import train_val_test_split_ni
 
 class Original(object):
     def __init__(self, x, y, unroll=False, color=False):
+        print("Original")
         if color:
             self.x = x / 255.0
         else:
@@ -63,6 +64,7 @@ class Original(object):
 
 class Noisy(Original):
     def __init__(self, x, y, full=False, color=False):
+        print("Noisy")
         super(Noisy, self).__init__(x, y, full, color)
 
     def next_task(self, noise_factor=0.8, sig=0.1, noise_type='Gaussian'):
@@ -81,6 +83,7 @@ class Noisy(Original):
 
 class Blurring(Original):
     def __init__(self, x, y, full=False, color=False):
+        print("Blurring")
         super(Blurring, self).__init__(x, y, full, color)
 
     def next_task(self, blurry_factor=0.6, blurry_type='Gaussian'):
@@ -99,6 +102,7 @@ class Blurring(Original):
 
 class Occlusion(Original):
     def __init__(self, x, y, full=False, color=False):
+        print("Occlusion")
         super(Occlusion, self).__init__(x, y, full, color)
 
     def next_task(self, occlusion_factor=0.2):
