@@ -167,6 +167,9 @@ def gaussian_blur(x, severity=1):
 
 
 def glass_blur(x, severity=1):
+    
+    h_img, w_img, _ = x.shape
+    
     # sigma, max_delta, iterations
     c = [(0.7, 1, 2), (0.9, 2, 1), (1, 2, 3), (1.1, 3, 2), (1.5, 4, 2)][severity - 1]
 
@@ -174,8 +177,8 @@ def glass_blur(x, severity=1):
 
     # locally shuffle pixels
     for i in range(c[2]):
-        for h in range(224 - c[1], c[1], -1):
-            for w in range(224 - c[1], c[1], -1):
+        for h in range(h_img - c[1], c[1], -1):
+            for w in range(w_img - c[1], c[1], -1):
                 dx, dy = np.random.randint(-c[1], c[1], size=(2,))
                 h_prime, w_prime = h + dy, w + dx
                 # swap
