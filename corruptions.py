@@ -206,7 +206,7 @@ def motion_blur(x, severity=1):
     c = [(10, 3), (15, 5), (15, 8), (15, 12), (20, 15)][severity - 1]
 
     output = BytesIO()
-    ##x.save(output, format='PNG')
+    x.save(output, format='PNG')
     x = MotionImage(blob=output.getvalue())
 
     x.motion_blur(radius=c[0], sigma=c[1], angle=np.random.uniform(-45, 45))
