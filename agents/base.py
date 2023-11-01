@@ -161,7 +161,7 @@ class ContinualLearner(torch.nn.Module, metaclass=abc.ABCMeta):
                 for i, (batch_x, batch_y, indices_1) in enumerate(test_loader):
                     batch_x = maybe_cuda(batch_x, self.cuda)
                     batch_y = maybe_cuda(batch_y, self.cuda)
-                    
+                    print("batch_x.shape", batch_x.shape)
                     batch_x_ = (batch_x.permute(0,2,3,1).cpu().numpy()* 255).astype(np.uint8)
                     
                     batch_x1 = torch.tensor(gaussian_noise(batch_x_).astype(float) / 255.0, dtype = batch_x.dtype).to("cuda").permute(0,3,1,2)
