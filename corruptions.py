@@ -183,7 +183,7 @@ def glass_blur(x, severity=1):
                 dx, dy = np.random.randint(-c[1], c[1], size=(2,))
                 h_prime, w_prime = h + dy, w + dx
                 # swap
-                x[h, w], x[h_prime, w_prime] = x[h_prime, w_prime], x[h, w]
+                x[:, h, w], x[:, h_prime, w_prime] = x[:, h_prime, w_prime], x[:, h, w]
 
     return np.clip(gaussian(x / 255., sigma=c[0], channel_axis=-1), 0, 1) * 255
     
@@ -198,13 +198,16 @@ def defocus_blur(x, severity=1):
 
     channels = []
     for d in range(3):
-        channels.append(cv2.filter2D(x[:, :, d], -1, kernel))
+        channels.append(cv2.filter2D(x[:, :, :, d], -1, kernel))
     #channels = np.array(channels).transpose((1, 2, 0))  # 3x224x224 -> 224x224x3
 
     return np.clip(channels, 0, 1) * 255
 
 
 def motion_blur(x, severity=1):
+
+    __, h_img, w_img, _ = x.shape
+    
     c = [(10, 3), (15, 5), (15, 8), (15, 12), (20, 15)][severity - 1]
 
     output = BytesIO()
