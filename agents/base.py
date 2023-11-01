@@ -166,8 +166,9 @@ class ContinualLearner(torch.nn.Module, metaclass=abc.ABCMeta):
                     #batch_x_ = (batch_x.permute(0,2,3,1).cpu().numpy()* 255).astype(np.uint8)
 
                     # Convert tensor to PIL image
-                    to_pil = ToPILImage()
-                    batch_x_ = to_pil(batch_x.cpu())  # Convert to PIL image
+                    #to_pil = ToPILImage()
+                    #batch_x_ = to_pil(batch_x.cpu())  # Convert to PIL image
+                    batch_x_ = torchvision.transforms.functional.to_pil_image(batch_x.cpu())
                     print("batch_x_.shape", batch_x_.shape)
                     print("batch_x_[0]", batch_x_[0])
                     batch_x_ = batch_x_[0]
