@@ -175,22 +175,22 @@ class ContinualLearner(torch.nn.Module, metaclass=abc.ABCMeta):
                     batch_x3 = torch.tensor(impulse_noise(batch_x_pil).astype(float) / 255.0, dtype = batch_x.dtype).to("cuda").permute(2,0,1).reshape(batch_x.shape)
                     batch_x4 = torch.tensor(defocus_blur(batch_x_pil).astype(float) / 255.0, dtype = batch_x.dtype).to("cuda").permute(2,0,1).reshape(batch_x.shape)
                     #batch_x5 = torch.tensor(glass_blur(batch_x_pil).astype(float) / 255.0, dtype = batch_x.dtype).to("cuda").permute(2,0,1).reshape(batch_x.shape)
-                    batch_x6 = torch.tensor(motion_blur(batch_x_pil).astype(float) / 255.0, dtype = batch_x.dtype).to("cuda").permute(2,0,1).reshape(batch_x.shape)
-                    batch_x7 = torch.tensor(zoom_blur(batch_x_pil).astype(float) / 255.0, dtype = batch_x.dtype).to("cuda").permute(2,0,1).reshape(batch_x.shape)
-                    #batch_x8 = torch.tensor(elastic_transform(batch_x_pil).astype(float) / 255.0, dtype = batch_x.dtype).to("cuda").permute(2,0,1).reshape(batch_x.shape)
+                    #batch_x6 = torch.tensor(motion_blur(batch_x_pil).astype(float) / 255.0, dtype = batch_x.dtype).to("cuda").permute(2,0,1).reshape(batch_x.shape)
+                    #batch_x7 = torch.tensor(zoom_blur(batch_x_pil).astype(float) / 255.0, dtype = batch_x.dtype).to("cuda").permute(2,0,1).reshape(batch_x.shape)
+                    batch_x8 = torch.tensor(elastic_transform(batch_x_pil).astype(float) / 255.0, dtype = batch_x.dtype).to("cuda").permute(2,0,1).reshape(batch_x.shape)
                     #batch_x9 = torch.tensor(pixelate(batch_x_pil).astype(float) / 255.0, dtype = batch_x.dtype).to("cuda").permute(2,0,1).reshape(batch_x.shape)
                     #batch_x10 = torch.tensor(jpeg_compression(batch_x_pil).astype(float) / 255.0, dtype = batch_x.dtype).to("cuda").permute(2,0,1).reshape(batch_x.shape)
                     
 
-                    all_batches = [batch_x, batch_x1, batch_x2, batch_x3, batch_x4, batch_x6, batch_x7]
+                    all_batches = [batch_x, batch_x1, batch_x2, batch_x3, batch_x4, batch_x8]
                     batch_x = torch.cat(all_batches, dim=0)
-                    batch_y = batch_y.repeat(7)
+                    batch_y = batch_y.repeat(6)
                     
                     ##print("batch_x.shape", batch_x.shape)
                     ##print(batch_y.shape, batch_y.shape)
                     
                     # Extract the first 10 images
-                    images_1 = [batch_x[i] for i in range(7)]
+                    images_1 = [batch_x[i] for i in range(6)]
                     
                     # Make a grid from these images
                     grid = torchvision.utils.make_grid(images_1, nrow=1)  # 5 images per row
