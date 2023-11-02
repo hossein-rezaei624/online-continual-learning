@@ -121,7 +121,7 @@ def clipped_zoom(img, zoom_factor):
 
 def gaussian_noise(x, severity=1):
     c = [.08, .12, 0.18, 0.26, 0.38][severity - 1]
-    
+
     x = np.array(x) / 255.
     return np.clip(x + np.random.normal(size=x.shape, scale=c), 0, 1) * 255
 
@@ -167,25 +167,21 @@ def gaussian_blur(x, severity=1):
 
 
 def glass_blur(x, severity=1):
-    
-    h_img, w_img, _ = x.shape
-    print("h_img", h_img, "w_img", w_img)
-    
     # sigma, max_delta, iterations
     c = [(0.7, 1, 2), (0.9, 2, 1), (1, 2, 3), (1.1, 3, 2), (1.5, 4, 2)][severity - 1]
 
-    x = np.uint8(gaussian(np.array(x) / 255., sigma=c[0], channel_axis=-1) * 255)
+    x = np.uint8(gaussian(np.array(x) / 255., sigma=c[0], multichannel=True) * 255)
 
     # locally shuffle pixels
     for i in range(c[2]):
-        for h in range(h_img - c[1], c[1], -1):
-            for w in range(w_img - c[1], c[1], -1):
+        for h in range(224 - c[1], c[1], -1):
+            for w in range(224 - c[1], c[1], -1):
                 dx, dy = np.random.randint(-c[1], c[1], size=(2,))
                 h_prime, w_prime = h + dy, w + dx
                 # swap
                 x[h, w], x[h_prime, w_prime] = x[h_prime, w_prime], x[h, w]
 
-    return np.clip(gaussian(x / 255., sigma=c[0], channel_axis=-1), 0, 1) * 255
+    return np.clip(gaussian(x / 255., sigma=c[0], multichannel=True), 0, 1) * 255
 
 
 def defocus_blur(x, severity=1):
@@ -246,9 +242,6 @@ def fog(x, severity=1):
 
 
 def frost(x, severity=1):
-
-    h_img, w_img, _ = x.shape
-    
     c = [(1, 0.4),
          (0.8, 0.6),
          (0.7, 0.7),
@@ -263,8 +256,8 @@ def frost(x, severity=1):
                 resource_filename(__name__, 'frost/frost6.jpg')][idx]
     frost = cv2.imread(filename)
     # randomly crop and convert to rgb
-    x_start, y_start = np.random.randint(0, frost.shape[0] - h_img), np.random.randint(0, frost.shape[1] - w_img)
-    frost = frost[x_start:x_start + h_img, y_start:y_start + w_img][..., [2, 1, 0]]
+    x_start, y_start = np.random.randint(0, frost.shape[0] - 224), np.random.randint(0, frost.shape[1] - 224)
+    frost = frost[x_start:x_start + 224, y_start:y_start + 224][..., [2, 1, 0]]
 
     return np.clip(c[0] * np.array(x) + c[1] * frost, 0, 255)
 
