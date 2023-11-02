@@ -169,8 +169,6 @@ def gaussian_blur(x, severity=1):
 def glass_blur(x, severity=1):
     
     h_img, w_img, _ = np.array(x).shape
-    print("np.array(x).shape", np.array(x).shape)
-    print("h_img", h_img, "w_img", w_img, "_", _)
     
     # sigma, max_delta, iterations
     c = [(0.7, 1, 2), (0.9, 2, 1), (1, 2, 3), (1.1, 3, 2), (1.5, 4, 2)][severity - 1]
