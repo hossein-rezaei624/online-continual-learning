@@ -262,8 +262,8 @@ def frost(x, severity=1):
                 resource_filename(__name__, 'frost/frost6.jpg')][idx]
     frost = cv2.imread(filename)
     # randomly crop and convert to rgb
-    x_start, y_start = np.random.randint(0, frost.shape[0] - 224), np.random.randint(0, frost.shape[1] - 224)
-    frost = frost[x_start:x_start + 224, y_start:y_start + 224][..., [2, 1, 0]]
+    x_start, y_start = np.random.randint(0, frost.shape[0] - 32), np.random.randint(0, frost.shape[1] - 32)
+    frost = frost[x_start:x_start + 32, y_start:y_start + 32][..., [2, 1, 0]]
 
     return np.clip(c[0] * np.array(x) + c[1] * frost, 0, 255)
 
