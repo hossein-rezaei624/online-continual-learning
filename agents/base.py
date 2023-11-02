@@ -164,8 +164,6 @@ class ContinualLearner(torch.nn.Module, metaclass=abc.ABCMeta):
                     batch_x = maybe_cuda(batch_x, self.cuda)
                     batch_y = maybe_cuda(batch_y, self.cuda)
 
-                    aa__ = deepcopy(batch_x)
-                    bb__ = deepcopy(batch_y)
                     
                     # List to hold all the batches with distortions applied
                     all_batches = []
@@ -216,9 +214,6 @@ class ContinualLearner(torch.nn.Module, metaclass=abc.ABCMeta):
                     # Save grid image with unique name for each batch
                     torchvision.utils.save_image(grid, f'grid_image_task{task}_batch{i}.png')
          
-
-                    batch_x = aa__
-                    batch_y = bb__
                     
                     
                     
