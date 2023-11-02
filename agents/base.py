@@ -119,131 +119,33 @@ class ContinualLearner(torch.nn.Module, metaclass=abc.ABCMeta):
         return self.model.forward(x)
 
     def evaluate(self, test_loaders):
-        self.model.eval()
-        acc_array = np.zeros(len(test_loaders))
-        if self.params.trick['ncm_trick'] or self.params.agent in ['ICARL', 'SCR', 'SCP']:
-            exemplar_means = {}
-            cls_exemplar = {cls: [] for cls in self.old_labels}
-            #print("self.old_labels", self.old_labels)
-            buffer_filled = self.buffer.current_index
-            for x, y in zip(self.buffer.buffer_img[:buffer_filled], self.buffer.buffer_label[:buffer_filled]):
-                cls_exemplar[y.item()].append(x)            
-            for cls, exemplar in cls_exemplar.items():
-                #print("cls", cls)
-                #print("exemplar", len(exemplar))
-                features = []
-                # Extract feature for each exemplar in p_y
-                for ex in exemplar:
-                    feature = self.model.features(ex.unsqueeze(0)).detach().clone()
-                    feature = feature.squeeze()
-                    feature.data = feature.data / feature.data.norm()  # Normalize
-                    features.append(feature)
-                if len(features) == 0:
-                    mu_y = maybe_cuda(torch.normal(0, 1, size=(1, 160)), self.cuda) #this line should change
-                    mu_y = mu_y.squeeze()
-                else:
-                    features = torch.stack(features)
-                    mu_y = features.mean(0).squeeze()
-                mu_y.data = mu_y.data / mu_y.data.norm()  # Normalize
-                exemplar_means[cls] = mu_y
-        with torch.no_grad():
-            if self.params.error_analysis:
-                error = 0
-                no = 0
-                nn = 0
-                oo = 0
-                on = 0
-                new_class_score = AverageMeter()
-                old_class_score = AverageMeter()
-                correct_lb = []
-                predict_lb = []
-            for task, test_loader in enumerate(test_loaders):
-                acc = AverageMeter()
-                for i, (batch_x, batch_y, indices_1) in enumerate(test_loader):
-                    batch_x = maybe_cuda(batch_x, self.cuda)
-                    batch_y = maybe_cuda(batch_y, self.cuda)
-                    
-                    #batch_x_ = (batch_x.permute(0,2,3,1).cpu().numpy()* 255).astype(np.uint8)
-
-                    # Convert tensor to PIL image
-                    to_pil = ToPILImage()
-                    batch_x_ = batch_x[0]  # Taking the first image from the batch
-                    batch_x_pil = to_pil(batch_x_.cpu())  # Convert to PIL image
-                    
-                    to_tensor_ = PILToTensor()
-                    batch_x1 = torch.tensor(gaussian_noise(batch_x_pil).astype(float) / 255.0, dtype = batch_x.dtype).to("cuda").permute(2,0,1).reshape(batch_x.shape)
 
 
-                    
+        for task, test_loader in enumerate(test_loaders):
+            acc = AverageMeter()
+            for i, (batch_x, batch_y, indices_1) in enumerate(test_loader):
+                batch_x = maybe_cuda(batch_x, self.cuda)
+                batch_y = maybe_cuda(batch_y, self.cuda)
+                
+                #batch_x_ = (batch_x.permute(0,2,3,1).cpu().numpy()* 255).astype(np.uint8)
 
-                    
-                    
-                    if self.params.trick['ncm_trick'] or self.params.agent in ['ICARL', 'SCR', 'SCP']:
-                        feature = self.model.features(batch_x)  # (batch_size, feature_size)
-                        for j in range(feature.size(0)):  # Normalize
-                            feature.data[j] = feature.data[j] / feature.data[j].norm()
-                        feature = feature.unsqueeze(2)  # (batch_size, feature_size, 1)
-                        means = torch.stack([exemplar_means[cls] for cls in self.old_labels])  # (n_classes, feature_size)
+                # Convert tensor to PIL image
+                to_pil = ToPILImage()
+                batch_x_ = batch_x[0]  # Taking the first image from the batch
+                batch_x_pil = to_pil(batch_x_.cpu())  # Convert to PIL image
+                
+                to_tensor_ = PILToTensor()
+                batch_x1 = torch.tensor(gaussian_noise(batch_x_pil).astype(float) / 255.0, dtype = batch_x.dtype).to("cuda").permute(2,0,1).reshape(batch_x.shape)
 
-                        #old ncm
-                        means = torch.stack([means] * batch_x.size(0))  # (batch_size, n_classes, feature_size)
-                        means = means.transpose(1, 2)
-                        feature = feature.expand_as(means)  # (batch_size, feature_size, n_classes)
-                        dists = (feature - means).pow(2).sum(1).squeeze()  # (batch_size, n_classes)
-                        _, pred_label = dists.min(1)
-                        # may be faster
-                        # feature = feature.squeeze(2).T
-                        # _, preds = torch.matmul(means, feature).max(0)
-                        correct_cnt = (np.array(self.old_labels)[
-                                           pred_label.tolist()] == batch_y.cpu().numpy()).sum().item() / batch_y.size(0)
-                    else:
-                        logits = self.model.forward(batch_x)
-                        _, pred_label = torch.max(logits, 1)
-                        correct_cnt = (pred_label == batch_y).sum().item()/batch_y.size(0)
+                self.model.eval()
+                with torch.no_grad():
+                    logits = self.model.forward(batch_x)
+                    _, pred_label = torch.max(logits, 1)
+                    correct_cnt = (pred_label == batch_y).sum().item()/batch_y.size(0)
 
-                    if self.params.error_analysis:
-                        correct_lb += [task] * len(batch_y)
-                        for i in pred_label:
-                            predict_lb.append(self.class_task_map[i.item()])
-                        if task < self.task_seen-1:
-                            # old test
-                            total = (pred_label != batch_y).sum().item()
-                            wrong = pred_label[pred_label != batch_y]
-                            error += total
-                            on_tmp = sum([(wrong == i).sum().item() for i in self.new_labels_zombie])
-                            oo += total - on_tmp
-                            on += on_tmp
-                            old_class_score.update(logits[:, list(set(self.old_labels) - set(self.new_labels_zombie))].mean().item(), batch_y.size(0))
-                        elif task == self.task_seen -1:
-                            # new test
-                            total = (pred_label != batch_y).sum().item()
-                            error += total
-                            wrong = pred_label[pred_label != batch_y]
-                            no_tmp = sum([(wrong == i).sum().item() for i in list(set(self.old_labels) - set(self.new_labels_zombie))])
-                            no += no_tmp
-                            nn += total - no_tmp
-                            new_class_score.update(logits[:, self.new_labels_zombie].mean().item(), batch_y.size(0))
-                        else:
-                            pass
-                    acc.update(correct_cnt, batch_y.size(0))
-                acc_array[task] = acc.avg()
+
+                acc.update(correct_cnt, batch_y.size(0))
+            acc_array[task] = acc.avg()
         print(acc_array)
-        if self.params.error_analysis:
-            self.error_list.append((no, nn, oo, on))
-            self.new_class_score.append(new_class_score.avg())
-            self.old_class_score.append(old_class_score.avg())
-            print("no ratio: {}\non ratio: {}".format(no/(no+nn+0.1), on/(oo+on+0.1)))
-            print(self.error_list)
-            print(self.new_class_score)
-            print(self.old_class_score)
-            self.fc_norm_new.append(self.model.linear.weight[self.new_labels_zombie].mean().item())
-            self.fc_norm_old.append(self.model.linear.weight[list(set(self.old_labels) - set(self.new_labels_zombie))].mean().item())
-            self.bias_norm_new.append(self.model.linear.bias[self.new_labels_zombie].mean().item())
-            self.bias_norm_old.append(self.model.linear.bias[list(set(self.old_labels) - set(self.new_labels_zombie))].mean().item())
-            print(self.fc_norm_old)
-            print(self.fc_norm_new)
-            print(self.bias_norm_old)
-            print(self.bias_norm_new)
-            with open('confusion', 'wb') as fp:
-                pickle.dump([correct_lb, predict_lb], fp)
+
         return acc_array
