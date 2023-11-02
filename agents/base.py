@@ -162,7 +162,7 @@ class ContinualLearner(torch.nn.Module, metaclass=abc.ABCMeta):
                 for i, (batch_x, batch_y, indices_1) in enumerate(test_loader):
                     batch_x = maybe_cuda(batch_x, self.cuda)
                     batch_y = maybe_cuda(batch_y, self.cuda)
-                    
+                    print("aaaaaaaaa", batch_x.shape, batch_x)
                     #batch_x_ = (batch_x.permute(0,2,3,1).cpu().numpy()* 255).astype(np.uint8)
 
                     # Convert tensor to PIL image
@@ -180,10 +180,10 @@ class ContinualLearner(torch.nn.Module, metaclass=abc.ABCMeta):
                     #batch_x6 = torch.tensor(motion_blur(batch_x_pil).astype(float) / 255.0, dtype = batch_x.dtype).to("cuda").permute(2,0,1).reshape(batch_x.shape)
                     #batch_x7 = torch.tensor(zoom_blur(batch_x_pil).astype(float) / 255.0, dtype = batch_x.dtype).to("cuda").permute(2,0,1).reshape(batch_x.shape)
                     #batch_x8 = torch.tensor(elastic_transform(batch_x_pil).astype(float) / 255.0, dtype = batch_x.dtype).to("cuda").permute(2,0,1).reshape(batch_x.shape)
-                    print("before", to_tensor_(pixelate(batch_x_pil)), to_tensor_(pixelate(batch_x_pil)).to(dtype=batch_x.dtype))
-                    print("few after", type(batch_x), type(to_tensor_(pixelate(batch_x_pil))), type(to_tensor_(pixelate(batch_x_pil)).to(dtype=batch_x.dtype)))
+                    ##print("before", to_tensor_(pixelate(batch_x_pil)), to_tensor_(pixelate(batch_x_pil)).to(dtype=batch_x.dtype))
+                    ##print("few after", type(batch_x), type(to_tensor_(pixelate(batch_x_pil))), type(to_tensor_(pixelate(batch_x_pil)).to(dtype=batch_x.dtype)))
                     batch_x9 = to_tensor_(pixelate(batch_x_pil)).to(dtype=batch_x.dtype).to("cuda").reshape(batch_x.shape)
-                    print("after", batch_x9[0], type(batch_x9))
+                    ##print("after", batch_x9[0], type(batch_x9))
                     #batch_x10 = torch.tensor(jpeg_compression(batch_x_pil).astype(float) / 255.0, dtype = batch_x.dtype).to("cuda").permute(2,0,1).reshape(batch_x.shape)
                     
 
