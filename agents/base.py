@@ -196,7 +196,7 @@ class ContinualLearner(torch.nn.Module, metaclass=abc.ABCMeta):
                     # Make a grid from these images
                     grid = torchvision.utils.make_grid(images_1, nrow=10)  # 5 images per row
                     
-                    torchvision.utils.save_image(grid, 'grid_image.png')
+                    torchvision.utils.save_image(grid, f'grid_image{i}.png')
                     
                     
                     if self.params.trick['ncm_trick'] or self.params.agent in ['ICARL', 'SCR', 'SCP']:
