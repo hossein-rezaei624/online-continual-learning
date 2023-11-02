@@ -189,7 +189,7 @@ class ContinualLearner(torch.nn.Module, metaclass=abc.ABCMeta):
                     ##print(batch_y.shape, batch_y.shape)
                     
                     # Extract the first 10 images
-                    images_1 = [batch_x[i] for i in range(1)]
+                    images_1 = [batch_x1[i] for i in range(1)]
                     
                     # Make a grid from these images
                     grid = torchvision.utils.make_grid(images_1, nrow=1)  # 5 images per row
