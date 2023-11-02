@@ -12,7 +12,7 @@ import pickle
 
 import torchvision
 from corruptions import *
-from torchvision.transforms import ToPILImage
+from torchvision.transforms import ToPILImage, PILToTensor
 
 class ContinualLearner(torch.nn.Module, metaclass=abc.ABCMeta):
     '''
@@ -169,6 +169,8 @@ class ContinualLearner(torch.nn.Module, metaclass=abc.ABCMeta):
                     to_pil = ToPILImage()
                     batch_x_ = batch_x[0]  # Taking the first image from the batch
                     batch_x_pil = to_pil(batch_x_.cpu())  # Convert to PIL image
+
+                    to_tensor_ = PILToTensor()
                     
                     batch_x1 = torch.tensor(gaussian_noise(batch_x_pil).astype(float) / 255.0, dtype = batch_x.dtype).to("cuda").permute(2,0,1).reshape(batch_x.shape)
                     batch_x2 = torch.tensor(shot_noise(batch_x_pil).astype(float) / 255.0, dtype = batch_x.dtype).to("cuda").permute(2,0,1).reshape(batch_x.shape)
@@ -178,7 +180,7 @@ class ContinualLearner(torch.nn.Module, metaclass=abc.ABCMeta):
                     #batch_x6 = torch.tensor(motion_blur(batch_x_pil).astype(float) / 255.0, dtype = batch_x.dtype).to("cuda").permute(2,0,1).reshape(batch_x.shape)
                     #batch_x7 = torch.tensor(zoom_blur(batch_x_pil).astype(float) / 255.0, dtype = batch_x.dtype).to("cuda").permute(2,0,1).reshape(batch_x.shape)
                     #batch_x8 = torch.tensor(elastic_transform(batch_x_pil).astype(float) / 255.0, dtype = batch_x.dtype).to("cuda").permute(2,0,1).reshape(batch_x.shape)
-                    batch_x9 = torch.tensor(pixelate(batch_x_pil), dtype = batch_x.dtype).to("cuda").permute(2,0,1).reshape(batch_x.shape)
+                    batch_x9 = to_tensor_(pixelate(batch_x_pil)).to(dtype=batch_x.dtype).to("cuda").reshape(batch_x.shape)
                     #batch_x10 = torch.tensor(jpeg_compression(batch_x_pil).astype(float) / 255.0, dtype = batch_x.dtype).to("cuda").permute(2,0,1).reshape(batch_x.shape)
                     
 
