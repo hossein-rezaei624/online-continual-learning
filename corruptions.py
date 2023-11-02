@@ -397,6 +397,7 @@ def pixelate(x, severity=1):
     x = x.resize((int(h_img * c), int(w_img * c)), PILImage.BOX)
     x = x.resize((h_img, w_img), PILImage.BOX)
 
+    print(type(x))
     return x
 
 
