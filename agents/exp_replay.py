@@ -101,7 +101,7 @@ class ExperienceReplay(ContinualLearner):
         for _, labels, indices_1 in train_loader:
             unique_classes.update(labels.numpy())
         
-        Epoch_Carto = 14
+        Epoch_Carto = 13
         device = "cuda"
         Model_Carto = ResNet18(len(unique_classes))
         Model_Carto = Model_Carto.to(device)
