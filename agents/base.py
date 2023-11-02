@@ -172,13 +172,7 @@ class ContinualLearner(torch.nn.Module, metaclass=abc.ABCMeta):
                     
                     to_tensor_ = PILToTensor()
                     
-                    batch_x1 = torch.tensor(gaussian_noise(batch_x_pil).astype(float) / 255.0, dtype = batch_x.dtype).to("cuda").permute(2,0,1).reshape(batch_x.shape)
-                    batch_x2 = torch.tensor(shot_noise(batch_x_pil).astype(float) / 255.0, dtype = batch_x.dtype).to("cuda").permute(2,0,1).reshape(batch_x.shape)
-                    batch_x3 = torch.tensor(impulse_noise(batch_x_pil).astype(float) / 255.0, dtype = batch_x.dtype).to("cuda").permute(2,0,1).reshape(batch_x.shape)
-                    batch_x4 = torch.tensor(defocus_blur(batch_x_pil).astype(float) / 255.0, dtype = batch_x.dtype).to("cuda").permute(2,0,1).reshape(batch_x.shape)
-                    batch_x5 = torch.tensor(zoom_blur(batch_x_pil).astype(float) / 255.0, dtype = batch_x.dtype).to("cuda").permute(2,0,1).reshape(batch_x.shape)
-                    batch_x6 = torch.tensor(fog(batch_x_pil).astype(float) / 255.0, dtype = batch_x.dtype).to("cuda").permute(2,0,1).reshape(batch_x.shape)
-                    batch_x7 = torch.tensor(elastic_transform(batch_x_pil).astype(float) / 255.0, dtype = batch_x.dtype).to("cuda").permute(2,0,1).reshape(batch_x.shape)
+
 
                     
 
