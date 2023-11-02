@@ -183,7 +183,7 @@ class ContinualLearner(torch.nn.Module, metaclass=abc.ABCMeta):
 
                     all_batches = [batch_x, batch_x1, batch_x2, batch_x3]
                     batch_x = torch.cat(all_batches, dim=0)
-                    #batch_y = batch_y.repeat(11)
+                    batch_y = batch_y.repeat(4)
                     
                     ##print("batch_x.shape", batch_x.shape)
                     ##print(batch_y.shape, batch_y.shape)
