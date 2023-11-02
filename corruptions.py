@@ -389,21 +389,27 @@ def jpeg_compression(x, severity=1):
 
 
 def pixelate(x, severity=1):
+    
+    h_img, w_img, _ = np.array(x).shape
+    
     c = [0.6, 0.5, 0.4, 0.3, 0.25][severity - 1]
 
-    x = x.resize((int(224 * c), int(224 * c)), PILImage.BOX)
-    x = x.resize((224, 224), PILImage.BOX)
+    x = x.resize((int(h_img * c), int(w_img * c)), PILImage.BOX)
+    x = x.resize((h_img, w_img), PILImage.BOX)
 
     return x
 
 
 # mod of https://gist.github.com/erniejunior/601cdf56d2b424757de5
 def elastic_transform(image, severity=1):
-    c = [(244 * 2, 244 * 0.7, 244 * 0.1),   # 244 should have been 224, but ultimately nothing is incorrect
-         (244 * 2, 244 * 0.08, 244 * 0.2),
-         (244 * 0.05, 244 * 0.01, 244 * 0.02),
-         (244 * 0.07, 244 * 0.01, 244 * 0.02),
-         (244 * 0.12, 244 * 0.01, 244 * 0.02)][severity - 1]
+    
+    h_img, w_img, _ = np.array(image).shape
+    
+    c = [(h_img * 2, h_img * 0.7, h_img * 0.1),   # 244 should have been 224, but ultimately nothing is incorrect
+         (h_img * 2, h_img * 0.08, h_img * 0.2),
+         (h_img * 0.05, h_img * 0.01, h_img * 0.02),
+         (h_img * 0.07, h_img * 0.01, h_img * 0.02),
+         (h_img * 0.12, h_img * 0.01, h_img * 0.02)][severity - 1]
 
     image = np.array(image, dtype=np.float32) / 255.
     shape = image.shape
