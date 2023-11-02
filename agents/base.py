@@ -173,31 +173,31 @@ class ContinualLearner(torch.nn.Module, metaclass=abc.ABCMeta):
                     to_tensor_ = PILToTensor()
                     
                     batch_x1 = torch.tensor(gaussian_noise(batch_x_pil).astype(float) / 255.0, dtype = batch_x.dtype).to("cuda").permute(2,0,1).reshape(batch_x.shape)
-                    batch_x2 = torch.tensor(shot_noise(batch_x_pil).astype(float) / 255.0, dtype = batch_x.dtype).to("cuda").permute(2,0,1).reshape(batch_x.shape)
-                    batch_x3 = torch.tensor(impulse_noise(batch_x_pil).astype(float) / 255.0, dtype = batch_x.dtype).to("cuda").permute(2,0,1).reshape(batch_x.shape)
-                    batch_x4 = torch.tensor(defocus_blur(batch_x_pil).astype(float) / 255.0, dtype = batch_x.dtype).to("cuda").permute(2,0,1).reshape(batch_x.shape)
-                    batch_x5 = torch.tensor(glass_blur(batch_x_pil).astype(float) / 255.0, dtype = batch_x.dtype).to("cuda").permute(2,0,1).reshape(batch_x.shape)
-                    batch_x6 = torch.tensor(motion_blur(batch_x_pil).astype(float) / 255.0, dtype = batch_x.dtype).to("cuda").permute(2,0,1).reshape(batch_x.shape)
-                    batch_x7 = torch.tensor(zoom_blur(batch_x_pil).astype(float) / 255.0, dtype = batch_x.dtype).to("cuda").permute(2,0,1).reshape(batch_x.shape)
-                    batch_x8 = torch.tensor(elastic_transform(batch_x_pil).astype(float) / 255.0, dtype = batch_x.dtype).to("cuda").permute(2,0,1).reshape(batch_x.shape)
-                    batch_x9 = to_tensor_(pixelate(batch_x_pil)).to(dtype=batch_x.dtype).to("cuda").reshape(batch_x.shape) / 255.0
-                    batch_x10 = to_tensor_(jpeg_compression(batch_x_pil)).to(dtype=batch_x.dtype).to("cuda").reshape(batch_x.shape) / 255.0
-                    batch_x11 = torch.tensor(fog(batch_x_pil).astype(float) / 255.0, dtype = batch_x.dtype).to("cuda").permute(2,0,1).reshape(batch_x.shape)
-                    batch_x12 = torch.tensor(snow(batch_x_pil).astype(float) / 255.0, dtype = batch_x.dtype).to("cuda").permute(2,0,1).reshape(batch_x.shape)
+                    #batch_x2 = torch.tensor(shot_noise(batch_x_pil).astype(float) / 255.0, dtype = batch_x.dtype).to("cuda").permute(2,0,1).reshape(batch_x.shape)
+                    #batch_x3 = torch.tensor(impulse_noise(batch_x_pil).astype(float) / 255.0, dtype = batch_x.dtype).to("cuda").permute(2,0,1).reshape(batch_x.shape)
+                    #batch_x4 = torch.tensor(defocus_blur(batch_x_pil).astype(float) / 255.0, dtype = batch_x.dtype).to("cuda").permute(2,0,1).reshape(batch_x.shape)
+                    #batch_x5 = torch.tensor(glass_blur(batch_x_pil).astype(float) / 255.0, dtype = batch_x.dtype).to("cuda").permute(2,0,1).reshape(batch_x.shape)
+                    #batch_x6 = torch.tensor(motion_blur(batch_x_pil).astype(float) / 255.0, dtype = batch_x.dtype).to("cuda").permute(2,0,1).reshape(batch_x.shape)
+                    #batch_x7 = torch.tensor(zoom_blur(batch_x_pil).astype(float) / 255.0, dtype = batch_x.dtype).to("cuda").permute(2,0,1).reshape(batch_x.shape)
+                    #batch_x8 = torch.tensor(elastic_transform(batch_x_pil).astype(float) / 255.0, dtype = batch_x.dtype).to("cuda").permute(2,0,1).reshape(batch_x.shape)
+                    #batch_x9 = to_tensor_(pixelate(batch_x_pil)).to(dtype=batch_x.dtype).to("cuda").reshape(batch_x.shape) / 255.0
+                    #batch_x10 = to_tensor_(jpeg_compression(batch_x_pil)).to(dtype=batch_x.dtype).to("cuda").reshape(batch_x.shape) / 255.0
+                    #batch_x11 = torch.tensor(fog(batch_x_pil).astype(float) / 255.0, dtype = batch_x.dtype).to("cuda").permute(2,0,1).reshape(batch_x.shape)
+                    #batch_x12 = torch.tensor(snow(batch_x_pil).astype(float) / 255.0, dtype = batch_x.dtype).to("cuda").permute(2,0,1).reshape(batch_x.shape)
 
                     
-                    all_batches = [batch_x, batch_x1, batch_x2, batch_x3, batch_x4, batch_x5, batch_x6, batch_x7, batch_x8, batch_x9, batch_x10, batch_x11 , batch_x12]
+                    all_batches = [batch_x, batch_x1]
                     batch_x = torch.cat(all_batches, dim=0)
-                    batch_y = batch_y.repeat(13)
+                    batch_y = batch_y.repeat(2)
                     
                     ##print("batch_x.shape", batch_x.shape)
                     ##print(batch_y.shape, batch_y.shape)
                     
                     # Extract the first 10 images
-                    images_1 = [batch_x[i] for i in range(13)]
+                    images_1 = [batch_x[i] for i in range(2)]
                     
                     # Make a grid from these images
-                    grid = torchvision.utils.make_grid(images_1, nrow=3)  # 5 images per row
+                    grid = torchvision.utils.make_grid(images_1, nrow=1)  # 5 images per row
                     
                     torchvision.utils.save_image(grid, 'grid_image.png')
                     
