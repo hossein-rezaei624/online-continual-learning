@@ -315,6 +315,7 @@ class ExperienceReplay(ContinualLearner):
         counter_class = [0 for _ in range(len(unique_classes))]
 
         if len(y_train) == top_n:
+            print("we are here in firsttttttt")
             condition = [num_per_class for _ in range(len(unique_classes))]
             diff = top_n - num_per_class*len(unique_classes)
             for o in range(diff):
@@ -324,8 +325,8 @@ class ExperienceReplay(ContinualLearner):
 
 
         check_bound = len(y_train)/len(unique_classes)
-        ##print("check_bound", check_bound)
-        ##print("condition", condition, sum(condition))
+        print("check_bound", check_bound)
+        print("condition", condition, sum(condition))
         for i in range(len(condition)):
             if condition[i] > check_bound:
                 ##print("iiiiiiiii", i)
@@ -333,7 +334,7 @@ class ExperienceReplay(ContinualLearner):
                 break
 
         
-        ##print("condition", condition, sum(condition), "top_n", top_n)
+        print("condition", condition, sum(condition), "top_n", top_n)
         images_list_ = []
         labels_list_ = []
         
@@ -343,17 +344,21 @@ class ExperienceReplay(ContinualLearner):
                 labels_list_.append(all_labels[i])
                 images_list_.append(all_images[i])
             if counter_class == condition:
-                ##print("yesssss")
+                print("yesssss")
                 break
 
         
+        print("counter_class", counter_class, sum(counter_class))
         all_images_ = torch.stack(images_list_)
         all_labels_ = torch.stack(labels_list_)
 
+        print("all_images_.size(0)", all_images_.size(0))
         indices = torch.randperm(all_images_.size(0))
+        print("len(indices)", len(indices))
         shuffled_images = all_images_[indices]
         shuffled_labels = all_labels_[indices]
-        ##print("shuffled_labels.shape", shuffled_labels.shape)
+        print("shuffled_labels.shape", shuffled_labels.shape)
+        print("len(list_of_indices)" ,len(list_of_indices))
         
         self.buffer.buffer_label[list_of_indices] = shuffled_labels.to(device)
         self.buffer.buffer_img[list_of_indices] = shuffled_images.to(device)
