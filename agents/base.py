@@ -162,7 +162,7 @@ class ContinualLearner(torch.nn.Module, metaclass=abc.ABCMeta):
                 for i, (batch_x, batch_y, indices_1) in enumerate(test_loader):
                     batch_x = maybe_cuda(batch_x, self.cuda)
                     batch_y = maybe_cuda(batch_y, self.cuda)
-                    print("before", batch_x[0][1][0])
+                    print("before", batch_x[0, 2, :, 3])
                     #batch_x_ = (batch_x.permute(0,2,3,1).cpu().numpy()* 255).astype(np.uint8)
 
                     # Convert tensor to PIL image
@@ -198,7 +198,7 @@ class ContinualLearner(torch.nn.Module, metaclass=abc.ABCMeta):
                     
                     torchvision.utils.save_image(grid, 'grid_image.png')
 
-                    print("after", batch_x[0][1][0])
+                    print("after", batch_x[0, 2, :, 3])
                     
                     
                     if self.params.trick['ncm_trick'] or self.params.agent in ['ICARL', 'SCR', 'SCP']:
