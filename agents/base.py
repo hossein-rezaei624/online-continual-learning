@@ -163,55 +163,7 @@ class ContinualLearner(torch.nn.Module, metaclass=abc.ABCMeta):
                     batch_x = maybe_cuda(batch_x, self.cuda)
                     batch_y = maybe_cuda(batch_y, self.cuda)
                     
-                    # List to hold all the batches with distortions applied
-                    all_batches = []
-                    
-                    # Convert the batch of images to a list of PIL images
-                    to_pil = ToPILImage()
-                    batch_x_pil_list = [to_pil(img.cpu()) for img in batch_x]  
-                    
-                    distortions = [
-                        gaussian_noise, shot_noise, impulse_noise, defocus_blur,
-                        zoom_blur, fog, elastic_transform, pixelate, jpeg_compression
-                    ]
-            
-                    # Process each image in the batch
-                    for batch_idx, batch_x_pil in enumerate(batch_x_pil_list):
-                        # List to hold the original and distorted images for the current batch image
-                        augmented_images = []
-                        
-                        # Add the original image to the list
-                        augmented_images.append(batch_x[batch_idx])
-                        
-                        # Loop through the distortions and apply them to the current image
-                        for function in distortions:
-                            if function in [pixelate, jpeg_compression]:
-                                # For functions returning tensors
-                                img_processed = PILToTensor()(function(batch_x_pil)).to(dtype=batch_x.dtype).to("cuda") / 255.0
-                            else:
-                                # For functions returning images
-                                img_processed = torch.tensor(function(batch_x_pil).astype(float) / 255.0, dtype=batch_x.dtype).to("cuda").permute(2, 0, 1)
-            
-                            # Append the distorted image
-                            augmented_images.append(img_processed)
-            
-                        # Concatenate the original and distorted images
-                        augmented_images_concatenated = torch.stack(augmented_images, dim=0)
-                        all_batches.append(augmented_images_concatenated)
-            
-                    # Concatenate all the augmented batches along the batch dimension
-                    batch_x_augmented = torch.cat(all_batches, dim=0)
-                    batch_y_augmented = batch_y.repeat(len(distortions) + 1)
-            
-                    # Extract the first 10 images to display (or fewer if there are less than 10 images)
-                    images_display = [batch_x_augmented[j] for j in range(min(10, batch_x_augmented.size(0)))]
-            
-                    # Make a grid from these images
-                    grid = torchvision.utils.make_grid(images_display, nrow=len(images_display))  # Adjust nrow based on actual images
-                    
-                    # Save grid image with unique name for each batch
-                    torchvision.utils.save_image(grid, f'grid_image_task{task}_batch{i}.png')
-            
+                       
                     
                     
                     if self.params.trick['ncm_trick'] or self.params.agent in ['ICARL', 'SCR', 'SCP']:
