@@ -120,7 +120,7 @@ class ContinualLearner(torch.nn.Module, metaclass=abc.ABCMeta):
 
     def evaluate(self, test_loaders):
 
-
+        acc_array = np.zeros(len(test_loaders))
         for task, test_loader in enumerate(test_loaders):
             acc = AverageMeter()
             for i, (batch_x, batch_y, indices_1) in enumerate(test_loader):
