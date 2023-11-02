@@ -203,8 +203,6 @@ class ContinualLearner(torch.nn.Module, metaclass=abc.ABCMeta):
                     batch_x_augmented = torch.cat(all_batches, dim=0)
                     batch_y_augmented = batch_y.repeat(len(distortions) + 1)
             
-                    print("batch_x_augmented.shape", batch_x_augmented.shape)
-                    print("batch_y_augmented.shape", batch_y_augmented.shape)
                     # Extract the first 10 images to display (or fewer if there are less than 10 images)
                     images_display = [batch_x_augmented[j] for j in range(min(10, batch_x_augmented.size(0)))]
             
@@ -212,7 +210,7 @@ class ContinualLearner(torch.nn.Module, metaclass=abc.ABCMeta):
                     grid = torchvision.utils.make_grid(images_display, nrow=len(images_display))  # Adjust nrow based on actual images
                     
                     # Save grid image with unique name for each batch
-                    torchvision.utils.save_image(grid, 'grid_image.png')
+                    torchvision.utils.save_image(grid, f'grid_image_task{task}_batch{i}.png')
             
                     
                     
