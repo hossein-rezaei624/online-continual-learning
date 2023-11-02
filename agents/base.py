@@ -13,6 +13,7 @@ import pickle
 import torchvision
 from corruptions import *
 from torchvision.transforms import ToPILImage, PILToTensor
+from copy import deepcopy
 
 class ContinualLearner(torch.nn.Module, metaclass=abc.ABCMeta):
     '''
