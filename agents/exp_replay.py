@@ -50,7 +50,7 @@ class ExperienceReplay(ContinualLearner):
             if discrepancy > 0:
                 samples[key] += 1
                 discrepancy -= 1
-            else:
+            elif discrepancy < 0 and samples[key] > 0:
                 samples[key] -= 1
                 discrepancy += 1
 
