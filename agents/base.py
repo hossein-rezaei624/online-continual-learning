@@ -183,7 +183,7 @@ class ContinualLearner(torch.nn.Module, metaclass=abc.ABCMeta):
                     ##print("before", to_tensor_(pixelate(batch_x_pil)), to_tensor_(pixelate(batch_x_pil)).to(dtype=batch_x.dtype))
                     ##print("few after", type(batch_x), type(to_tensor_(pixelate(batch_x_pil))), type(to_tensor_(pixelate(batch_x_pil)).to(dtype=batch_x.dtype)))
                     batch_x9 = to_tensor_(pixelate(batch_x_pil)).to(dtype=batch_x.dtype).to("cuda").reshape(batch_x.shape)
-                    print("after", to_tensor_(pixelate(batch_x_pil)), dtype(to_tensor_(pixelate(batch_x_pil))), dtype(batch_x), dtype(batch_x9))
+                    print("after", to_tensor_(pixelate(batch_x_pil)), (to_tensor_(pixelate(batch_x_pil)).dtype), (batch_x.dtype), (batch_x9.dtype))
                     #batch_x10 = torch.tensor(jpeg_compression(batch_x_pil).astype(float) / 255.0, dtype = batch_x.dtype).to("cuda").permute(2,0,1).reshape(batch_x.shape)
                     
 
