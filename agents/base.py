@@ -183,9 +183,9 @@ class ContinualLearner(torch.nn.Module, metaclass=abc.ABCMeta):
                     batch_x9 = to_tensor_(jpeg_compression(batch_x_pil)).to(dtype=batch_x.dtype).to("cuda").reshape(batch_x.shape) / 255.0
 
                     
-                    all_batches = [batch_x for i in range(10)]
-                    batch_x = torch.cat(all_batches, dim=0)
-                    batch_y = batch_y.repeat(10)
+                    #all_batches = [batch_x for i in range(10)]
+                    #batch_x = torch.cat(all_batches, dim=0)
+                    #batch_y = batch_y.repeat(10)
                     
                     ##print("batch_x.shape", batch_x.shape)
                     ##print(batch_y.shape, batch_y.shape)
