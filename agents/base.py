@@ -10,10 +10,6 @@ import copy
 from utils.loss import SupConLoss
 import pickle
 
-import torchvision
-from corruptions import *
-from torchvision.transforms import ToPILImage, PILToTensor
-from copy import deepcopy
 
 class ContinualLearner(torch.nn.Module, metaclass=abc.ABCMeta):
     '''
@@ -125,13 +121,10 @@ class ContinualLearner(torch.nn.Module, metaclass=abc.ABCMeta):
         if self.params.trick['ncm_trick'] or self.params.agent in ['ICARL', 'SCR', 'SCP']:
             exemplar_means = {}
             cls_exemplar = {cls: [] for cls in self.old_labels}
-            #print("self.old_labels", self.old_labels)
             buffer_filled = self.buffer.current_index
             for x, y in zip(self.buffer.buffer_img[:buffer_filled], self.buffer.buffer_label[:buffer_filled]):
-                cls_exemplar[y.item()].append(x)            
+                cls_exemplar[y.item()].append(x)
             for cls, exemplar in cls_exemplar.items():
-                #print("cls", cls)
-                #print("exemplar", len(exemplar))
                 features = []
                 # Extract feature for each exemplar in p_y
                 for ex in exemplar:
@@ -140,7 +133,7 @@ class ContinualLearner(torch.nn.Module, metaclass=abc.ABCMeta):
                     feature.data = feature.data / feature.data.norm()  # Normalize
                     features.append(feature)
                 if len(features) == 0:
-                    mu_y = maybe_cuda(torch.normal(0, 1, size=(1, 160)), self.cuda) #this line should change
+                    mu_y = maybe_cuda(torch.normal(0, 1, size=tuple(self.model.features(x.unsqueeze(0)).detach().size())), self.cuda)
                     mu_y = mu_y.squeeze()
                 else:
                     features = torch.stack(features)
@@ -160,12 +153,9 @@ class ContinualLearner(torch.nn.Module, metaclass=abc.ABCMeta):
                 predict_lb = []
             for task, test_loader in enumerate(test_loaders):
                 acc = AverageMeter()
-                for i, (batch_x, batch_y, indices_1) in enumerate(test_loader):
+                for i, (batch_x, batch_y) in enumerate(test_loader):
                     batch_x = maybe_cuda(batch_x, self.cuda)
                     batch_y = maybe_cuda(batch_y, self.cuda)
-                    
-                    
-                    
                     if self.params.trick['ncm_trick'] or self.params.agent in ['ICARL', 'SCR', 'SCP']:
                         feature = self.model.features(batch_x)  # (batch_size, feature_size)
                         for j in range(feature.size(0)):  # Normalize
