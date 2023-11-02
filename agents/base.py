@@ -162,7 +162,7 @@ class ContinualLearner(torch.nn.Module, metaclass=abc.ABCMeta):
                 for i, (batch_x, batch_y, indices_1) in enumerate(test_loader):
                     batch_x = maybe_cuda(batch_x, self.cuda)
                     batch_y = maybe_cuda(batch_y, self.cuda)
-                    print("before", batch_y)
+                    
                     #batch_x_ = (batch_x.permute(0,2,3,1).cpu().numpy()* 255).astype(np.uint8)
 
                     # Convert tensor to PIL image
@@ -183,22 +183,7 @@ class ContinualLearner(torch.nn.Module, metaclass=abc.ABCMeta):
                     batch_x9 = to_tensor_(jpeg_compression(batch_x_pil)).to(dtype=batch_x.dtype).to("cuda").reshape(batch_x.shape) / 255.0
 
                     
-                    #all_batches = [batch_x for i in range(10)]
-                    #batch_x = torch.cat(all_batches, dim=0)
-                    #batch_y = batch_y.repeat(10)
-                    
-                    ##print("batch_x.shape", batch_x.shape)
-                    ##print(batch_y.shape, batch_y.shape)
-                    
-                    # Extract the first 10 images
-                    images_1 = [batch_x[i] for i in range(1)]
-                    
-                    # Make a grid from these images
-                    grid = torchvision.utils.make_grid(images_1, nrow=10)  # 5 images per row
-                    
-                    torchvision.utils.save_image(grid, 'grid_image.png')
 
-                    print("after", batch_y)
                     
                     
                     if self.params.trick['ncm_trick'] or self.params.agent in ['ICARL', 'SCR', 'SCP']:
