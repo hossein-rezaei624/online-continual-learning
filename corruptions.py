@@ -202,6 +202,9 @@ def defocus_blur(x, severity=1):
 
 
 def motion_blur(x, severity=1):
+    
+    h_img, w_img, _ = np.array(x).shape
+    
     c = [(10, 3), (15, 5), (15, 8), (15, 12), (20, 15)][severity - 1]
 
     output = BytesIO()
@@ -213,7 +216,7 @@ def motion_blur(x, severity=1):
     x = cv2.imdecode(np.fromstring(x.make_blob(), np.uint8),
                      cv2.IMREAD_UNCHANGED)
 
-    if x.shape != (32, 32):
+    if x.shape != (h_img, w_img):
         return np.clip(x[..., [2, 1, 0]], 0, 255)  # BGR to RGB
     else:  # greyscale to RGB
         return np.clip(np.array([x, x, x]).transpose((1, 2, 0)), 0, 255)
