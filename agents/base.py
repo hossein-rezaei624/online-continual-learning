@@ -179,8 +179,6 @@ class ContinualLearner(torch.nn.Module, metaclass=abc.ABCMeta):
                     batch_x5 = torch.tensor(zoom_blur(batch_x_pil).astype(float) / 255.0, dtype = batch_x.dtype).to("cuda").permute(2,0,1).reshape(batch_x.shape)
                     batch_x6 = torch.tensor(fog(batch_x_pil).astype(float) / 255.0, dtype = batch_x.dtype).to("cuda").permute(2,0,1).reshape(batch_x.shape)
                     batch_x7 = torch.tensor(elastic_transform(batch_x_pil).astype(float) / 255.0, dtype = batch_x.dtype).to("cuda").permute(2,0,1).reshape(batch_x.shape)
-                    batch_x8 = to_tensor_(pixelate(batch_x_pil)).to(dtype=batch_x.dtype).to("cuda").reshape(batch_x.shape) / 255.0
-                    batch_x9 = to_tensor_(jpeg_compression(batch_x_pil)).to(dtype=batch_x.dtype).to("cuda").reshape(batch_x.shape) / 255.0
 
                     
 
