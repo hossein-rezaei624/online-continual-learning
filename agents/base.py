@@ -170,8 +170,7 @@ class ContinualLearner(torch.nn.Module, metaclass=abc.ABCMeta):
                     #print("Current Torch Random Seed (Before):", torch.initial_seed())
                     #print("Current Torch CUDA Random Seed (Before):", torch.cuda.initial_seed())
                     
-                    current_seed = torch.seed()
-                    print("Current Torch Random Seed (Before):", current_seed)
+                    print("Current Torch Random Seed (Before):", torch.seed())
                     before_seed = np.random.get_state()[1][0]
                     #before_cuda = torch.seed()
                     to_pil = ToPILImage()
@@ -184,7 +183,8 @@ class ContinualLearner(torch.nn.Module, metaclass=abc.ABCMeta):
                     #print("Current NumPy Random Seed (After):", np.random.get_state()[1][0])
                     #print("Current Torch Random Seed (After):", torch.initial_seed())
                     #print("Current Torch CUDA Random Seed (Before):", torch.cuda.initial_seed())
-                    print("Current Torch Random Seed (After):", current_seed)
+                    print("Current Torch Random Seed (After):", torch.seed())
+                    print("Current Torch Random Seed (After):", torch.seed())
                     
                     if self.params.trick['ncm_trick'] or self.params.agent in ['ICARL', 'SCR', 'SCP']:
                         feature = self.model.features(batch_x)  # (batch_size, feature_size)
