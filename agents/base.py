@@ -13,6 +13,11 @@ import pickle
 import torchvision
 from corruptions import *
 
+
+import random
+
+
+
 class ContinualLearner(torch.nn.Module, metaclass=abc.ABCMeta):
     '''
     Abstract module which is inherited by each and every continual learning algorithm.
