@@ -146,17 +146,18 @@ class ContinualLearner(torch.nn.Module, metaclass=abc.ABCMeta):
                 #random.seed(0)
 
 
-                np.random.seed(0)  # Set the seed
+                #np.random.seed(0)  # Set the seed
                 x_original = np.random.rand(3, 32, 32)  # Some random image
-                x_noisy = gaussian_noise(x_original)  # Apply noise
                 
-                np.random.seed(0)  # Reset the seed
-                x_noisy_again = gaussian_noise(x_original)  # Apply noise again
                 
-                print(np.array_equal(x_noisy, x_noisy_again))
 
+                seed_value = 0
+                x_noisy = gaussian_noise_deterministic(x_original, severity=1, seed=seed_value)
+                x_noisy_again = gaussian_noise_deterministic(x_original, severity=1, seed=seed_value)
+                #np.random.seed(0)  # Reset the seed
                 
-                
+                print(np.array_equal(x_noisy, x_noisy_again))  # This should now be True
+                                
                 if task == 0 and i == 0:
                     print(batch_y, batch_x[0][0][0])
                 self.model.eval()
