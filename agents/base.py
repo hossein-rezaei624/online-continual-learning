@@ -190,18 +190,18 @@ class ContinualLearner(torch.nn.Module, metaclass=abc.ABCMeta):
 
 
                     
-                    all_batches = [batch_x, batch_x1, batch_x2, batch_x3, batch_x4, batch_x5, batch_x6, batch_x7, batch_x8, batch_x9, batch_x10, batch_x11]
+                    all_batches = [batch_x, batch_x1, batch_x2, batch_x3, batch_x4, batch_x6, batch_x7, batch_x9, batch_x10, batch_x11]
                     batch_x_all = torch.cat(all_batches, dim=0)
-                    batch_y_all = batch_y.repeat(12)
+                    batch_y_all = batch_y.repeat(10)
                     
                     ##print("batch_x.shape", batch_x.shape)
                     ##print(batch_y.shape, batch_y.shape)
                     
                     # Extract the first 10 images
-                    images_1 = [batch_x_all[i] for i in range(12)]
+                    images_1 = [batch_x_all[i] for i in range(10)]
                     
                     # Make a grid from these images
-                    grid = torchvision.utils.make_grid(images_1, nrow=4)  # 5 images per row
+                    grid = torchvision.utils.make_grid(images_1, nrow=10)  # 5 images per row
                     
                     torchvision.utils.save_image(grid, f'grid_image{i}.png')
                     
