@@ -122,6 +122,7 @@ class ContinualLearner(torch.nn.Module, metaclass=abc.ABCMeta):
         acc_array = np.zeros(len(test_loaders))
         for task, test_loader in enumerate(test_loaders):
             acc = AverageMeter()
+            print(task)
             for i, (batch_x, batch_y, indices_1) in enumerate(test_loader):
                 batch_x = maybe_cuda(batch_x, self.cuda)
                 batch_y = maybe_cuda(batch_y, self.cuda)
