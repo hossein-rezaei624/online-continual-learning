@@ -181,7 +181,7 @@ class ContinualLearner(torch.nn.Module, metaclass=abc.ABCMeta):
                     torch.manual_seed(0)
                     torch.cuda.manual_seed(0)
                     torch.backends.cudnn.deterministic = True
-                    torch.backends.cudnn.benchmark = False
+                    #torch.backends.cudnn.benchmark = False
                     
                     
                     if self.params.trick['ncm_trick'] or self.params.agent in ['ICARL', 'SCR', 'SCP']:
