@@ -10,6 +10,7 @@ import copy
 from utils.loss import SupConLoss
 import pickle
 
+from torchvision.transforms import ToPILImage, PILToTensor
 
 class ContinualLearner(torch.nn.Module, metaclass=abc.ABCMeta):
     '''
@@ -115,6 +116,14 @@ class ContinualLearner(torch.nn.Module, metaclass=abc.ABCMeta):
     def forward(self, x):
         return self.model.forward(x)
 
+    
+    def gaussian_noise(self, x, severity=1):
+        c = [.08, .12, 0.18, 0.26, 0.38][severity - 1]
+    
+        x = np.array(x) / 255.
+        return np.clip(x + np.random.normal(size=x.shape, scale=c), 0, 1) * 255
+    
+    
     def evaluate(self, test_loaders):
         self.model.eval()
         acc_array = np.zeros(len(test_loaders))
@@ -156,6 +165,17 @@ class ContinualLearner(torch.nn.Module, metaclass=abc.ABCMeta):
                 for i, (batch_x, batch_y) in enumerate(test_loader):
                     batch_x = maybe_cuda(batch_x, self.cuda)
                     batch_y = maybe_cuda(batch_y, self.cuda)
+                    
+                    
+                    
+                    to_pil = ToPILImage()
+                    batch_x_ = batch_x[0]  # Taking the first image from the batch
+                    batch_x_pil = to_pil(batch_x_.cpu())  # Convert to PIL image
+                                        
+                    batch_x111 = torch.tensor(self.gaussian_noise(batch_x_pil).astype(float) / 255.0, dtype = batch_x.dtype).to("cuda").permute(2,0,1).reshape(batch_x.shape)
+                    
+                    
+                    
                     if self.params.trick['ncm_trick'] or self.params.agent in ['ICARL', 'SCR', 'SCP']:
                         feature = self.model.features(batch_x)  # (batch_size, feature_size)
                         for j in range(feature.size(0)):  # Normalize
