@@ -115,7 +115,7 @@ class ContinualLearner(torch.nn.Module, metaclass=abc.ABCMeta):
     def forward(self, x):
         return self.model.forward(x)
 
-    def evaluate(self, test_loaders):
+    def evaluate(self, test_loaders, task_num_):
         self.model.eval()
         acc_array = np.zeros(len(test_loaders))
         if self.params.trick['ncm_trick'] or self.params.agent in ['ICARL', 'SCR', 'SCP']:
