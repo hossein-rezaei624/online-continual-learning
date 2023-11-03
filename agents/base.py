@@ -11,10 +11,10 @@ from utils.loss import SupConLoss
 import pickle
 
 import torchvision
-##from corruptions import *
+from corruptions import *
 
 
-##import random
+import random
 
 
 
@@ -147,13 +147,13 @@ class ContinualLearner(torch.nn.Module, metaclass=abc.ABCMeta):
 
 
                 #np.random.seed(0)  # Set the seed
-                x_original = np.random.rand(3, 32, 32)  # Some random image
+                #x_original = np.random.rand(3, 32, 32)  # Some random image
                 
                 
 
-                seed_value = 0
+                #seed_value = 0
                 #x_noisy = gaussian_noise_deterministic(x_original, severity=1, seed=seed_value)
-                x_noisy_again = gaussian_noise_deterministic(x_original, severity=1, seed=seed_value)
+                #x_noisy_again = gaussian_noise_deterministic(x_original, severity=1, seed=seed_value)
                 #np.random.seed(0)  # Reset the seed
                 
                                 
