@@ -174,6 +174,14 @@ class ContinualLearner(torch.nn.Module, metaclass=abc.ABCMeta):
 ##                    batch_x111 = torch.tensor(self.gaussian_noise(batch_x_pil).astype(float) / 255.0, dtype = batch_x.dtype).to("cuda").permute(2,0,1).reshape(batch_x.shape)
 ##
                     
+                    np.random.seed(0)
+                    random.seed(0)
+                    torch.manual_seed(0)
+                    torch.cuda.manual_seed(0)
+                    torch.backends.cudnn.deterministic = True
+                    torch.backends.cudnn.benchmark = False
+                    
+                    
                     if self.params.trick['ncm_trick'] or self.params.agent in ['ICARL', 'SCR', 'SCP']:
                         feature = self.model.features(batch_x)  # (batch_size, feature_size)
                         for j in range(feature.size(0)):  # Normalize
