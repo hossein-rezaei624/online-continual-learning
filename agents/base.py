@@ -10,6 +10,8 @@ import copy
 from utils.loss import SupConLoss
 import pickle
 
+from corruptions import *
+from torchvision.transforms import ToPILImage, PILToTensor
 
 class ContinualLearner(torch.nn.Module, metaclass=abc.ABCMeta):
     '''
@@ -115,7 +117,8 @@ class ContinualLearner(torch.nn.Module, metaclass=abc.ABCMeta):
     def forward(self, x):
         return self.model.forward(x)
 
-    def evaluate(self, test_loaders, task_num_):
+    
+    def evaluate(self, test_loaders, task_num):
         self.model.eval()
         acc_array = np.zeros(len(test_loaders))
         if self.params.trick['ncm_trick'] or self.params.agent in ['ICARL', 'SCR', 'SCP']:
@@ -156,6 +159,60 @@ class ContinualLearner(torch.nn.Module, metaclass=abc.ABCMeta):
                 for i, (batch_x, batch_y) in enumerate(test_loader):
                     batch_x = maybe_cuda(batch_x, self.cuda)
                     batch_y = maybe_cuda(batch_y, self.cuda)
+                    
+
+                    np_seed_state = np.random.get_state()
+                    torch_seed_state = torch.get_rng_state()
+                    
+
+                    to_pil = ToPILImage()
+                    batch_x_ = batch_x[0]  # Taking the first image from the batch
+                    batch_x_pil = to_pil(batch_x_.cpu())  # Convert to PIL image
+                                        
+                    ##batch_x111 = torch.tensor(self.gaussian_noise(batch_x_pil).astype(float) / 255.0, dtype = batch_x.dtype).to("cuda").permute(2,0,1).reshape(batch_x.shape)
+
+                    
+                    
+                    to_tensor_ = PILToTensor()
+                    
+                    batch_x1 = torch.tensor(gaussian_noise(batch_x_pil).astype(float) / 255.0, dtype = batch_x.dtype).to("cuda").permute(2,0,1).reshape(batch_x.shape)
+                    batch_x2 = torch.tensor(shot_noise(batch_x_pil).astype(float) / 255.0, dtype = batch_x.dtype).to("cuda").permute(2,0,1).reshape(batch_x.shape)
+                    batch_x3 = torch.tensor(impulse_noise(batch_x_pil).astype(float) / 255.0, dtype = batch_x.dtype).to("cuda").permute(2,0,1).reshape(batch_x.shape)
+                    batch_x4 = torch.tensor(defocus_blur(batch_x_pil).astype(float) / 255.0, dtype = batch_x.dtype).to("cuda").permute(2,0,1).reshape(batch_x.shape)
+                    batch_x5 = torch.tensor(motion_blur(batch_x_pil).astype(float) / 255.0, dtype = batch_x.dtype).to("cuda").permute(2,0,1).reshape(batch_x.shape)
+                    batch_x6 = torch.tensor(zoom_blur(batch_x_pil).astype(float) / 255.0, dtype = batch_x.dtype).to("cuda").permute(2,0,1).reshape(batch_x.shape)
+                    batch_x7 = torch.tensor(fog(batch_x_pil).astype(float) / 255.0, dtype = batch_x.dtype).to("cuda").permute(2,0,1).reshape(batch_x.shape)
+                    batch_x8 = torch.tensor(snow(batch_x_pil).astype(float) / 255.0, dtype = batch_x.dtype).to("cuda").permute(2,0,1).reshape(batch_x.shape)
+                    batch_x9 = torch.tensor(elastic_transform(batch_x_pil).astype(float) / 255.0, dtype = batch_x.dtype).to("cuda").permute(2,0,1).reshape(batch_x.shape)
+                    batch_x10 = to_tensor_(pixelate(batch_x_pil)).to(dtype=batch_x.dtype).to("cuda").reshape(batch_x.shape) / 255.0
+                    batch_x11 = to_tensor_(jpeg_compression(batch_x_pil)).to(dtype=batch_x.dtype).to("cuda").reshape(batch_x.shape) / 255.0
+
+
+                    
+                    all_batches = [batch_x, batch_x1, batch_x2, batch_x3, batch_x4, batch_x5, batch_x6, batch_x7, batch_x8, batch_x9, batch_x10, batch_x11]
+                    batch_x_all = torch.cat(all_batches, dim=0)
+                    batch_y_all = batch_y.repeat(12)
+                    
+                    ##print("batch_x.shape", batch_x.shape)
+                    ##print(batch_y.shape, batch_y.shape)
+                    
+                    # Extract the first 10 images
+                    images_1 = [batch_x_all[i] for i in range(12)]
+                    
+                    # Make a grid from these images
+                    grid = torchvision.utils.make_grid(images_1, nrow=12)  # 5 images per row
+                    
+                    torchvision.utils.save_image(grid, f'grid_image{i}.png')
+                    
+                    
+                        
+                    
+                    
+                    np.random.set_state(np_seed_state)
+                    torch.set_rng_state(torch_seed_state)
+
+                    
+                    
                     if self.params.trick['ncm_trick'] or self.params.agent in ['ICARL', 'SCR', 'SCP']:
                         feature = self.model.features(batch_x)  # (batch_size, feature_size)
                         for j in range(feature.size(0)):  # Normalize
