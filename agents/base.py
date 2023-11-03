@@ -128,10 +128,10 @@ class ContinualLearner(torch.nn.Module, metaclass=abc.ABCMeta):
                 batch_y = maybe_cuda(batch_y, self.cuda)
                 
 
-                batch_x_ = batch_x[0]  # Taking the first image from the batch
-                batch_x_pil = torchvision.transforms.functional.to_pil_image(batch_x_.cpu())  # Convert to PIL image
+                #batch_x_ = batch_x[0]  # Taking the first image from the batch
+                batch_x_pil = torchvision.transforms.functional.to_pil_image(torch.randn((3,32,32)).cpu())  # Convert to PIL image
                 
-                batch_x = torch.tensor(gaussian_noise(batch_x_pil).astype(float) / 255.0, dtype = batch_x.dtype).to("cuda").permute(2,0,1).reshape(batch_x.shape)
+                torch.tensor(gaussian_noise(batch_x_pil).astype(float) / 255.0, dtype = batch_x.dtype).to("cuda").permute(2,0,1).reshape(batch_x.shape)
 
                 self.model.eval()
                 with torch.no_grad():
