@@ -171,13 +171,20 @@ class ContinualLearner(torch.nn.Module, metaclass=abc.ABCMeta):
                     #np.random.seed(0)
                     #torch.manual_seed(0)
 
+                    np_seed_state = np.random.get_state()
+                    torch_seed_state = torch.get_rng_state()
+                    print("before np_seed_state", np_seed_state)
+                    print("before torch_seed_state", torch_seed_state)
+                    
+
                     to_pil = ToPILImage()
                     batch_x_ = batch_x[0]  # Taking the first image from the batch
                     batch_x_pil = to_pil(batch_x_.cpu())  # Convert to PIL image
                                         
                     batch_x111 = torch.tensor(self.gaussian_noise(batch_x_pil).astype(float) / 255.0, dtype = batch_x.dtype).to("cuda").permute(2,0,1).reshape(batch_x.shape)
 
-                    
+                    print("after np_seed_state", np_seed_state)
+                    print("after torch_seed_state", torch_seed_state)
 
                     
                     
