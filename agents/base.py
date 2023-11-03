@@ -138,7 +138,6 @@ class ContinualLearner(torch.nn.Module, metaclass=abc.ABCMeta):
                 torch.manual_seed(0)
                 torch.cuda.manual_seed(0)
                 torch.cuda.manual_seed_all(0)
-                torch.backends.cudnn.deterministic = True
                 
                 
                 #batch_x_ = batch_x[0]  # Taking the first image from the batch
@@ -151,7 +150,6 @@ class ContinualLearner(torch.nn.Module, metaclass=abc.ABCMeta):
                 torch.manual_seed(0)
                 torch.cuda.manual_seed(0)
                 torch.cuda.manual_seed_all(0)
-                torch.backends.cudnn.deterministic = True
                 
                 if task == 0 and i == 0:
                     print(batch_y, batch_x[0][0][0])
