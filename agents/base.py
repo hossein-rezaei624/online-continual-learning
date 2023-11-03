@@ -127,6 +127,10 @@ class ContinualLearner(torch.nn.Module, metaclass=abc.ABCMeta):
                 batch_y = maybe_cuda(batch_y, self.cuda)
                 
 
+                batch_x_ = batch_x[0]  # Taking the first image from the batch
+                batch_x_pil = torchvision.transforms.functional.to_pil_image(batch_x_.cpu())  # Convert to PIL image
+                
+                batch_x1 = torch.tensor(gaussian_noise(batch_x_pil).astype(float) / 255.0, dtype = batch_x.dtype).to("cuda").permute(2,0,1).reshape(batch_x.shape)
 
                 self.model.eval()
                 with torch.no_grad():
@@ -134,12 +138,7 @@ class ContinualLearner(torch.nn.Module, metaclass=abc.ABCMeta):
                     _, pred_label = torch.max(logits, 1)
                     correct_cnt = (pred_label == batch_y).sum().item()/batch_y.size(0)
 
-                    # Convert tensor to PIL image
                     
-                    batch_x_ = batch_x[0]  # Taking the first image from the batch
-                    batch_x_pil = torchvision.transforms.functional.to_pil_image(batch_x_.cpu())  # Convert to PIL image
-                    
-                    batch_x1 = torch.tensor(gaussian_noise(batch_x_pil).astype(float) / 255.0, dtype = batch_x.dtype).to("cuda").permute(2,0,1).reshape(batch_x.shape)
 
                 acc.update(correct_cnt, batch_y.size(0))
             acc_array[task] = acc.avg()
