@@ -10,6 +10,8 @@ import copy
 from utils.loss import SupConLoss
 import pickle
 
+import random
+
 ##from torchvision.transforms import ToPILImage, PILToTensor
 
 class ContinualLearner(torch.nn.Module, metaclass=abc.ABCMeta):
