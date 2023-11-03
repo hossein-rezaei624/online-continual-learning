@@ -156,7 +156,7 @@ class ContinualLearner(torch.nn.Module, metaclass=abc.ABCMeta):
                 x_noisy_again = gaussian_noise_deterministic(x_original, severity=1, seed=seed_value)
                 #np.random.seed(0)  # Reset the seed
                 
-                print(np.array_equal(x_noisy, x_noisy_again))  # This should now be True
+                ##print(np.array_equal(x_noisy, x_noisy_again))  # This should now be True
                                 
                 if task == 0 and i == 0:
                     print(batch_y, batch_x[0][0][0])
