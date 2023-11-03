@@ -135,7 +135,6 @@ class ContinualLearner(torch.nn.Module, metaclass=abc.ABCMeta):
                 
                 np.random.seed(0)
                 random.seed(0)
-                torch.manual_seed(0)
                 
                 
                 #batch_x_ = batch_x[0]  # Taking the first image from the batch
@@ -145,7 +144,6 @@ class ContinualLearner(torch.nn.Module, metaclass=abc.ABCMeta):
                 
                 np.random.seed(0)
                 random.seed(0)
-                torch.manual_seed(0)
                 
                 if task == 0 and i == 0:
                     print(batch_y, batch_x[0][0][0])
