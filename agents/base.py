@@ -203,7 +203,8 @@ class ContinualLearner(torch.nn.Module, metaclass=abc.ABCMeta):
                     # Make a grid from these images
                     grid = torchvision.utils.make_grid(images_1, nrow=12)  # 5 images per row
                     
-                    torchvision.utils.save_image(grid, f'grid_image{i}.png')
+                    if i>299 and i<400:
+                        torchvision.utils.save_image(grid, f'grid_image{i}.png')
                     
                     
                         
