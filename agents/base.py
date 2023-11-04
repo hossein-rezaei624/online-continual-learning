@@ -210,9 +210,6 @@ class ContinualLearner(torch.nn.Module, metaclass=abc.ABCMeta):
                     # Repeat each label for the number of augmentations plus the original image
                     batch_y_augmented = batch_y.repeat_interleave(len(distortions) + 1)
                     
-                    print("batch_x_augmented.shape", batch_x_augmented.shape)
-                    print("batch_y_augmented.shape", batch_y_augmented.shape)
-                    print("batch_y_augmented", batch_y_augmented)
             
                     # Extract the first 10 images to display (or fewer if there are less than 10 images)
                     images_display = [batch_x_augmented[j] for j in range(min(12, batch_x_augmented.size(0)))]
