@@ -166,45 +166,58 @@ class ContinualLearner(torch.nn.Module, metaclass=abc.ABCMeta):
                     torch_seed_state = torch.get_rng_state()
                     
 
+
+
+                    # List to hold all the batches with distortions applied
+                    all_batches = []
+                    
+                    # Convert the batch of images to a list of PIL images
                     to_pil = ToPILImage()
-                    batch_x_ = batch_x[0]  # Taking the first image from the batch
-                    batch_x_pil = to_pil(batch_x_.cpu())  # Convert to PIL image
-                                        
-                    ##batch_x111 = torch.tensor(self.gaussian_noise(batch_x_pil).astype(float) / 255.0, dtype = batch_x.dtype).to("cuda").permute(2,0,1).reshape(batch_x.shape)
-
+                    batch_x_pil_list = [to_pil(img.cpu()) for img in batch_x]  
                     
-                    
-                    to_tensor_ = PILToTensor()
-                    
-                    batch_x1 = torch.tensor(gaussian_noise(batch_x_pil).astype(float) / 255.0, dtype = batch_x.dtype).to("cuda").permute(2,0,1).reshape(batch_x.shape)
-                    batch_x2 = torch.tensor(shot_noise(batch_x_pil).astype(float) / 255.0, dtype = batch_x.dtype).to("cuda").permute(2,0,1).reshape(batch_x.shape)
-                    batch_x3 = torch.tensor(impulse_noise(batch_x_pil).astype(float) / 255.0, dtype = batch_x.dtype).to("cuda").permute(2,0,1).reshape(batch_x.shape)
-                    batch_x4 = torch.tensor(defocus_blur(batch_x_pil).astype(float) / 255.0, dtype = batch_x.dtype).to("cuda").permute(2,0,1).reshape(batch_x.shape)
-                    batch_x5 = torch.tensor(motion_blur(batch_x_pil).astype(float) / 255.0, dtype = batch_x.dtype).to("cuda").permute(2,0,1).reshape(batch_x.shape)
-                    batch_x6 = torch.tensor(zoom_blur(batch_x_pil).astype(float) / 255.0, dtype = batch_x.dtype).to("cuda").permute(2,0,1).reshape(batch_x.shape)
-                    batch_x7 = torch.tensor(fog(batch_x_pil).astype(float) / 255.0, dtype = batch_x.dtype).to("cuda").permute(2,0,1).reshape(batch_x.shape)
-                    batch_x8 = torch.tensor(snow(batch_x_pil).astype(float) / 255.0, dtype = batch_x.dtype).to("cuda").permute(2,0,1).reshape(batch_x.shape)
-                    batch_x9 = torch.tensor(elastic_transform(batch_x_pil).astype(float) / 255.0, dtype = batch_x.dtype).to("cuda").permute(2,0,1).reshape(batch_x.shape)
-                    batch_x10 = to_tensor_(pixelate(batch_x_pil)).to(dtype=batch_x.dtype).to("cuda").reshape(batch_x.shape) / 255.0
-                    batch_x11 = to_tensor_(jpeg_compression(batch_x_pil)).to(dtype=batch_x.dtype).to("cuda").reshape(batch_x.shape) / 255.0
-
-
-                    
-                    all_batches = [batch_x, batch_x1, batch_x2, batch_x3, batch_x4, batch_x5, batch_x6, batch_x7, batch_x8, batch_x9, batch_x10, batch_x11]
-                    batch_x_all = torch.cat(all_batches, dim=0)
-                    batch_y_all = batch_y.repeat(12)
-                    
-                    ##print("batch_x.shape", batch_x.shape)
-                    ##print(batch_y.shape, batch_y.shape)
-                    
-                    # Extract the first 10 images
-                    images_1 = [batch_x_all[i] for i in range(12)]
-                    
+                    distortions = [
+                        gaussian_noise, shot_noise, impulse_noise, defocus_blur, motion_blur,
+                        zoom_blur, fog, snow, elastic_transform, pixelate, jpeg_compression
+                    ]
+            
+                    # Process each image in the batch
+                    for batch_idx, batch_x_pil in enumerate(batch_x_pil_list):
+                        # List to hold the original and distorted images for the current batch image
+                        augmented_images = []
+                        
+                        # Add the original image to the list
+                        augmented_images.append(batch_x[batch_idx])
+                        
+                        # Loop through the distortions and apply them to the current image
+                        for function in distortions:
+                            if function in [pixelate, jpeg_compression]:
+                                # For functions returning tensors
+                                img_processed = PILToTensor()(function(batch_x_pil)).to(dtype=batch_x.dtype).to("cuda") / 255.0
+                            else:
+                                # For functions returning images
+                                img_processed = torch.tensor(function(batch_x_pil).astype(float) / 255.0, dtype=batch_x.dtype).to("cuda").permute(2, 0, 1)
+            
+                            # Append the distorted image
+                            augmented_images.append(img_processed)
+            
+                        # Concatenate the original and distorted images
+                        augmented_images_concatenated = torch.stack(augmented_images, dim=0)
+                        all_batches.append(augmented_images_concatenated)
+            
+                    # Concatenate all the augmented batches along the batch dimension
+                    batch_x_augmented = torch.cat(all_batches, dim=0)
+                    batch_y_augmented = batch_y.repeat(len(distortions) + 1)
+            
+                    # Extract the first 10 images to display (or fewer if there are less than 10 images)
+                    images_display = [batch_x_augmented[j] for j in range(min(10, batch_x_augmented.size(0)))]
+            
                     # Make a grid from these images
-                    grid = torchvision.utils.make_grid(images_1, nrow=12)  # 5 images per row
+                    grid = torchvision.utils.make_grid(images_display, nrow=len(images_display))  # Adjust nrow based on actual images
                     
-                    torchvision.utils.save_image(grid, 'grid_image.png')
-                    
+                    # Save grid image with unique name for each batch
+                    torchvision.utils.save_image(grid, f'grid_image_task{task}_batch{i}.png')
+
+
                     
                         
                     
