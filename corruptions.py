@@ -167,21 +167,24 @@ def gaussian_blur(x, severity=1):
 
 
 def glass_blur(x, severity=1):
+    
+    h_img, w_img, _ = np.array(x).shape
+    
     # sigma, max_delta, iterations
     c = [(0.7, 1, 2), (0.9, 2, 1), (1, 2, 3), (1.1, 3, 2), (1.5, 4, 2)][severity - 1]
 
-    x = np.uint8(gaussian(np.array(x) / 255., sigma=c[0], multichannel=True) * 255)
+    x = np.uint8(gaussian(np.array(x) / 255., sigma=c[0], channel_axis=-1) * 255)
 
     # locally shuffle pixels
     for i in range(c[2]):
-        for h in range(224 - c[1], c[1], -1):
-            for w in range(224 - c[1], c[1], -1):
+        for h in range(h_img - c[1], c[1], -1):
+            for w in range(w_img - c[1], c[1], -1):
                 dx, dy = np.random.randint(-c[1], c[1], size=(2,))
                 h_prime, w_prime = h + dy, w + dx
                 # swap
                 x[h, w], x[h_prime, w_prime] = x[h_prime, w_prime], x[h, w]
 
-    return np.clip(gaussian(x / 255., sigma=c[0], multichannel=True), 0, 1) * 255
+    return np.clip(gaussian(x / 255., sigma=c[0], channel_axis=-1), 0, 1) * 255
 
 
 def defocus_blur(x, severity=1):
@@ -199,6 +202,9 @@ def defocus_blur(x, severity=1):
 
 
 def motion_blur(x, severity=1):
+    
+    h_img, w_img, _ = np.array(x).shape
+    
     c = [(10, 3), (15, 5), (15, 8), (15, 12), (20, 15)][severity - 1]
 
     output = BytesIO()
@@ -210,7 +216,7 @@ def motion_blur(x, severity=1):
     x = cv2.imdecode(np.fromstring(x.make_blob(), np.uint8),
                      cv2.IMREAD_UNCHANGED)
 
-    if x.shape != (224, 224):
+    if x.shape != (h_img, w_img):
         return np.clip(x[..., [2, 1, 0]], 0, 255)  # BGR to RGB
     else:  # greyscale to RGB
         return np.clip(np.array([x, x, x]).transpose((1, 2, 0)), 0, 255)
@@ -233,11 +239,14 @@ def zoom_blur(x, severity=1):
 
 
 def fog(x, severity=1):
+    
+    h_img, w_img, _ = np.array(x).shape
+    
     c = [(1.5, 2), (2., 2), (2.5, 1.7), (2.5, 1.5), (3., 1.4)][severity - 1]
 
     x = np.array(x) / 255.
     max_val = x.max()
-    x += c[0] * plasma_fractal(wibbledecay=c[1])[:224, :224][..., np.newaxis]
+    x += c[0] * plasma_fractal(wibbledecay=c[1])[:h_img, :w_img][..., np.newaxis]
     return np.clip(x * max_val / (max_val + c[0]), 0, 1) * 255
 
 
@@ -256,13 +265,16 @@ def frost(x, severity=1):
                 resource_filename(__name__, 'frost/frost6.jpg')][idx]
     frost = cv2.imread(filename)
     # randomly crop and convert to rgb
-    x_start, y_start = np.random.randint(0, frost.shape[0] - 224), np.random.randint(0, frost.shape[1] - 224)
-    frost = frost[x_start:x_start + 224, y_start:y_start + 224][..., [2, 1, 0]]
+    x_start, y_start = np.random.randint(0, frost.shape[0] - 32), np.random.randint(0, frost.shape[1] - 32)
+    frost = frost[x_start:x_start + 32, y_start:y_start + 32][..., [2, 1, 0]]
 
     return np.clip(c[0] * np.array(x) + c[1] * frost, 0, 255)
 
 
 def snow(x, severity=1):
+    
+    h_img, w_img, _ = np.array(x).shape
+    
     c = [(0.1, 0.3, 3, 0.5, 10, 4, 0.8),
          (0.2, 0.3, 2, 0.5, 12, 4, 0.7),
          (0.55, 0.3, 4, 0.9, 12, 8, 0.7),
@@ -286,7 +298,7 @@ def snow(x, severity=1):
                               cv2.IMREAD_UNCHANGED) / 255.
     snow_layer = snow_layer[..., np.newaxis]
 
-    x = c[6] * x + (1 - c[6]) * np.maximum(x, cv2.cvtColor(x, cv2.COLOR_RGB2GRAY).reshape(224, 224, 1) * 1.5 + 0.5)
+    x = c[6] * x + (1 - c[6]) * np.maximum(x, cv2.cvtColor(x, cv2.COLOR_RGB2GRAY).reshape(h_img, w_img, 1) * 1.5 + 0.5)
     return np.clip(x + snow_layer + np.rot90(snow_layer, k=2), 0, 1) * 255
 
 
@@ -383,21 +395,27 @@ def jpeg_compression(x, severity=1):
 
 
 def pixelate(x, severity=1):
+    
+    h_img, w_img, _ = np.array(x).shape
+    
     c = [0.6, 0.5, 0.4, 0.3, 0.25][severity - 1]
 
-    x = x.resize((int(224 * c), int(224 * c)), PILImage.BOX)
-    x = x.resize((224, 224), PILImage.BOX)
+    x = x.resize((int(h_img * c), int(w_img * c)), PILImage.BOX)
+    x = x.resize((h_img, w_img), PILImage.BOX)
 
     return x
 
 
 # mod of https://gist.github.com/erniejunior/601cdf56d2b424757de5
 def elastic_transform(image, severity=1):
-    c = [(244 * 2, 244 * 0.7, 244 * 0.1),   # 244 should have been 224, but ultimately nothing is incorrect
-         (244 * 2, 244 * 0.08, 244 * 0.2),
-         (244 * 0.05, 244 * 0.01, 244 * 0.02),
-         (244 * 0.07, 244 * 0.01, 244 * 0.02),
-         (244 * 0.12, 244 * 0.01, 244 * 0.02)][severity - 1]
+    
+    h_img, w_img, _ = np.array(image).shape
+    
+    c = [(h_img * 2, h_img * 0.7, h_img * 0.1),   # 244 should have been 224, but ultimately nothing is incorrect
+         (h_img * 2, h_img * 0.08, h_img * 0.2),
+         (h_img * 0.05, h_img * 0.01, h_img * 0.02),
+         (h_img * 0.07, h_img * 0.01, h_img * 0.02),
+         (h_img * 0.12, h_img * 0.01, h_img * 0.02)][severity - 1]
 
     image = np.array(image, dtype=np.float32) / 255.
     shape = image.shape
