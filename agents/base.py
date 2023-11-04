@@ -210,39 +210,20 @@ class ContinualLearner(torch.nn.Module, metaclass=abc.ABCMeta):
                     # Repeat each label for the number of augmentations plus the original image
                     batch_y_augmented = batch_y.repeat_interleave(len(distortions) + 1)
                     
-                    #print("batch_x_augmented.shape", batch_x_augmented.shape)
-                    #print("batch_y_augmented.shape", batch_y_augmented.shape)
-                    ##print("batch_y_augmented", batch_y_augmented)
+                    print("batch_x_augmented.shape", batch_x_augmented.shape)
+                    print("batch_y_augmented.shape", batch_y_augmented.shape)
+                    print("batch_y_augmented", batch_y_augmented)
             
-##                    # Extract the first 10 images to display (or fewer if there are less than 10 images)
-##                    images_display = [batch_x_augmented[j] for j in range(min(12, batch_x_augmented.size(0)))]
-##            
-##                    # Make a grid from these images
-##                    grid = torchvision.utils.make_grid(images_display, nrow=len(images_display))  # Adjust nrow based on actual images
-##                    
-##                    # Save grid image with unique name for each batch
-##                    torchvision.utils.save_image(grid, 'grid_image.png')
-##
-
-
                     # Extract the first 10 images to display (or fewer if there are less than 10 images)
-                    display_limit = min(12, batch_x_augmented.size(0))
-                    images_display = [batch_x_augmented[j+11] for j in range(display_limit)]
-                    labels_display = [batch_y_augmented[j+11] for j in range(display_limit)]
-                    
-                    # Combine images and labels into a list of tuples
-                    images_with_labels = [(images_display[i], labels_display[i]) for i in range(display_limit)]
-                    
-                    # Create a grid from these images and labels
+                    images_display = [batch_x_augmented[j] for j in range(min(12, batch_x_augmented.size(0)))]
+            
+                    # Make a grid from these images
                     grid = torchvision.utils.make_grid(images_display, nrow=len(images_display))  # Adjust nrow based on actual images
                     
                     # Save grid image with unique name for each batch
                     torchvision.utils.save_image(grid, 'grid_image.png')
-                    
-                    # Print the labels
-                    print("Labels for displayed images:")
-                    for i, label in enumerate(labels_display):
-                        print(f"Image {i+1} Label: {label}")
+
+
 
                     
                         
