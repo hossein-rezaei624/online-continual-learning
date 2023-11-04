@@ -221,17 +221,24 @@ class ContinualLearner(torch.nn.Module, metaclass=abc.ABCMeta):
        ##             torchvision.utils.save_image(grid, 'grid_image.png')
 
 
-                    # Create a list to store images and their corresponding labels
-                    images_with_labels = [(batch_x_augmented[j], batch_y_augmented[j]) for j in range(min(12, batch_x_augmented.size(0)))]
+                    # Extract the first 10 images to display (or fewer if there are less than 10 images)
+                    display_limit = min(12, batch_x_augmented.size(0))
+                    images_display = [batch_x_augmented[j] for j in range(display_limit)]
+                    labels_display = [batch_y_augmented[j] for j in range(display_limit)]
                     
-                    # Make a grid with images and labels
-                    grid = torchvision.utils.make_grid(
-                        [torch.cat((image, torch.full_like(image, label).unsqueeze(0).unsqueeze(0)), dim=0) for image, label in images_with_labels],
-                        nrow=len(images_with_labels),
-                        padding=20)
+                    # Combine images and labels into a list of tuples
+                    images_with_labels = [(images_display[i], labels_display[i]) for i in range(display_limit)]
                     
-                    # Save the grid image with a unique name for each batch
+                    # Create a grid from these images and labels
+                    grid = torchvision.utils.make_grid(images_display, nrow=len(images_display))  # Adjust nrow based on actual images
+                    
+                    # Save grid image with unique name for each batch
                     torchvision.utils.save_image(grid, 'grid_image.png')
+                    
+                    # Print the labels
+                    print("Labels for displayed images:")
+                    for i, label in enumerate(labels_display):
+                        print(f"Image {i+1} Label: {label}")
 
 
 
