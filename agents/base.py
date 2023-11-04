@@ -206,7 +206,10 @@ class ContinualLearner(torch.nn.Module, metaclass=abc.ABCMeta):
             
                     # Concatenate all the augmented batches along the batch dimension
                     batch_x_augmented = torch.cat(all_batches, dim=0)
-                    batch_y_augmented = batch_y.repeat(len(distortions) + 1)
+                    
+                    # Repeat each label for the number of augmentations plus the original image
+                    batch_y_augmented = batch_y.repeat_interleave(len(distortions) + 1)
+                    
                     #print("batch_x_augmented.shape", batch_x_augmented.shape)
                     #print("batch_y_augmented.shape", batch_y_augmented.shape)
                     print("batch_y_augmented", batch_y_augmented)
