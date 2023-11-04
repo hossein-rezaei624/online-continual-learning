@@ -218,7 +218,7 @@ class ContinualLearner(torch.nn.Module, metaclass=abc.ABCMeta):
                     grid = torchvision.utils.make_grid(images_display, nrow=len(images_display))  # Adjust nrow based on actual images
                     
                     # Save grid image with unique name for each batch
-                    torchvision.utils.save_image(grid, 'grid_image.png')
+                    torchvision.utils.save_image(grid, f'grid_image{i}.png')
 
 
 
