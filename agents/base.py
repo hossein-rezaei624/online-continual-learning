@@ -226,12 +226,13 @@ class ContinualLearner(torch.nn.Module, metaclass=abc.ABCMeta):
                     
                     # Make a grid with images and labels
                     grid = torchvision.utils.make_grid(
-                        [torch.cat((image, torch.full_like(image, label).unsqueeze(0)), dim=0) for image, label in images_with_labels],
+                        [torch.cat((image, torch.full_like(image, label).unsqueeze(0).unsqueeze(0)), dim=0) for image, label in images_with_labels],
                         nrow=len(images_with_labels),
                         padding=20)
                     
                     # Save the grid image with a unique name for each batch
                     torchvision.utils.save_image(grid, 'grid_image.png')
+
 
 
                     
