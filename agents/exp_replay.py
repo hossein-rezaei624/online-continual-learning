@@ -304,7 +304,7 @@ class ExperienceReplay(ContinualLearner):
         all_labels = torch.cat(labels_list, dim=0)
 
 
-        updated_std_of_means_by_class = {k: v.item() for k, v in std_of_means_by_class.items()}
+        updated_std_of_means_by_class = {k: 1 - v.item() for k, v in std_of_means_by_class.items()}
         
         ##print("updated_std_of_means_by_class", updated_std_of_means_by_class)
 
