@@ -227,8 +227,8 @@ class ContinualLearner(torch.nn.Module, metaclass=abc.ABCMeta):
 
                     # Extract the first 10 images to display (or fewer if there are less than 10 images)
                     display_limit = min(12, batch_x_augmented.size(0))
-                    images_display = [batch_x_augmented[j] for j in range(display_limit)]
-                    labels_display = [batch_y_augmented[j] for j in range(display_limit)]
+                    images_display = [batch_x_augmented[j+11] for j in range(display_limit)]
+                    labels_display = [batch_y_augmented[j+11] for j in range(display_limit)]
                     
                     # Combine images and labels into a list of tuples
                     images_with_labels = [(images_display[i], labels_display[i]) for i in range(display_limit)]
