@@ -49,18 +49,22 @@ def multiple_run(params, store=False, save_path=None):
                 print("-----------run {} training batch {}-------------".format(run, i))
                 print('size: {}, {}'.format(x_train.shape, y_train.shape))
                 agent.train_learner(x_train, y_train)
-                acc_array, acc_array_augmented = agent.evaluate(test_loaders, i)
+                if i == 9:
+                    acc_array, acc_array_augmented = agent.evaluate(test_loaders, i)
+                else:
+                    acc_array = agent.evaluate(test_loaders, i)
                 tmp_acc.append(acc_array)
-                tmp_acc_augmented.append(acc_array_augmented)
+                if i == 9:
+                    tmp_acc_augmented.append(acc_array_augmented)
             run_end = time.time()
             print(
                 "-----------run {}-----------avg_end_acc {}-----------train time {}".format(run, np.mean(tmp_acc[-1]),
                                                                                run_end - run_start))
-            print(
-                "-----------run {}-----------avg_end_acc_augmented {}-----------train time {}".format(run, np.mean(tmp_acc_augmented[-1]),
-                                                                               run_end - run_start))
+            if i == 9:
+                print("-----------run {}-----------avg_end_acc_augmented {}-----------train time {}".format(run, np.mean(tmp_acc_augmented[-1]), run_end - run_start))
             accuracy_list.append(np.array(tmp_acc))
-            accuracy_list_augmented.append(np.array(tmp_acc_augmented))
+            if i == 9:
+                accuracy_list_augmented.append(np.array(tmp_acc_augmented))
         else:
             x_train_offline = []
             y_train_offline = []
