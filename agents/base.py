@@ -207,20 +207,31 @@ class ContinualLearner(torch.nn.Module, metaclass=abc.ABCMeta):
                     # Concatenate all the augmented batches along the batch dimension
                     batch_x_augmented = torch.cat(all_batches, dim=0)
                     batch_y_augmented = batch_y.repeat(len(distortions) + 1)
-                    print("batch_x_augmented.shape", batch_x_augmented.shape)
-                    print("batch_y_augmented.shape", batch_y_augmented.shape)
-                    print("batch_y_augmented", batch_y_augmented)
+                    #print("batch_x_augmented.shape", batch_x_augmented.shape)
+                    #print("batch_y_augmented.shape", batch_y_augmented.shape)
+                    #print("batch_y_augmented", batch_y_augmented)
             
-                    # Extract the first 10 images to display (or fewer if there are less than 10 images)
-                    images_display = [batch_x_augmented[j] for j in range(min(12, batch_x_augmented.size(0)))]
-            
-                    # Make a grid from these images
-                    grid = torchvision.utils.make_grid(images_display, nrow=len(images_display))  # Adjust nrow based on actual images
+       ##             # Extract the first 10 images to display (or fewer if there are less than 10 images)
+       ##             images_display = [batch_x_augmented[j] for j in range(min(12, batch_x_augmented.size(0)))]
+       ##     
+       ##             # Make a grid from these images
+       ##             grid = torchvision.utils.make_grid(images_display, nrow=len(images_display))  # Adjust nrow based on actual images
+       ##             
+       ##             # Save grid image with unique name for each batch
+       ##             torchvision.utils.save_image(grid, 'grid_image.png')
+
+
+                    # Create a list to store images and their corresponding labels
+                    images_with_labels = [(batch_x_augmented[j], batch_y_augmented[j]) for j in range(min(12, batch_x_augmented.size(0)))]
                     
-                    # Save grid image with unique name for each batch
+                    # Make a grid with images and labels
+                    grid = torchvision.utils.make_grid(
+                        [torch.cat((image, torch.tensor([label]).type_as(image))) for image, label in images_with_labels], 
+                        nrow=len(images_with_labels),
+                        padding=20)
+                    
+                    # Save the grid image with a unique name for each batch
                     torchvision.utils.save_image(grid, 'grid_image.png')
-
-
                     
                         
                     
