@@ -288,11 +288,14 @@ class ContinualLearner(torch.nn.Module, metaclass=abc.ABCMeta):
                         else:
                             pass
                     acc.update(correct_cnt, batch_y.size(0))
-                    acc_augmented.update(correct_cnt_augmented, batch_y_augmented.size(0))
+                    if task_num == 9:
+                        acc_augmented.update(correct_cnt_augmented, batch_y_augmented.size(0))
                 acc_array[task] = acc.avg()
-                acc_array_augmented[task] = acc_augmented.avg()
+                if task_num == 9:
+                    acc_array_augmented[task] = acc_augmented.avg()
         print(acc_array)
-        print(acc_array_augmented)
+        if task_num == 9:
+            print(acc_array_augmented)
         if self.params.error_analysis:
             self.error_list.append((no, nn, oo, on))
             self.new_class_score.append(new_class_score.avg())
@@ -311,4 +314,9 @@ class ContinualLearner(torch.nn.Module, metaclass=abc.ABCMeta):
             print(self.bias_norm_new)
             with open('confusion', 'wb') as fp:
                 pickle.dump([correct_lb, predict_lb], fp)
-        return acc_array, acc_array_augmented
+        
+        if task_num == 9:
+            return acc_array, acc_array_augmented
+
+        else:
+            return acc_array
