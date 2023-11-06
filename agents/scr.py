@@ -57,7 +57,7 @@ class SupContrastReplay(ContinualLearner):
             if discrepancy > 0:
                 samples[key] += 1
                 discrepancy -= 1
-            else:
+            elif discrepancy < 0 and samples[key] > 0:
                 samples[key] -= 1
                 discrepancy += 1
 
@@ -89,7 +89,7 @@ class SupContrastReplay(ContinualLearner):
         # Cap values greater than 500
         for i, val in enumerate(lst):
             if val > 500:
-                return distribute_excess(lst)
+                return self.distribute_excess(lst)
                 break
     
         return lst
