@@ -164,10 +164,6 @@ class ContinualLearner(torch.nn.Module, metaclass=abc.ABCMeta):
                     batch_y = maybe_cuda(batch_y, self.cuda)
                     
 
-
-
-                    
-                    
                     if self.params.trick['ncm_trick'] or self.params.agent in ['ICARL', 'SCR', 'SCP']:
                         feature = self.model.features(batch_x)  # (batch_size, feature_size)
                         for j in range(feature.size(0)):  # Normalize
@@ -186,13 +182,9 @@ class ContinualLearner(torch.nn.Module, metaclass=abc.ABCMeta):
                         # _, preds = torch.matmul(means, feature).max(0)
                         correct_cnt = (np.array(self.old_labels)[
                                            pred_label.tolist()] == batch_y.cpu().numpy()).sum().item() / batch_y.size(0)
-                    else:
-                        logits = self.model.forward(batch_x)
-                        _, pred_label = torch.max(logits, 1)
-                        correct_cnt = (pred_label == batch_y).sum().item()/batch_y.size(0)
-
-
-
+                    
+                    
+                    
                         if task_num == 9:
                         
                             np_seed_state = np.random.get_state()
@@ -256,9 +248,32 @@ class ContinualLearner(torch.nn.Module, metaclass=abc.ABCMeta):
                             torch.set_rng_state(torch_seed_state)
 
 
-                            logits_augmented = self.model.forward(batch_x_augmented)
-                            __augmented, pred_label_augmented = torch.max(logits_augmented, 1)
-                            correct_cnt_augmented = (pred_label_augmented == batch_y_augmented).sum().item()/batch_y_augmented.size(0)
+                            feature_augmented = self.model.features(batch_x_augmented)  # (batch_size, feature_size)
+                            for j in range(feature_augmented.size(0)):  # Normalize
+                                feature_augmented.data[j] = feature_augmented.data[j] / feature_augmented.data[j].norm()
+                            feature_augmented = feature_augmented.unsqueeze(2)  # (batch_size, feature_size, 1)
+                            means_augmented = torch.stack([exemplar_means[cls] for cls in self.old_labels])  # (n_classes, feature_size)
+    
+                            #old ncm
+                            means_augmented = torch.stack([means_augmented] * batch_x_augmented.size(0))  # (batch_size, n_classes, feature_size)
+                            means_augmented = means_augmented.transpose(1, 2)
+                            feature_augmented = feature_augmented.expand_as(means_augmented)  # (batch_size, feature_size, n_classes)
+                            dists_augmented = (feature_augmented - means_augmented).pow(2).sum(1).squeeze()  # (batch_size, n_classes)
+                            __augmented, pred_label_augmented = dists_augmented.min(1)
+                            # may be faster
+                            # feature = feature.squeeze(2).T
+                            # _, preds = torch.matmul(means, feature).max(0)
+                            correct_cnt_augmented = (np.array(self.old_labels)[
+                                               pred_label_augmented.tolist()] == batch_y_augmented.cpu().numpy()).sum().item() / batch_y_augmented.size(0)
+                            
+                             
+                            
+                    
+                    
+                    else:
+                        logits = self.model.forward(batch_x)
+                        _, pred_label = torch.max(logits, 1)
+                        correct_cnt = (pred_label == batch_y).sum().item()/batch_y.size(0)
 
 
                     
