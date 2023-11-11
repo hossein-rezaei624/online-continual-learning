@@ -98,7 +98,7 @@ class ExperienceReplay(ContinualLearner):
     
         return lst
     
-    def apply_tsne(features, labels, perplexity=30, learning_rate=200, n_iter=1000):
+    def apply_tsne(self, features, labels, perplexity=30, learning_rate=200, n_iter=1000):
         # Standardize features
         scaler = StandardScaler()
         standardized_features = scaler.fit_transform(features)
@@ -116,7 +116,7 @@ class ExperienceReplay(ContinualLearner):
         plt.savefig("tsneeeee.png")
 
 
-    def subsample_dataset(dataset, subsample_size=1000):
+    def subsample_dataset(self, dataset, subsample_size=1000):
         # Shuffle the dataset indices
         indices = torch.randperm(len(dataset)).tolist()
     
@@ -134,7 +134,7 @@ class ExperienceReplay(ContinualLearner):
         self.before_train(x_train, y_train)
         # set up loader
         train_dataset = dataset_transform(x_train, y_train, transform=transforms_match[self.data])
-        train_loader = data.DataLoader(train_dataset, batch_size=self.batch, shuffle=True, num_workers=0,
+        train_loader = torch.utils.data.DataLoader(train_dataset, batch_size=self.batch, shuffle=True, num_workers=0,
                                        drop_last=True)
         
 
@@ -145,7 +145,7 @@ class ExperienceReplay(ContinualLearner):
         
         
         # Use the subsample_dataset function
-        subsampled_dataset = subsample_dataset(subset, subsample_size=2000)  # assuming you want 2000 samples
+        subsampled_dataset = self.subsample_dataset(subset, subsample_size=2000)  # assuming you want 2000 samples
         
         # Continue with data loading and feature extraction as before
         loader = torch.utils.data.DataLoader(subsampled_dataset, batch_size=64, shuffle=False)
@@ -161,7 +161,7 @@ class ExperienceReplay(ContinualLearner):
         labels = []
         with torch.no_grad():
             for data, label, __ in loader:
-                #data = data.to('cuda')  # If you have a GPU, transfer data to GPU to speed up feature extraction
+                data = data.to('cuda')  # If you have a GPU, transfer data to GPU to speed up feature extraction
                 outputs = model(data)
                 # Flatten the features from [batch_size, channels, height, width] to [batch_size, features]
                 outputs = torch.flatten(outputs, start_dim=1)
@@ -173,7 +173,7 @@ class ExperienceReplay(ContinualLearner):
         pca_result = pca.fit_transform(features)
         
         # Apply t-SNE to PCA-reduced features
-        apply_tsne(pca_result, labels, perplexity=50, learning_rate=300)
+        self.apply_tsne(pca_result, labels, perplexity=50, learning_rate=300)
         
         
         
