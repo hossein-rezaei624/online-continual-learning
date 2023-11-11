@@ -391,6 +391,10 @@ class ExperienceReplay(ContinualLearner):
         optimizer_CASP = optim.Adam(model.parameters(), lr=0.001)
         
 
+        ##train_loader_CASP = data.DataLoader(train_dataset, batch_size=64, shuffle=True, num_workers=0,
+        ##                               drop_last=True)
+        
+        
         # Train the model
         num_epochs = 5  # Adjust number of epochs as necessary
         for epoch in range(num_epochs):
@@ -399,6 +403,7 @@ class ExperienceReplay(ContinualLearner):
             correct = 0
             total = 0
             for inputs, labels, __ in train_loader:
+                print(__)
                 optimizer_CASP.zero_grad()
                 outputs = model(inputs)
                 loss = criterion_CASP(outputs, labels)
