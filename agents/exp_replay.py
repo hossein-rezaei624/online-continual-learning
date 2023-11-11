@@ -401,7 +401,6 @@ class ExperienceReplay(ContinualLearner):
             total = 0
             for inputs, labels, __ in train_loader:
                 inputs, labels = inputs.to(device), labels.to(device)
-                print(__)
                 optimizer_CASP.zero_grad()
                 outputs = model(inputs)
                 loss = criterion_CASP(outputs, labels)
@@ -419,23 +418,23 @@ class ExperienceReplay(ContinualLearner):
             print("\n")
             print(f'Epoch {epoch+1}, Loss: {epoch_loss:.4f}, Accuracy: {epoch_accuracy:.2f}%')
 
-            # Extract features for t-SNE
-            model.eval()
-            features = []
-            labels = []
-            with torch.no_grad():
-                for data_, label, __ in train_loader:
-                    data_, label = data_.to(device), label.to(device)
-                    outputs = model(data_)
-                    features.extend(outputs.cpu().numpy())
-                    labels.extend(label.cpu().numpy())
-            
-            # Convert features to a NumPy array
-            features_array = np.array(features)
-            labels_array = np.array(labels)
-            
-            # Apply t-SNE
-            self.apply_tsne(features_array, labels_array, perplexity=50, learning_rate=300)
+        # Extract features for t-SNE
+        model.eval()
+        features = []
+        labels = []
+        with torch.no_grad():
+            for data_, label, __ in train_loader:
+                data_, label = data_.to(device), label.to(device)
+                outputs = model(data_)
+                features.extend(outputs.cpu().numpy())
+                labels.extend(label.cpu().numpy())
+        
+        # Convert features to a NumPy array
+        features_array = np.array(features)
+        labels_array = np.array(labels)
+        
+        # Apply t-SNE
+        self.apply_tsne(features_array, labels_array, perplexity=50, learning_rate=300)
 
         print("Now you can see the result...")
         
