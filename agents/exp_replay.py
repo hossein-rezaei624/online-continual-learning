@@ -427,8 +427,8 @@ class ExperienceReplay(ContinualLearner):
                 for data_, label, __ in train_loader:
                     data_, label = data_.to(device), label.to(device)
                     outputs = model(data_)
-                    features.extend(outputs.numpy())
-                    labels.extend(label.numpy())
+                    features.extend(outputs.cpu().numpy())
+                    labels.extend(label.cpu().numpy())
             
             # Convert features to a NumPy array
             features_array = np.array(features)
