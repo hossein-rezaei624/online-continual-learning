@@ -389,7 +389,7 @@ class ExperienceReplay(ContinualLearner):
         model = model.to(device)
         
         criterion_CASP = nn.CrossEntropyLoss()
-        optimizer_CASP = optim.SGD(model.parameters(), lr=0.1,
+        optimizer_CASP = optim.SGD(model.parameters(), lr=0.001,
                               momentum=0.9, weight_decay=5e-4)
         
         
