@@ -432,12 +432,12 @@ class ExperienceReplay(ContinualLearner):
         random_image_indices = []
         
         # Iterate over the train_dataset
-        for idx, (data, target, __) in enumerate(train_dataset):
+        for idx, (data_11, target, __) in enumerate(train_dataset):
             for random_img in self.buffer.buffer_img:
                 # Compare data (image from train_dataset) with random_img
                 # The comparison logic depends on your data format
                 # For example, if they are numpy arrays or tensors you might do a direct comparison
-                if torch.equal(data, random_img):
+                if torch.equal(data_11, random_img):
                     # If they match, store the index
                     random_image_indices.append(idx)
                     break  # Assuming each random image is unique
