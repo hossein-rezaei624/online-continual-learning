@@ -425,6 +425,7 @@ class ExperienceReplay(ContinualLearner):
             labels = []
             with torch.no_grad():
                 for data_, label, __ in train_loader:
+                    data_, label = data_.to(device), label.to(device)
                     outputs = model(data_)
                     features.extend(outputs.numpy())
                     labels.extend(label.numpy())
