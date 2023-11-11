@@ -388,10 +388,8 @@ class ExperienceReplay(ContinualLearner):
         model.fc = nn.Linear(num_ftrs, 10)  # 10 classes
         
         criterion_CASP = nn.CrossEntropyLoss()
-        optimizer_CASP = optim.SGD(model.parameters(), lr=0.1,
-                              momentum=0.9, weight_decay=5e-4)
+        optimizer_CASP = optim.Adam(model.parameters(), lr=0.001)
         
-
 
         # Train the model
         num_epochs = 5  # Adjust number of epochs as necessary
