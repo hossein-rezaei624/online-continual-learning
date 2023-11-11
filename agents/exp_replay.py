@@ -114,8 +114,6 @@ class ExperienceReplay(ContinualLearner):
     
     def train_learner(self, x_train, y_train):
         self.before_train(x_train, y_train)
-
-        print(self.data)
         
         # set up loader
         train_dataset = dataset_transform(x_train, y_train, transform=transforms_match[self.data])
@@ -452,7 +450,21 @@ class ExperienceReplay(ContinualLearner):
         train_loader_CASP = data.DataLoader(train_dataset_CASP, batch_size=self.batch, shuffle=False, num_workers=0)
         
         
+        features = []
+        labels = []
+        with torch.no_grad():
+            for data_, label, __ in train_loader_CASP:
+                data_, label = data_.to(device), label.to(device)
+                outputs = model(data_)
+                features.extend(outputs.cpu().numpy())
+                labels.extend(label.cpu().numpy())
         
+        # Convert features to a NumPy array
+        features_array = np.array(features)
+        labels_array = np.array(labels)
+        
+        # Apply t-SNE
+        self.apply_tsne(features_array, labels_array, perplexity=50, learning_rate=300)
         
         
         
