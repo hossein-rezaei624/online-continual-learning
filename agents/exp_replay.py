@@ -92,7 +92,7 @@ class ExperienceReplay(ContinualLearner):
     
     
         # Function to apply t-SNE and visualize the results
-    def apply_tsne(self, features, labels, perplexity=30, learning_rate=200, n_iter=1000, sty=0):
+    def apply_tsne(self, features, labels, perplexity=30, learning_rate=200, n_iter=1000):
         # Standardize features
         scaler = StandardScaler()
         standardized_features = scaler.fit_transform(features)
@@ -105,11 +105,7 @@ class ExperienceReplay(ContinualLearner):
         plt.figure(figsize=(10, 6))
         for i in range(10):
             indices = [j for j, label in enumerate(labels) if label == i]
-            if sty == 0:
-                plt.scatter(reduced_features[indices, 0], reduced_features[indices, 1], label=f'Class {i}', s=5)
-            if sty == 1:
-                plt.scatter(reduced_features[indices, 0], reduced_features[indices, 1], label=f'Class {i}', s=5, marker='^')
-        
+            plt.scatter(reduced_features[indices, 0], reduced_features[indices, 1], label=f'Class {i}', s=5)
         #plt.legend()
         plt.savefig("tsneCASP")
     
@@ -118,7 +114,6 @@ class ExperienceReplay(ContinualLearner):
     
     def train_learner(self, x_train, y_train):
         self.before_train(x_train, y_train)
-        
         # set up loader
         train_dataset = dataset_transform(x_train, y_train, transform=transforms_match[self.data])
         train_loader = data.DataLoader(train_dataset, batch_size=self.batch, shuffle=True, num_workers=0,
@@ -378,7 +373,6 @@ class ExperienceReplay(ContinualLearner):
         all_images_ = torch.stack(images_list_)
         all_labels_ = torch.stack(labels_list_)
 
-        
         indices = torch.randperm(all_images_.size(0))
         shuffled_images = all_images_[indices]
         shuffled_labels = all_labels_[indices]
@@ -425,6 +419,16 @@ class ExperienceReplay(ContinualLearner):
             print("\n")
             print(f'Epoch {epoch+1}, Loss: {epoch_loss:.4f}, Accuracy: {epoch_accuracy:.2f}%')
 
+        
+        
+        train_loader_CASP = data.DataLoader(train_dataset, batch_size=self.batch, shuffle=False, num_workers=0,
+                                       drop_last=True)
+        
+        
+        
+        
+        
+        
         # Extract features for t-SNE
         model.eval()
         features = []
@@ -441,38 +445,8 @@ class ExperienceReplay(ContinualLearner):
         labels_array = np.array(labels)
         
         # Apply t-SNE
-        self.apply_tsne(features_array, labels_array, perplexity=50, learning_rate=300, n_iter=1000, sty=0)
+        self.apply_tsne(features_array, labels_array, perplexity=50, learning_rate=300)
 
-        
-        
-
-
-        x_train_CASP = all_images_.permute(0, 2, 3, 1).cpu().numpy()
-        y_train_CASP = all_labels_.cpu().numpy()
-
-        train_dataset_CASP = dataset_transform(x_train_CASP, y_train_CASP, transform=transforms_match[self.data])
-        train_loader_CASP = data.DataLoader(train_dataset_CASP, batch_size=self.batch, shuffle=False, num_workers=0)
-        
-        
-        features = []
-        labels = []
-        with torch.no_grad():
-            for data_, label, __ in train_loader_CASP:
-                data_, label = data_.to(device), label.to(device)
-                outputs = model(data_)
-                features.extend(outputs.cpu().numpy())
-                labels.extend(label.cpu().numpy())
-        
-        # Convert features to a NumPy array
-        features_array = np.array(features)
-        labels_array = np.array(labels)
-        
-        # Apply t-SNE
-        self.apply_tsne(features_array, labels_array, perplexity=50, learning_rate=300, n_iter=1000, sty=1)
-        
-        
-        
-        
         print("Now you can see the result...")
         
         self.after_train()
