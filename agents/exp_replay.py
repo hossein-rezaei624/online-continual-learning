@@ -20,7 +20,9 @@ import math
 from torch.utils.data import Dataset
 import pickle
 
-
+from sklearn.manifold import TSNE
+from sklearn.preprocessing import StandardScaler
+import torchvision.models as models
 
 
 class ExperienceReplay(ContinualLearner):
@@ -87,6 +89,25 @@ class ExperienceReplay(ContinualLearner):
                 break
     
         return lst
+    
+    
+        # Function to apply t-SNE and visualize the results
+    def apply_tsne(self, features, labels, perplexity=30, learning_rate=200, n_iter=1000):
+        # Standardize features
+        scaler = StandardScaler()
+        standardized_features = scaler.fit_transform(features)
+    
+        # Apply t-SNE
+        tsne = TSNE(n_components=2, perplexity=perplexity, learning_rate=learning_rate, n_iter=n_iter, random_state=0)
+        reduced_features = tsne.fit_transform(standardized_features)
+    
+        # Visualization
+        plt.figure(figsize=(10, 6))
+        for i in range(10):
+            indices = [j for j, label in enumerate(labels) if label == i]
+            plt.scatter(reduced_features[indices, 0], reduced_features[indices, 1], label=f'Class {i}', s=5)
+        #plt.legend()
+        plt.savefig("tsneCASP")
     
     
     
@@ -359,8 +380,61 @@ class ExperienceReplay(ContinualLearner):
         
         self.buffer.buffer_label[list_of_indices] = shuffled_labels.to(device)
         self.buffer.buffer_img[list_of_indices] = shuffled_images.to(device)
+
+
+        # Load and modify the ResNet50 model for 10 classes
+        model = models.resnet18(pretrained=True)
+        num_ftrs = model.fc.in_features
+        model.fc = nn.Linear(num_ftrs, 10)  # 10 classes
         
+        criterion_CASP = nn.CrossEntropyLoss()
+        optimizer_CASP = optim.SGD(model.parameters(), lr=0.1,
+                              momentum=0.9, weight_decay=5e-4)
         
+
+
+        # Train the model
+        num_epochs = 5  # Adjust number of epochs as necessary
+        for epoch in range(num_epochs):
+            model.train()
+            running_loss = 0.0
+            correct = 0
+            total = 0
+            for inputs, labels, __ in train_loader:
+                optimizer_CASP.zero_grad()
+                outputs = model(inputs)
+                loss = criterion_CASP(outputs, labels)
+                loss.backward()
+                optimizer_CASP.step()
+                running_loss += loss.item()
         
+                # Calculate accuracy
+                _, predicted = torch.max(outputs.data, 1)
+                total += labels.size(0)
+                correct += (predicted == labels).sum().item()
+        
+            epoch_loss = running_loss / len(train_loader)
+            epoch_accuracy = 100 * correct / total
+            print("\n")
+            print(f'Epoch {epoch+1}, Loss: {epoch_loss:.4f}, Accuracy: {epoch_accuracy:.2f}%')
+
+            # Extract features for t-SNE
+            model.eval()
+            features = []
+            labels = []
+            with torch.no_grad():
+                for data, label, __ in train_loader:
+                    outputs = model(data)
+                    features.extend(outputs.numpy())
+                    labels.extend(label.numpy())
+            
+            # Convert features to a NumPy array
+            features_array = np.array(features)
+            labels_array = np.array(labels)
+            
+            # Apply t-SNE
+            self.apply_tsne(features_array, labels_array, perplexity=50, learning_rate=300)
+
+        print("Now you can see the result...")
         
         self.after_train()
