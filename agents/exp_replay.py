@@ -376,7 +376,7 @@ class ExperienceReplay(ContinualLearner):
         all_images_ = torch.stack(images_list_)
         all_labels_ = torch.stack(labels_list_)
 
-        print("after", all_images_.cpu().numpy().shape, type(all_images_.cpu().numpy()), all_labels_.cpu().numpy().shape, type(all_labels_.cpu().numpy()))
+        print("after", all_images_.permute(0, 2, 3, 1).cpu().numpy().shape, type(all_images_.cpu().numpy()), all_labels_.cpu().numpy().shape, type(all_labels_.cpu().numpy()))
         
         indices = torch.randperm(all_images_.size(0))
         shuffled_images = all_images_[indices]
