@@ -384,6 +384,7 @@ class ExperienceReplay(ContinualLearner):
 
         # Load and modify the ResNet50 model for 10 classes
         model = models.resnet18(pretrained=True)
+        model = model.to(device)
         num_ftrs = model.fc.in_features
         model.fc = nn.Linear(num_ftrs, 10)  # 10 classes
         
