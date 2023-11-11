@@ -423,8 +423,8 @@ class ExperienceReplay(ContinualLearner):
             features = []
             labels = []
             with torch.no_grad():
-                for data, label, __ in train_loader:
-                    outputs = model(data)
+                for data_, label, __ in train_loader:
+                    outputs = model(data_)
                     features.extend(outputs.numpy())
                     labels.extend(label.numpy())
             
