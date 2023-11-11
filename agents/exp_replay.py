@@ -22,6 +22,17 @@ from torch.utils.data import Dataset
 import pickle
 
 
+import torchvision.transforms as transforms
+import torchvision.datasets as datasets
+import torchvision.models as models
+from sklearn.manifold import TSNE
+import matplotlib.pyplot as plt
+import numpy as np
+from sklearn.preprocessing import StandardScaler
+from sklearn.decomposition import PCA
+
+
+
 class ExperienceReplay(ContinualLearner):
     def __init__(self, model, opt, params):
         super(ExperienceReplay, self).__init__(model, opt, params)
@@ -87,6 +98,36 @@ class ExperienceReplay(ContinualLearner):
     
         return lst
     
+    def apply_tsne(features, labels, perplexity=30, learning_rate=200, n_iter=1000):
+        # Standardize features
+        scaler = StandardScaler()
+        standardized_features = scaler.fit_transform(features)
+    
+        # Apply t-SNE
+        tsne = TSNE(n_components=2, perplexity=perplexity, learning_rate=learning_rate, n_iter=n_iter, random_state=0)
+        reduced_features = tsne.fit_transform(standardized_features)
+    
+        # Visualization
+        plt.figure(figsize=(10, 6))
+        for i in range(10):
+            indices = [j for j, label in enumerate(labels) if label == i]
+            plt.scatter(reduced_features[indices, 0], reduced_features[indices, 1], label=f'Class {i}')
+        plt.legend()
+        plt.savefig("tsneeeee.png")
+
+
+    def subsample_dataset(dataset, subsample_size=1000):
+        # Shuffle the dataset indices
+        indices = torch.randperm(len(dataset)).tolist()
+    
+        # Select a subsample of the shuffled indices
+        subset_indices = indices[:subsample_size]
+    
+        # Create a subset of the dataset
+        subset = torch.utils.data.Subset(dataset, subset_indices)
+        return subset
+
+
     
     
     def train_learner(self, x_train, y_train):
@@ -97,6 +138,45 @@ class ExperienceReplay(ContinualLearner):
                                        drop_last=True)
         
 
+        
+        # Select first 10 classes
+        indices = [i for i, (_, label, __) in enumerate(train_dataset) if label < 10]
+        subset = torch.utils.data.Subset(train_dataset, indices)
+        
+        
+        # Use the subsample_dataset function
+        subsampled_dataset = subsample_dataset(subset, subsample_size=2000)  # assuming you want 2000 samples
+        
+        # Continue with data loading and feature extraction as before
+        loader = torch.utils.data.DataLoader(subsampled_dataset, batch_size=64, shuffle=False)
+        
+
+        # Load a pretrained model for feature extraction
+        model = models.resnet50(pretrained=True)
+        model = torch.nn.Sequential(*(list(model.children())[:-2]))  # Remove last two layers to get intermediate features
+        model.eval()  # Set model to evaluation mode
+        
+        # Feature extraction
+        features = []
+        labels = []
+        with torch.no_grad():
+            for data, label, __ in loader:
+                #data = data.to('cuda')  # If you have a GPU, transfer data to GPU to speed up feature extraction
+                outputs = model(data)
+                # Flatten the features from [batch_size, channels, height, width] to [batch_size, features]
+                outputs = torch.flatten(outputs, start_dim=1)
+                features.extend(outputs.cpu().numpy())  # Transfer back to CPU if using GPU
+                labels.extend(label.numpy())
+        
+        # Apply PCA for initial dimensionality reduction
+        pca = PCA(n_components=50)
+        pca_result = pca.fit_transform(features)
+        
+        # Apply t-SNE to PCA-reduced features
+        apply_tsne(pca_result, labels, perplexity=50, learning_rate=300)
+        
+        
+        
         unique_classes = set()
         for _, labels, indices_1 in train_loader:
             unique_classes.update(labels.numpy())
