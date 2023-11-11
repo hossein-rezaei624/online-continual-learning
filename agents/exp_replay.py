@@ -114,6 +114,9 @@ class ExperienceReplay(ContinualLearner):
     
     def train_learner(self, x_train, y_train):
         self.before_train(x_train, y_train)
+
+        print("before", x_train.shape, type(x_train), y_train.shape, type(y_train))
+        
         # set up loader
         train_dataset = dataset_transform(x_train, y_train, transform=transforms_match[self.data])
         train_loader = data.DataLoader(train_dataset, batch_size=self.batch, shuffle=True, num_workers=0,
@@ -373,6 +376,8 @@ class ExperienceReplay(ContinualLearner):
         all_images_ = torch.stack(images_list_)
         all_labels_ = torch.stack(labels_list_)
 
+        print("after", all_images_.shape, type(all_images_), all_labels_.shape, type(all_labels_))
+        
         indices = torch.randperm(all_images_.size(0))
         shuffled_images = all_images_[indices]
         shuffled_labels = all_labels_[indices]
