@@ -92,7 +92,7 @@ class ExperienceReplay(ContinualLearner):
     
     
         # Function to apply t-SNE and visualize the results
-    def apply_tsne(self, features, labels, perplexity=30, learning_rate=200, n_iter=1000):
+    def apply_tsne(self, features, labels, perplexity=30, learning_rate=200, n_iter=1000, sty=0):
         # Standardize features
         scaler = StandardScaler()
         standardized_features = scaler.fit_transform(features)
@@ -105,7 +105,11 @@ class ExperienceReplay(ContinualLearner):
         plt.figure(figsize=(10, 6))
         for i in range(10):
             indices = [j for j, label in enumerate(labels) if label == i]
-            plt.scatter(reduced_features[indices, 0], reduced_features[indices, 1], label=f'Class {i}', s=5)
+            if sty == 0:
+                plt.scatter(reduced_features[indices, 0], reduced_features[indices, 1], label=f'Class {i}', s=5)
+            if sty == 1:
+                plt.scatter(reduced_features[indices, 0], reduced_features[indices, 1], label=f'Class {i}', s=5, marker='^')
+        
         #plt.legend()
         plt.savefig("tsneCASP")
     
@@ -437,7 +441,7 @@ class ExperienceReplay(ContinualLearner):
         labels_array = np.array(labels)
         
         # Apply t-SNE
-        self.apply_tsne(features_array, labels_array, perplexity=50, learning_rate=300)
+        self.apply_tsne(features_array, labels_array, perplexity=50, learning_rate=300, n_iter=1000, sty=0)
 
         
         
@@ -464,7 +468,7 @@ class ExperienceReplay(ContinualLearner):
         labels_array = np.array(labels)
         
         # Apply t-SNE
-        self.apply_tsne(features_array, labels_array, perplexity=50, learning_rate=300)
+        self.apply_tsne(features_array, labels_array, perplexity=50, learning_rate=300, n_iter=1000, sty=1)
         
         
         
