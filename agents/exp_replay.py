@@ -404,6 +404,7 @@ class ExperienceReplay(ContinualLearner):
             correct = 0
             total = 0
             for inputs, labels, __ in train_loader:
+                inputs, labels = inputs.to(device), labels.to(device)
                 print(__)
                 optimizer_CASP.zero_grad()
                 outputs = model(inputs)
