@@ -167,7 +167,7 @@ class ExperienceReplay(ContinualLearner):
         with torch.no_grad():
             for data, label, _ in loader:  # Assuming your DataLoader returns a tuple with data and labels
                 # Move data to the same device as the model
-                data = data.to(model.device)
+                data = data.to("cuda")
                 outputs = model(data)
                 # Flatten the features
                 outputs = torch.flatten(outputs, start_dim=1)
