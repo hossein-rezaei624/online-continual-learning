@@ -92,7 +92,7 @@ class ExperienceReplay(ContinualLearner):
     
     
         # Function to apply t-SNE and visualize the results
-    def apply_tsne(self, features, labels, perplexity=30, learning_rate=200, n_iter=1000, random_image_indices):
+    def apply_tsne(self, features, labels, random_image_indices, perplexity=30, learning_rate=200, n_iter=1000):
         # Standardize features
         scaler = StandardScaler()
         standardized_features = scaler.fit_transform(features)
@@ -461,7 +461,7 @@ class ExperienceReplay(ContinualLearner):
         labels_array = np.array(labels)
         
         # Apply t-SNE
-        self.apply_tsne(features_array, labels_array, perplexity=50, learning_rate=300, n_iter=1000, random_image_indices)
+        self.apply_tsne(features_array, labels_array, random_image_indices, perplexity=50, learning_rate=300, n_iter=1000)
 
         print("Now you can see the result...")
         
