@@ -153,20 +153,28 @@ class ExperienceReplay(ContinualLearner):
 
         # Load a pretrained model for feature extraction
         model = models.resnet50(pretrained=True)
-        model = torch.nn.Sequential(*(list(model.children())[:-2]))  # Remove last two layers to get intermediate features
+        
+        # If you have a GPU, move the model to GPU
+        model = model.to('cuda')
+        
+        # Modify the model to remove the last two layers
+        model = torch.nn.Sequential(*(list(model.children())[:-2]))
         model.eval()  # Set model to evaluation mode
         
         # Feature extraction
         features = []
         labels = []
         with torch.no_grad():
-            for data, label, __ in loader:
-                data = data.to('cuda')  # If you have a GPU, transfer data to GPU to speed up feature extraction
+            for data, label, _ in loader:  # Assuming your DataLoader returns a tuple with data and labels
+                # Move data to the same device as the model
+                data = data.to(model.device)
                 outputs = model(data)
-                # Flatten the features from [batch_size, channels, height, width] to [batch_size, features]
+                # Flatten the features
                 outputs = torch.flatten(outputs, start_dim=1)
-                features.extend(outputs.cpu().numpy())  # Transfer back to CPU if using GPU
-                labels.extend(label.numpy())
+                # If using a GPU, transfer the outputs back to CPU to work with NumPy
+                features.extend(outputs.cpu().numpy())
+                labels.extend(label.cpu().numpy())  # Make sure labels are also brought back to CPU if necessary
+
         
         # Apply PCA for initial dimensionality reduction
         pca = PCA(n_components=50)
