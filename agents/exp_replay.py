@@ -115,7 +115,7 @@ class ExperienceReplay(ContinualLearner):
     def train_learner(self, x_train, y_train):
         self.before_train(x_train, y_train)
 
-        print("before", x_train.shape, type(x_train), y_train.shape, type(y_train))
+        print(self.data, self.data.shape, type(self.data))
         
         # set up loader
         train_dataset = dataset_transform(x_train, y_train, transform=transforms_match[self.data])
@@ -376,7 +376,6 @@ class ExperienceReplay(ContinualLearner):
         all_images_ = torch.stack(images_list_)
         all_labels_ = torch.stack(labels_list_)
 
-        print("after", all_images_.permute(0, 2, 3, 1).cpu().numpy().shape, type(all_images_.cpu().numpy()), all_labels_.cpu().numpy().shape, type(all_labels_.cpu().numpy()))
         
         indices = torch.randperm(all_images_.size(0))
         shuffled_images = all_images_[indices]
@@ -442,6 +441,22 @@ class ExperienceReplay(ContinualLearner):
         # Apply t-SNE
         self.apply_tsne(features_array, labels_array, perplexity=50, learning_rate=300)
 
+        
+        
+
+
+        x_train_CASP = all_images_.permute(0, 2, 3, 1).cpu().numpy()
+        y_train_CASP = all_labels_.cpu().numpy()
+
+        train_dataset_CASP = dataset_transform(x_train_CASP, y_train_CASP, transform=transforms_match[self.data])
+        train_loader_CASP = data.DataLoader(train_dataset_CASP, batch_size=self.batch, shuffle=False, num_workers=0)
+        
+        
+        
+        
+        
+        
+        
         print("Now you can see the result...")
         
         self.after_train()
