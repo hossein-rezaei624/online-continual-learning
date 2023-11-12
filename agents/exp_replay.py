@@ -120,7 +120,7 @@ class ExperienceReplay(ContinualLearner):
         
         
         ##plt.legend()
-        plt.savefig("tsneER")
+        plt.savefig("tsneGSS")
     
     
     def train_learner(self, x_train, y_train):
