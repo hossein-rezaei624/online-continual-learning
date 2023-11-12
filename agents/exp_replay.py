@@ -103,6 +103,7 @@ class ExperienceReplay(ContinualLearner):
     
         # Visualization
         plt.figure(figsize=(10, 6))
+        colors = plt.cm.get_cmap('tab10', 10)  # Get a colormap with 10 distinct colors
         for i in range(10):
         
             indices = [j for j, label in enumerate(labels) if label == i]
@@ -110,16 +111,15 @@ class ExperienceReplay(ContinualLearner):
             # Split indices based on whether they are in random_image_indices
             special_indices = [index for index in indices if index in random_image_indices]
             normal_indices = [index for index in indices if index not in random_image_indices]
-    
-            # Plotting
-            plt.scatter(reduced_features[normal_indices, 0], reduced_features[normal_indices, 1], label=f'Class {i}', s=5)
-            if special_indices:
-                plt.scatter(reduced_features[special_indices, 0], reduced_features[special_indices, 1], marker='^', label=f'Class {i} special', s=5)
         
+            # Plotting
+            color = colors(i)  # Get the color for the current class
+            plt.scatter(reduced_features[normal_indices, 0], reduced_features[normal_indices, 1], color=color, label=f'Class {i}', s=2)
+            if special_indices:
+                plt.scatter(reduced_features[special_indices, 0], reduced_features[special_indices, 1], color=color, marker='^', label=f'Class {i} special', s=20)
         
         plt.legend()
         plt.savefig("tsneCASP")
-    
     
     
     def train_learner(self, x_train, y_train):
