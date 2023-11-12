@@ -102,7 +102,7 @@ class ExperienceReplay(ContinualLearner):
         reduced_features = tsne.fit_transform(standardized_features)
     
         # Visualization
-        plt.figure(figsize=(6, 6))
+        plt.figure(figsize=(5, 5))
         colors = plt.cm.get_cmap('tab10', 10)  # Get a colormap with 10 distinct colors
         for i in range(10):
         
