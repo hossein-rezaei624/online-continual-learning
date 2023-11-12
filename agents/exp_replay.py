@@ -114,17 +114,17 @@ class ExperienceReplay(ContinualLearner):
         
             # Plotting
             color = colors(i)  # Get the color for the current class
-            plt.scatter(reduced_features[normal_indices, 0], reduced_features[normal_indices, 1], color=color, alpha=0.4, label=f'Class {i}', s=4)
+            plt.scatter(reduced_features[normal_indices, 0], reduced_features[normal_indices, 1], color=color, alpha=0.4, label=f'Class {i}', s=2)
             if special_indices:
-                plt.scatter(reduced_features[special_indices, 0], reduced_features[special_indices, 1], color=color, marker='^', label=f'Class {i} special', s=40)
+                plt.scatter(reduced_features[special_indices, 0], reduced_features[special_indices, 1], color=color, marker='^', label=f'Class {i} special', s=50)
         
                 # Calculate average position of special_indices points
                 avg_x = np.mean(reduced_features[special_indices, 0])
                 avg_y = np.mean(reduced_features[special_indices, 1])
-                offset_x, offset_y = 0.02, 0.02  # Adjust these offsets as needed
+                offset_x, offset_y = 0.05, -0.05  # Adjust these offsets as needed
         
                 # Add annotation with a contrasting background
-                plt.text(avg_x + offset_x, avg_y + offset_y, f'{len(special_indices)}', color='white', fontsize=9, bbox=dict(facecolor='black', alpha=0.6, edgecolor='none'))
+                plt.text(avg_x + offset_x, avg_y + offset_y, f'{len(special_indices)}', color=color, fontsize=10)
         
         ##plt.legend()
         plt.savefig("tsneASER")
@@ -421,7 +421,7 @@ class ExperienceReplay(ContinualLearner):
         
         
         # Train the model
-        num_epochs = 7  # Adjust number of epochs as necessary
+        num_epochs = 8  # Adjust number of epochs as necessary
         for epoch in range(num_epochs):
             model.train()
             running_loss = 0.0
