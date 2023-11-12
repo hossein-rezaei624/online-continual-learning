@@ -119,7 +119,7 @@ class ExperienceReplay(ContinualLearner):
                 plt.scatter(reduced_features[special_indices, 0], reduced_features[special_indices, 1], color=color, marker='^', label=f'Class {i} special', s=40)        
         
         ##plt.legend()
-        plt.savefig("tsneCASPhard")
+        plt.savefig("tsneER")
     
     
     def train_learner(self, x_train, y_train):
@@ -391,8 +391,8 @@ class ExperienceReplay(ContinualLearner):
         shuffled_labels = all_labels_[indices]
         ##print("shuffled_labels.shape", shuffled_labels.shape)
         
-        self.buffer.buffer_label[list_of_indices] = shuffled_labels.to(device)
-        self.buffer.buffer_img[list_of_indices] = shuffled_images.to(device)
+        ##self.buffer.buffer_label[list_of_indices] = shuffled_labels.to(device)
+        ##self.buffer.buffer_img[list_of_indices] = shuffled_images.to(device)
 
 
 
