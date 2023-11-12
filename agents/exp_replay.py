@@ -104,12 +104,21 @@ class ExperienceReplay(ContinualLearner):
         # Visualization
         plt.figure(figsize=(10, 6))
         for i in range(10):
-            indices = [j for j, label in enumerate(labels) if label == i]
-            plt.scatter(reduced_features[indices, 0], reduced_features[indices, 1], label=f'Class {i}', s=5)
         
-        #plt.legend()
-        plt.savefig("tsneCASP")
+            indices = [j for j, label in enumerate(labels) if label == i]
+            
+            # Split indices based on whether they are in random_image_indices
+            special_indices = [index for index in indices if index in random_image_indices]
+            normal_indices = [index for index in indices if index not in random_image_indices]
     
+            # Plotting
+            plt.scatter(reduced_features[normal_indices, 0], reduced_features[normal_indices, 1], label=f'Class {i}', s=5)
+            if special_indices:
+                plt.scatter(reduced_features[special_indices, 0], reduced_features[special_indices, 1], marker='^', label=f'Class {i} special', s=5)
+        
+        
+        plt.legend()
+        plt.savefig("tsneCASP")
     
     
     
