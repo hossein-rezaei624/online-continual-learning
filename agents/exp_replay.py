@@ -114,9 +114,9 @@ class ExperienceReplay(ContinualLearner):
         
             # Plotting
             color = colors(i)  # Get the color for the current class
-            plt.scatter(reduced_features[normal_indices, 0], reduced_features[normal_indices, 1], color=color, label=f'Class {i}', s=2)
+            plt.scatter(reduced_features[normal_indices, 0], reduced_features[normal_indices, 1], color=color + (0.5,), label=f'Class {i}', s=2)
             if special_indices:
-                plt.scatter(reduced_features[special_indices, 0], reduced_features[special_indices, 1], color=color, marker='^', label=f'Class {i} special', s=20)
+                plt.scatter(reduced_features[special_indices, 0], reduced_features[special_indices, 1], color=color, marker='^', label=f'Class {i} special', s=40)        
         
         plt.legend()
         plt.savefig("tsneCASP")
