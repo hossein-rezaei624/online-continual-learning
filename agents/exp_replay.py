@@ -119,7 +119,7 @@ class ExperienceReplay(ContinualLearner):
                 plt.scatter(reduced_features[special_indices, 0], reduced_features[special_indices, 1], color=color, marker='^', label=f'Class {i} special', s=40)        
         
         ##plt.legend()
-        plt.savefig("tsneGSS")
+        plt.savefig("tsneER")
     
     
     def train_learner(self, x_train, y_train):
