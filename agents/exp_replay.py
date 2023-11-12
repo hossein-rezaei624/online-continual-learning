@@ -102,7 +102,7 @@ class ExperienceReplay(ContinualLearner):
         reduced_features = tsne.fit_transform(standardized_features)
     
         # Visualization
-        plt.figure(figsize=(5, 5))
+        plt.figure(figsize=(4, 4))
         colors = plt.cm.get_cmap('tab10', 10)  # Get a colormap with 10 distinct colors
         for i in range(10):
         
@@ -118,13 +118,6 @@ class ExperienceReplay(ContinualLearner):
             if special_indices:
                 plt.scatter(reduced_features[special_indices, 0], reduced_features[special_indices, 1], color=color, marker='^', label=f'Class {i} special', s=50)
         
-                # Calculate average position of special_indices points
-                avg_x = np.mean(reduced_features[special_indices, 0])
-                avg_y = np.mean(reduced_features[special_indices, 1])
-                offset_x, offset_y = 0.05, -0.05  # Adjust these offsets as needed
-        
-                # Add annotation with a contrasting background
-                plt.text(avg_x + offset_x, avg_y + offset_y, f'{len(special_indices)}', color=color, fontsize=10)
         
         ##plt.legend()
         plt.savefig("tsneCASPvar")
