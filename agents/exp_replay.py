@@ -119,7 +119,7 @@ class ExperienceReplay(ContinualLearner):
                 plt.scatter(reduced_features[special_indices, 0], reduced_features[special_indices, 1], color=color, marker='^', label=f'Class {i} special', s=40)        
         
         ##plt.legend()
-        plt.savefig("tsneGSS")
+        plt.savefig("tsneCASPvar")
     
     
     def train_learner(self, x_train, y_train):
@@ -128,6 +128,9 @@ class ExperienceReplay(ContinualLearner):
         train_dataset = dataset_transform(x_train, y_train, transform=transforms_match[self.data])
         train_loader = data.DataLoader(train_dataset, batch_size=self.batch, shuffle=True, num_workers=0,
                                        drop_last=True)
+
+        np_seed_state = np.random.get_state()
+        torch_seed_state = torch.get_rng_state()
         
         
         unique_classes = set()
@@ -316,11 +319,11 @@ class ExperienceReplay(ContinualLearner):
         #top_indices_sorted = top_indices_1[::-1] #ambiguous
 
 
-        top_indices_sorted = sorted_indices_1 #hard to learn
+        ##top_indices_sorted = sorted_indices_1 #hard to learn
         
         ##top_indices_sorted = sorted_indices_1[::-1] #easy to learn
 
-        ##top_indices_sorted = sorted_indices_2[::-1] #ambiguous
+        top_indices_sorted = sorted_indices_2[::-1] #ambiguous
 
         
         subset_data = torch.utils.data.Subset(train_dataset, top_indices_sorted)
@@ -388,10 +391,16 @@ class ExperienceReplay(ContinualLearner):
         shuffled_labels = all_labels_[indices]
         ##print("shuffled_labels.shape", shuffled_labels.shape)
         
-        ##self.buffer.buffer_label[list_of_indices] = shuffled_labels.to(device)
-        ##self.buffer.buffer_img[list_of_indices] = shuffled_images.to(device)
+        self.buffer.buffer_label[list_of_indices] = shuffled_labels.to(device)
+        self.buffer.buffer_img[list_of_indices] = shuffled_images.to(device)
 
 
+
+        np.random.set_state(np_seed_state)
+        torch.set_rng_state(torch_seed_state)
+        
+        
+        
         # Load and modify the ResNet50 model for 10 classes
         model = models.resnet18(pretrained=True)
         num_ftrs = model.fc.in_features
