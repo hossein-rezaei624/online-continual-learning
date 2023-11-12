@@ -437,7 +437,7 @@ class ExperienceReplay(ContinualLearner):
                 # Compare data (image from train_dataset) with random_img
                 # The comparison logic depends on your data format
                 # For example, if they are numpy arrays or tensors you might do a direct comparison
-                if torch.equal(data_11, random_img):
+                if torch.equal(data_11.to(device), random_img):
                     # If they match, store the index
                     random_image_indices.append(idx)
                     break  # Assuming each random image is unique
