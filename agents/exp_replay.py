@@ -127,7 +127,7 @@ class ExperienceReplay(ContinualLearner):
                 plt.text(avg_x + offset_x, avg_y + offset_y, f'{len(special_indices)}', color=color, fontsize=10)
         
         ##plt.legend()
-        plt.savefig("tsneASER")
+        plt.savefig("tsneGSS")
     
     
     def train_learner(self, x_train, y_train):
