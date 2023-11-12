@@ -118,7 +118,7 @@ class ExperienceReplay(ContinualLearner):
             if special_indices:
                 plt.scatter(reduced_features[special_indices, 0], reduced_features[special_indices, 1], color=color, marker='^', label=f'Class {i} special', s=40)        
         
-        plt.legend()
+        ##plt.legend()
         plt.savefig("tsneCASP")
     
     
@@ -404,7 +404,7 @@ class ExperienceReplay(ContinualLearner):
         
         
         # Train the model
-        num_epochs = 2  # Adjust number of epochs as necessary
+        num_epochs = 5  # Adjust number of epochs as necessary
         for epoch in range(num_epochs):
             model.train()
             running_loss = 0.0
