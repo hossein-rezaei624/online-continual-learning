@@ -119,7 +119,7 @@ class ExperienceReplay(ContinualLearner):
                 plt.scatter(reduced_features[special_indices, 0], reduced_features[special_indices, 1], color=color, marker='^', label=f'Class {i} special', s=40)        
         
         ##plt.legend()
-        plt.savefig("tsneCASPeasy")
+        plt.savefig("tsneCASPvar")
     
     
     def train_learner(self, x_train, y_train):
@@ -321,9 +321,9 @@ class ExperienceReplay(ContinualLearner):
 
         ##top_indices_sorted = sorted_indices_1 #hard to learn
         
-        top_indices_sorted = sorted_indices_1[::-1] #easy to learn
+        ##top_indices_sorted = sorted_indices_1[::-1] #easy to learn
 
-        ##top_indices_sorted = sorted_indices_2[::-1] #ambiguous
+        top_indices_sorted = sorted_indices_2[::-1] #ambiguous
 
         
         subset_data = torch.utils.data.Subset(train_dataset, top_indices_sorted)
