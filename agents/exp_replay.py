@@ -127,7 +127,7 @@ class ExperienceReplay(ContinualLearner):
                 plt.text(avg_x + offset_x, avg_y + offset_y, f'{len(special_indices)}', color='white', fontsize=9, bbox=dict(facecolor='black', alpha=0.6, edgecolor='none'))
         
         ##plt.legend()
-        plt.savefig("tsneCASPvar")
+        plt.savefig("tsneER")
     
     
     def train_learner(self, x_train, y_train):
@@ -399,8 +399,8 @@ class ExperienceReplay(ContinualLearner):
         shuffled_labels = all_labels_[indices]
         ##print("shuffled_labels.shape", shuffled_labels.shape)
         
-        self.buffer.buffer_label[list_of_indices] = shuffled_labels.to(device)
-        self.buffer.buffer_img[list_of_indices] = shuffled_images.to(device)
+        ##self.buffer.buffer_label[list_of_indices] = shuffled_labels.to(device)
+        ##self.buffer.buffer_img[list_of_indices] = shuffled_images.to(device)
 
 
 
