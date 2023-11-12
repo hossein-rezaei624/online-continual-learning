@@ -105,11 +105,8 @@ class ExperienceReplay(ContinualLearner):
         plt.figure(figsize=(10, 6))
         for i in range(10):
             indices = [j for j, label in enumerate(labels) if label == i]
-            for k in range(len(indices)):
-                if indices[k] in random_image_indices:
-                    plt.scatter(reduced_features[indices[k], 0], reduced_features[indices[k], 1], label=f'Class {i}', s=5, marker='^')
-                else:
-                    plt.scatter(reduced_features[indices[k], 0], reduced_features[indices[k], 1], label=f'Class {i}', s=5)
+            plt.scatter(reduced_features[indices, 0], reduced_features[indices, 1], label=f'Class {i}', s=5)
+        
         #plt.legend()
         plt.savefig("tsneCASP")
     
