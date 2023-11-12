@@ -102,7 +102,7 @@ class ExperienceReplay(ContinualLearner):
         reduced_features = tsne.fit_transform(standardized_features)
     
         # Visualization
-        plt.figure(figsize=(8, 6))
+        plt.figure(figsize=(6, 6))
         colors = plt.cm.get_cmap('tab10', 10)  # Get a colormap with 10 distinct colors
         for i in range(10):
         
@@ -116,13 +116,15 @@ class ExperienceReplay(ContinualLearner):
             color = colors(i)  # Get the color for the current class
             plt.scatter(reduced_features[normal_indices, 0], reduced_features[normal_indices, 1], color=color, alpha=0.4, label=f'Class {i}', s=4)
             if special_indices:
-                plt.scatter(reduced_features[special_indices, 0], reduced_features[special_indices, 1], color=color, marker='^', label=f'Class {i} special', s=50)
-
-                # Use the first special index for annotation
-                representative_point = special_indices[0]
-                offset = 0.04  # Adjust this offset as needed
-                plt.text(reduced_features[representative_point, 0] + offset, reduced_features[representative_point, 1] + offset,
-                         f'{len(special_indices)}', color=color, fontsize=9)
+                plt.scatter(reduced_features[special_indices, 0], reduced_features[special_indices, 1], color=color, marker='^', label=f'Class {i} special', s=40)
+        
+                # Calculate average position of special_indices points
+                avg_x = np.mean(reduced_features[special_indices, 0])
+                avg_y = np.mean(reduced_features[special_indices, 1])
+                offset_x, offset_y = 0.02, 0.02  # Adjust these offsets as needed
+        
+                # Add annotation with a contrasting background
+                plt.text(avg_x + offset_x, avg_y + offset_y, f'{len(special_indices)}', color='white', fontsize=9, bbox=dict(facecolor='black', alpha=0.6, edgecolor='none'))
         
         ##plt.legend()
         plt.savefig("tsneCASPvar")
@@ -419,7 +421,7 @@ class ExperienceReplay(ContinualLearner):
         
         
         # Train the model
-        num_epochs = 8  # Adjust number of epochs as necessary
+        num_epochs = 7  # Adjust number of epochs as necessary
         for epoch in range(num_epochs):
             model.train()
             running_loss = 0.0
