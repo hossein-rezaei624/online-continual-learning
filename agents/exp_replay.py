@@ -404,7 +404,7 @@ class ExperienceReplay(ContinualLearner):
         
         
         # Train the model
-        num_epochs = 8  # Adjust number of epochs as necessary
+        num_epochs = 9  # Adjust number of epochs as necessary
         for epoch in range(num_epochs):
             model.train()
             running_loss = 0.0
