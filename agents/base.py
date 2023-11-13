@@ -14,6 +14,9 @@ from corruptions import *
 from torchvision.transforms import ToPILImage, PILToTensor
 import torchvision
 
+from collections import defaultdict
+
+
 class ContinualLearner(torch.nn.Module, metaclass=abc.ABCMeta):
     '''
     Abstract module which is inherited by each and every continual learning algorithm.
@@ -156,6 +159,11 @@ class ContinualLearner(torch.nn.Module, metaclass=abc.ABCMeta):
                 old_class_score = AverageMeter()
                 correct_lb = []
                 predict_lb = []
+            
+            num_classes = 10
+            class_correct = defaultdict(int)  # Dictionary to store correct counts per class
+            class_total = defaultdict(int) 
+            
             for task, test_loader in enumerate(test_loaders):
                 acc = AverageMeter()
                 acc_augmented = AverageMeter()
@@ -274,8 +282,14 @@ class ContinualLearner(torch.nn.Module, metaclass=abc.ABCMeta):
                         logits = self.model.forward(batch_x)
                         _, pred_label = torch.max(logits, 1)
                         correct_cnt = (pred_label == batch_y).sum().item()/batch_y.size(0)
+                        correct = (pred_label == batch_y)
 
+                        for label, is_correct in zip(batch_y, correct):
+                            class_total[label.item()] += 1
+                            if is_correct.item():
+                                class_correct[label.item()] += 1
 
+                    
                     
 
                     if self.params.error_analysis:
@@ -308,6 +322,15 @@ class ContinualLearner(torch.nn.Module, metaclass=abc.ABCMeta):
                 acc_array[task] = acc.avg()
                 if task_num == 9:
                     acc_array_augmented[task] = acc_augmented.avg()
+        
+        # Print the accuracy for each class
+        for class_id in range(num_classes):
+            if class_total[class_id] > 0:
+                accuracy = 100 * class_correct[class_id] / class_total[class_id]
+                print(f"Accuracy of class {class_id}: {accuracy:.2f}%")
+            else:
+                print(f"Class {class_id} has no examples in the test set.")
+        
         print(acc_array)
         if task_num == 9:
             print(acc_array_augmented)
