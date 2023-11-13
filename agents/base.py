@@ -160,7 +160,7 @@ class ContinualLearner(torch.nn.Module, metaclass=abc.ABCMeta):
                 correct_lb = []
                 predict_lb = []
             
-            num_classes = 10
+            num_classes = 100
             class_correct = defaultdict(int)  # Dictionary to store correct counts per class
             class_total = defaultdict(int) 
             
