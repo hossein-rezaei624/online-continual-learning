@@ -167,7 +167,7 @@ def multiple_run(params, store=False, save_path=None):
                         if agent.buffer.buffer_label[i].item() in unique_classes_tsne:
                             list_of_indices_tsne.append(i)
 
-
+                    print("len(list_of_indices_tsne)", len(list_of_indices_tsne))
                     train_dataset_CASP = dataset_transform(x_train_tsne, y_train_tsne, transform=transforms_match['cifar100'])
         
                     train_loader_CASP = data.DataLoader(train_dataset_CASP, batch_size=10, shuffle=False, num_workers=0,
@@ -176,7 +176,7 @@ def multiple_run(params, store=False, save_path=None):
                     
                     random_image_indices_tsne = []
                     temp_again = agent.buffer.buffer_img[list_of_indices_tsne]
-                    
+                    print("temp_again.shape", temp_again.shape)
                     # Iterate over the train_dataset
                     for idx_tsne, (data_11_tsne, target_tsne, ___tsne) in enumerate(train_dataset_CASP):
                         for random_img_tsne in temp_again:
