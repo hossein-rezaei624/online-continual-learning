@@ -267,6 +267,7 @@ class ExperienceReplay(ContinualLearner):
                 counter__ +=1
                 list_of_indices.append(i)
 
+        print("self.buffer.buffer_label[list_of_indices]", self.buffer.buffer_label[list_of_indices])
         top_n = counter__
 
         # Find the indices that would sort the array
