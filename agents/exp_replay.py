@@ -357,8 +357,8 @@ class ExperienceReplay(ContinualLearner):
         shuffled_labels = all_labels_[indices]
         ##print("shuffled_labels.shape", shuffled_labels.shape)
         
-        ##self.buffer.buffer_label[list_of_indices] = shuffled_labels.to(device)
-        ##self.buffer.buffer_img[list_of_indices] = shuffled_images.to(device)
+        self.buffer.buffer_label[list_of_indices] = shuffled_labels.to(device)
+        self.buffer.buffer_img[list_of_indices] = shuffled_images.to(device)
 
 
 
