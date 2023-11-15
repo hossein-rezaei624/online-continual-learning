@@ -170,7 +170,7 @@ def multiple_run(params, store=False, save_path=None):
                     print("len(list_of_indices_tsne)", len(list_of_indices_tsne))
                     train_dataset_CASP = dataset_transform(x_train_tsne, y_train_tsne, transform=transforms_match['cifar100'])
         
-                    train_loader_CASP = data.DataLoader(train_dataset_CASP, batch_size=10, shuffle=False, num_workers=0,
+                    train_loader_CASP = torch.utils.data.DataLoader(train_dataset_CASP, batch_size=10, shuffle=False, num_workers=0,
                                                    drop_last=True)
                     
                     
