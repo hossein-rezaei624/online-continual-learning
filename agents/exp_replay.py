@@ -367,47 +367,5 @@ class ExperienceReplay(ContinualLearner):
         
         
         
-
-        
-        
-        train_loader_CASP = data.DataLoader(train_dataset, batch_size=self.batch, shuffle=False, num_workers=0,
-                                       drop_last=True)
-        
-        
-        random_image_indices = []
-        
-        # Iterate over the train_dataset
-        for idx, (data_11, target, __) in enumerate(train_dataset):
-            for random_img in self.buffer.buffer_img:
-                # Compare data (image from train_dataset) with random_img
-                # The comparison logic depends on your data format
-                # For example, if they are numpy arrays or tensors you might do a direct comparison
-                if torch.equal(data_11.to(device), random_img):
-                    # If they match, store the index
-                    random_image_indices.append(idx)
-                    break  # Assuming each random image is unique
-        
-        
-        
-        
-        # Extract features for t-SNE
-        model.eval()
-        features = []
-        labels = []
-        with torch.no_grad():
-            for data_, label, __ in train_loader_CASP:
-                data_, label = data_.to(device), label.to(device)
-                outputs = model(data_)
-                features.extend(outputs.cpu().numpy())
-                labels.extend(label.cpu().numpy())
-        
-        # Convert features to a NumPy array
-        features_array = np.array(features)
-        labels_array = np.array(labels)
-        
-        # Apply t-SNE
-        self.apply_tsne(features_array, labels_array, random_image_indices, perplexity=50, learning_rate=300, n_iter=1000)
-
-        print("Now you can see the result...")
         
         self.after_train()
