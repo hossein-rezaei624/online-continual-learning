@@ -92,6 +92,7 @@ def multiple_run(params, store=False, save_path=None):
         opt = setup_opt(params.optimizer, model, params.learning_rate, params.weight_decay)
         agent = agents[params.agent](model, opt, params)
 
+        
         # prepare val data loader
         test_loaders = setup_test_loader(data_continuum.test_data(), params)
         if params.online:
@@ -102,9 +103,10 @@ def multiple_run(params, store=False, save_path=None):
 
 
                 if i == 0:
-                    print("we are hereee")
+                    print("we are hereee 0")
 
-
+                    x_train_tsne = x_train
+                    y_train_tsne = y_train
 
                     train_dataset_tsne = dataset_transform(x_train, y_train, transform=transforms_match['cifar100'])
                     train_loader_tsne = torch.utils.data.DataLoader(train_dataset_tsne, batch_size=10, shuffle=True, num_workers=0,
@@ -149,7 +151,68 @@ def multiple_run(params, store=False, save_path=None):
                         print(f'Epoch {epoch_tsne+1}, Loss: {epoch_loss_tsne:.4f}, Accuracy: {epoch_accuracy_tsne:.2f}%')
 
 
+                if i == 9:
+                    print("now we are here 9")
 
+                    
+                    unique_classes_tsne = set()
+                    for __tsne, labels_tsne, indices_1_tsne in train_loader_tsne:
+                        unique_classes_tsne.update(labels_tsne.numpy())
+                    
+                    print("unique_classes_tsne", unique_classes_tsne)
+                    list_of_indices_tsne = []
+                    for i in range(agent.buffer.buffer_label.shape[0]):
+                        if agent.buffer.buffer_label[i].item() in unique_classes_tsne:
+                            list_of_indices_tsne.append(i)
+
+
+                    train_dataset_CASP = dataset_transform(x_train_tsne, y_train_tsne, transform=transforms_match['cifar100'])
+        
+                    train_loader_CASP = data.DataLoader(train_dataset_CASP, batch_size=10, shuffle=False, num_workers=0,
+                                                   drop_last=True)
+                    
+                    
+                    random_image_indices_tsne = []
+                    temp_again = agent.buffer.buffer_img[list_of_indices_tsne]
+                    
+                    # Iterate over the train_dataset
+                    for idx_tsne, (data_11_tsne, target_tsne, ___tsne) in enumerate(train_dataset_CASP):
+                        for random_img_tsne in temp_again:
+                            # Compare data (image from train_dataset) with random_img
+                            # The comparison logic depends on your data format
+                            # For example, if they are numpy arrays or tensors you might do a direct comparison
+                            if torch.equal(data_11_tsne.to('cuda'), random_img_tsne):
+                                # If they match, store the index
+                                random_image_indices_tsne.append(idx_tsne)
+                                break  # Assuming each random image is unique
+                    
+                    
+                    
+                    
+                    # Extract features for t-SNE
+                    model_tsne.eval()
+                    features_tsne = []
+                    labels_tsne = []
+                    with torch.no_grad():
+                        for data__tsne, label_tsne, ___tsne in train_loader_CASP:
+                            data__tsne, label_tsne = data__tsne.to('cuda'), label_tsne.to('cuda')
+                            outputs_tsne = model_tsne(data__tsne)
+                            features_tsne.extend(outputs_tsne.cpu().numpy())
+                            labels_tsne.extend(label_tsne.cpu().numpy())
+                    
+                    # Convert features to a NumPy array
+                    features_array_tsne = np.array(features_tsne)
+                    labels_array_tsne = np.array(labels_tsne)
+                    
+                    # Apply t-SNE
+                    apply_tsne(features_array_tsne, labels_array_tsne, random_image_indices_tsne, perplexity=50, learning_rate=300, n_iter=1000)
+            
+                    print("Now you can see the result...")
+
+
+                
+
+                
 
                 
                 acc_array = agent.evaluate(test_loaders)
