@@ -10,9 +10,6 @@ import copy
 from utils.loss import SupConLoss
 import pickle
 
-from corruptions import *
-from torchvision.transforms import ToPILImage, PILToTensor
-import torchvision
 
 class ContinualLearner(torch.nn.Module, metaclass=abc.ABCMeta):
     '''
@@ -118,11 +115,9 @@ class ContinualLearner(torch.nn.Module, metaclass=abc.ABCMeta):
     def forward(self, x):
         return self.model.forward(x)
 
-    
-    def evaluate(self, test_loaders, task_num):
+    def evaluate(self, test_loaders):
         self.model.eval()
         acc_array = np.zeros(len(test_loaders))
-        acc_array_augmented = np.zeros(len(test_loaders))
         if self.params.trick['ncm_trick'] or self.params.agent in ['ICARL', 'SCR', 'SCP']:
             exemplar_means = {}
             cls_exemplar = {cls: [] for cls in self.old_labels}
@@ -158,12 +153,9 @@ class ContinualLearner(torch.nn.Module, metaclass=abc.ABCMeta):
                 predict_lb = []
             for task, test_loader in enumerate(test_loaders):
                 acc = AverageMeter()
-                acc_augmented = AverageMeter()
-                for i, (batch_x, batch_y, indices_1) in enumerate(test_loader):
+                for i, (batch_x, batch_y) in enumerate(test_loader):
                     batch_x = maybe_cuda(batch_x, self.cuda)
                     batch_y = maybe_cuda(batch_y, self.cuda)
-                    
-
                     if self.params.trick['ncm_trick'] or self.params.agent in ['ICARL', 'SCR', 'SCP']:
                         feature = self.model.features(batch_x)  # (batch_size, feature_size)
                         for j in range(feature.size(0)):  # Normalize
@@ -182,101 +174,10 @@ class ContinualLearner(torch.nn.Module, metaclass=abc.ABCMeta):
                         # _, preds = torch.matmul(means, feature).max(0)
                         correct_cnt = (np.array(self.old_labels)[
                                            pred_label.tolist()] == batch_y.cpu().numpy()).sum().item() / batch_y.size(0)
-                    
-                    
-                    
-                        if task_num == 9:
-                        
-                            np_seed_state = np.random.get_state()
-                            torch_seed_state = torch.get_rng_state()
-                            
-        
-                            # List to hold all the batches with distortions applied
-                            all_batches = []
-                            
-                            # Convert the batch of images to a list of PIL images
-                            to_pil = ToPILImage()
-                            batch_x_pil_list = [to_pil(img.cpu()) for img in batch_x]  
-                            
-                            distortions = [
-                                gaussian_noise, shot_noise, impulse_noise, defocus_blur, motion_blur,
-                                zoom_blur, fog, snow, elastic_transform, pixelate, jpeg_compression
-                            ]
-                    
-                            # Process each image in the batch
-                            for batch_idx, batch_x_pil in enumerate(batch_x_pil_list):
-                                # List to hold the original and distorted images for the current batch image
-                                augmented_images = []
-                                
-                                # Add the original image to the list
-                                augmented_images.append(batch_x[batch_idx])
-                                
-                                # Loop through the distortions and apply them to the current image
-                                for function in distortions:
-                                    if function in [pixelate, jpeg_compression]:
-                                        # For functions returning tensors
-                                        img_processed = PILToTensor()(function(batch_x_pil)).to(dtype=batch_x.dtype).to("cuda") / 255.0
-                                    else:
-                                        # For functions returning images
-                                        img_processed = torch.tensor(function(batch_x_pil).astype(float) / 255.0, dtype=batch_x.dtype).to("cuda").permute(2, 0, 1)
-                    
-                                    # Append the distorted image
-                                    augmented_images.append(img_processed)
-                    
-                                # Concatenate the original and distorted images
-                                augmented_images_concatenated = torch.stack(augmented_images, dim=0)
-                                all_batches.append(augmented_images_concatenated)
-                    
-                            # Concatenate all the augmented batches along the batch dimension
-                            batch_x_augmented = torch.cat(all_batches, dim=0)
-                            
-                            # Repeat each label for the number of augmentations plus the original image
-                            batch_y_augmented = batch_y.repeat_interleave(len(distortions) + 1)
-                            
-   ##                 
-   ##                         # Extract the first 12 images to display (or fewer if there are less than 12 images)
-   ##                         images_display = [batch_x_augmented[j] for j in range(min(12, batch_x_augmented.size(0)))]
-   ##                 
-   ##                         # Make a grid from these images
-   ##                         grid = torchvision.utils.make_grid(images_display, nrow=len(images_display))  # Adjust nrow based on actual images
-   ##                         
-   ##                         # Save grid image with unique name for each batch
-   ##                         torchvision.utils.save_image(grid, 'grid_image.png')
-   ##                         
-                            
-                            np.random.set_state(np_seed_state)
-                            torch.set_rng_state(torch_seed_state)
-
-
-                            feature_augmented = self.model.features(batch_x_augmented)  # (batch_size, feature_size)
-                            for j in range(feature_augmented.size(0)):  # Normalize
-                                feature_augmented.data[j] = feature_augmented.data[j] / feature_augmented.data[j].norm()
-                            feature_augmented = feature_augmented.unsqueeze(2)  # (batch_size, feature_size, 1)
-                            means_augmented = torch.stack([exemplar_means[cls] for cls in self.old_labels])  # (n_classes, feature_size)
-    
-                            #old ncm
-                            means_augmented = torch.stack([means_augmented] * batch_x_augmented.size(0))  # (batch_size, n_classes, feature_size)
-                            means_augmented = means_augmented.transpose(1, 2)
-                            feature_augmented = feature_augmented.expand_as(means_augmented)  # (batch_size, feature_size, n_classes)
-                            dists_augmented = (feature_augmented - means_augmented).pow(2).sum(1).squeeze()  # (batch_size, n_classes)
-                            __augmented, pred_label_augmented = dists_augmented.min(1)
-                            # may be faster
-                            # feature = feature.squeeze(2).T
-                            # _, preds = torch.matmul(means, feature).max(0)
-                            correct_cnt_augmented = (np.array(self.old_labels)[
-                                               pred_label_augmented.tolist()] == batch_y_augmented.cpu().numpy()).sum().item() / batch_y_augmented.size(0)
-                            
-                             
-                            
-                    
-                    
                     else:
                         logits = self.model.forward(batch_x)
                         _, pred_label = torch.max(logits, 1)
                         correct_cnt = (pred_label == batch_y).sum().item()/batch_y.size(0)
-
-
-                    
 
                     if self.params.error_analysis:
                         correct_lb += [task] * len(batch_y)
@@ -303,14 +204,8 @@ class ContinualLearner(torch.nn.Module, metaclass=abc.ABCMeta):
                         else:
                             pass
                     acc.update(correct_cnt, batch_y.size(0))
-                    if task_num == 9:
-                        acc_augmented.update(correct_cnt_augmented, batch_y_augmented.size(0))
                 acc_array[task] = acc.avg()
-                if task_num == 9:
-                    acc_array_augmented[task] = acc_augmented.avg()
         print(acc_array)
-        if task_num == 9:
-            print(acc_array_augmented)
         if self.params.error_analysis:
             self.error_list.append((no, nn, oo, on))
             self.new_class_score.append(new_class_score.avg())
@@ -329,9 +224,4 @@ class ContinualLearner(torch.nn.Module, metaclass=abc.ABCMeta):
             print(self.bias_norm_new)
             with open('confusion', 'wb') as fp:
                 pickle.dump([correct_lb, predict_lb], fp)
-        
-        if task_num == 9:
-            return acc_array, acc_array_augmented
-
-        else:
-            return acc_array
+        return acc_array
