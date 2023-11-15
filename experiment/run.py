@@ -62,7 +62,7 @@ def apply_tsne(features, labels, random_image_indices, perplexity=30, learning_r
     
     
     ##plt.legend()
-    plt.savefig("tsneCASPvarplus")
+    plt.savefig("tsneERplus")
 
 
 
