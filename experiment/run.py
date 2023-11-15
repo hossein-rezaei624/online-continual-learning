@@ -14,6 +14,58 @@ import os
 import pickle
 
 
+import torch
+from utils.setup_elements import transforms_match
+
+import torch.nn as nn
+import torch.optim as optim
+import matplotlib.pyplot as plt
+import torchvision.transforms as transforms
+import torchvision
+
+from torch.utils.data import Dataset
+import pickle
+
+from sklearn.manifold import TSNE
+from sklearn.preprocessing import StandardScaler
+import torchvision.models as models_tsne
+
+
+
+
+def apply_tsne(self, features, labels, random_image_indices, perplexity=30, learning_rate=200, n_iter=1000):
+    # Standardize features
+    scaler = StandardScaler()
+    standardized_features = scaler.fit_transform(features)
+
+    # Apply t-SNE
+    tsne = TSNE(n_components=2, perplexity=perplexity, learning_rate=learning_rate, n_iter=n_iter, random_state=0)
+    reduced_features = tsne.fit_transform(standardized_features)
+
+    # Visualization
+    plt.figure(figsize=(4, 4))
+    colors = plt.cm.get_cmap('tab10', 10)  # Get a colormap with 10 distinct colors
+    for i in range(10):
+    
+        indices = [j for j, label in enumerate(labels) if label == i]
+        
+        # Split indices based on whether they are in random_image_indices
+        special_indices = [index for index in indices if index in random_image_indices]
+        normal_indices = [index for index in indices if index not in random_image_indices]
+    
+        # Plotting
+        color = colors(i)  # Get the color for the current class
+        plt.scatter(reduced_features[normal_indices, 0], reduced_features[normal_indices, 1], color=color, alpha=0.2, label=f'Class {i}', s=1)
+        if special_indices:
+            plt.scatter(reduced_features[special_indices, 0], reduced_features[special_indices, 1], color=color, marker='^', label=f'Class {i} special', s=30)
+    
+    
+    ##plt.legend()
+    plt.savefig("tsneCASPvar")
+
+
+
+
 def multiple_run(params, store=False, save_path=None):
     # Set up data stream
     start = time.time()
@@ -47,6 +99,59 @@ def multiple_run(params, store=False, save_path=None):
                 print("-----------run {} training batch {}-------------".format(run, i))
                 print('size: {}, {}'.format(x_train.shape, y_train.shape))
                 agent.train_learner(x_train, y_train)
+
+
+                if i == 0:
+                    print("we are hereee")
+
+
+
+                    train_dataset_tsne = dataset_transform(x_train, y_train, transform=transforms_match['cifar100'])
+                    train_loader_tsne = torch.utils.data.DataLoader(train_dataset_tsne, batch_size=10, shuffle=True, num_workers=0,
+                                                   drop_last=True)
+                                
+
+                    # Load and modify the ResNet18 model for 10 classes
+                    model_tsne = models_tsne.resnet18(pretrained=True)
+                    num_ftrs_tsne = model_tsne.fc.in_features
+                    model_tsne.fc = nn.Linear(num_ftrs_tsne, 10)  # 10 classes
+                    model_tsne = model_tsne.to('cuda')
+                    
+                    criterion_CASP = nn.CrossEntropyLoss()
+                    optimizer_CASP = optim.SGD(model_tsne.parameters(), lr=0.001,
+                                          momentum=0.9, weight_decay=5e-4)
+                    
+                    
+                    # Train the model
+                    num_epochs_tsne = 8  # Adjust number of epochs as necessary
+                    for epoch_tsne in range(num_epochs_tsne):
+                        model_tsne.train()
+                        running_loss_tsne = 0.0
+                        correct_tsne = 0
+                        total_tsne = 0
+                        for inputs_tsne, labels_tsne, ___tsne in train_loader_tsne:
+                            inputs_tsne, labels_tsne = inputs_tsne.to('cuda'), labels_tsne.to('cuda')
+                            optimizer_CASP.zero_grad()
+                            outputs_tsne = model_tsne(inputs_tsne)
+                            loss_tsne = criterion_CASP(outputs_tsne, labels_tsne)
+                            loss_tsne.backward()
+                            optimizer_CASP.step()
+                            running_loss_tsne += loss_tsne.item()
+                    
+                            # Calculate accuracy
+                            __tsne, predicted_tsne = torch.max(outputs_tsne.data, 1)
+                            total_tsne += labels_tsne.size(0)
+                            correct_tsne += (predicted_tsne == labels_tsne).sum().item()
+                    
+                        epoch_loss_tsne = running_loss_tsne / len(train_loader_tsne)
+                        epoch_accuracy_tsne = 100 * correct_tsne / total_tsne
+                        print("\n")
+                        print(f'Epoch {epoch_tsne+1}, Loss: {epoch_loss_tsne:.4f}, Accuracy: {epoch_accuracy_tsne:.2f}%')
+
+
+
+
+                
                 acc_array = agent.evaluate(test_loaders)
                 tmp_acc.append(acc_array)
             run_end = time.time()
