@@ -267,6 +267,13 @@ class ExperienceReplay(ContinualLearner):
                 counter__ +=1
                 list_of_indices.append(i)
 
+        
+        diction_1 = {i:0 for i in range(10)}
+        ff = self.buffer.buffer_label[list_of_indices]
+        for i in ff:
+            diction_1[i] +=1
+        
+        print(diction_1, "diction_1")
         print("self.buffer.buffer_label[list_of_indices]", self.buffer.buffer_label[list_of_indices])
         top_n = counter__
 
