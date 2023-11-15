@@ -89,7 +89,7 @@ class ExperienceReplay(ContinualLearner):
     
     
     def train_learner(self, x_train, y_train):
-        self.before_train(x_train, y_train)
+        
         # set up loader
         train_dataset = dataset_transform(x_train, y_train, transform=transforms_match[self.data])
         train_loader = data.DataLoader(train_dataset, batch_size=self.batch, shuffle=True, num_workers=0,
@@ -368,4 +368,3 @@ class ExperienceReplay(ContinualLearner):
         
         
         
-        self.after_train()
