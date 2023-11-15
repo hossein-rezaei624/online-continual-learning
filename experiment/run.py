@@ -34,7 +34,7 @@ import torchvision.models as models_tsne
 
 
 
-def apply_tsne(self, features, labels, random_image_indices, perplexity=30, learning_rate=200, n_iter=1000):
+def apply_tsne(features, labels, random_image_indices, perplexity=30, learning_rate=200, n_iter=1000):
     # Standardize features
     scaler = StandardScaler()
     standardized_features = scaler.fit_transform(features)
