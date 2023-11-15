@@ -16,6 +16,7 @@ import pickle
 
 import torch
 from utils.setup_elements import transforms_match
+from continuum.data_utils import dataset_transform
 
 import torch.nn as nn
 import torch.optim as optim
