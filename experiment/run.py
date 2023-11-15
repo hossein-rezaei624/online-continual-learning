@@ -62,7 +62,7 @@ def apply_tsne(features, labels, random_image_indices, perplexity=30, learning_r
     
     
     ##plt.legend()
-    plt.savefig("tsneCASPvar1313")
+    plt.savefig("tsneCASPvarplus")
 
 
 
@@ -127,7 +127,7 @@ def multiple_run(params, store=False, save_path=None):
                     
                     
                     # Train the model
-                    num_epochs_tsne = 13  # Adjust number of epochs as necessary
+                    num_epochs_tsne = 12  # Adjust number of epochs as necessary
                     for epoch_tsne in range(num_epochs_tsne):
                         model_tsne.train()
                         running_loss_tsne = 0.0
