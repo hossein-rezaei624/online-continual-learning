@@ -20,10 +20,6 @@ import math
 from torch.utils.data import Dataset
 import pickle
 
-from sklearn.manifold import TSNE
-from sklearn.preprocessing import StandardScaler
-import torchvision.models as models
-
 
 class ExperienceReplay(ContinualLearner):
     def __init__(self, model, opt, params):
@@ -90,37 +86,6 @@ class ExperienceReplay(ContinualLearner):
     
         return lst
     
-    
-        # Function to apply t-SNE and visualize the results
-    def apply_tsne(self, features, labels, random_image_indices, perplexity=30, learning_rate=200, n_iter=1000):
-        # Standardize features
-        scaler = StandardScaler()
-        standardized_features = scaler.fit_transform(features)
-    
-        # Apply t-SNE
-        tsne = TSNE(n_components=2, perplexity=perplexity, learning_rate=learning_rate, n_iter=n_iter, random_state=0)
-        reduced_features = tsne.fit_transform(standardized_features)
-    
-        # Visualization
-        plt.figure(figsize=(4, 4))
-        colors = plt.cm.get_cmap('tab10', 10)  # Get a colormap with 10 distinct colors
-        for i in range(10):
-        
-            indices = [j for j, label in enumerate(labels) if label == i]
-            
-            # Split indices based on whether they are in random_image_indices
-            special_indices = [index for index in indices if index in random_image_indices]
-            normal_indices = [index for index in indices if index not in random_image_indices]
-        
-            # Plotting
-            color = colors(i)  # Get the color for the current class
-            plt.scatter(reduced_features[normal_indices, 0], reduced_features[normal_indices, 1], color=color, alpha=0.2, label=f'Class {i}', s=1)
-            if special_indices:
-                plt.scatter(reduced_features[special_indices, 0], reduced_features[special_indices, 1], color=color, marker='^', label=f'Class {i} special', s=30)
-        
-        
-        ##plt.legend()
-        plt.savefig("tsneCASPvar")
     
     
     def train_learner(self, x_train, y_train):
@@ -402,42 +367,6 @@ class ExperienceReplay(ContinualLearner):
         
         
         
-        # Load and modify the ResNet50 model for 10 classes
-        model = models.resnet18(pretrained=True)
-        num_ftrs = model.fc.in_features
-        model.fc = nn.Linear(num_ftrs, 10)  # 10 classes
-        model = model.to(device)
-        
-        criterion_CASP = nn.CrossEntropyLoss()
-        optimizer_CASP = optim.SGD(model.parameters(), lr=0.001,
-                              momentum=0.9, weight_decay=5e-4)
-        
-        
-        # Train the model
-        num_epochs = 8  # Adjust number of epochs as necessary
-        for epoch in range(num_epochs):
-            model.train()
-            running_loss = 0.0
-            correct = 0
-            total = 0
-            for inputs, labels, __ in train_loader:
-                inputs, labels = inputs.to(device), labels.to(device)
-                optimizer_CASP.zero_grad()
-                outputs = model(inputs)
-                loss = criterion_CASP(outputs, labels)
-                loss.backward()
-                optimizer_CASP.step()
-                running_loss += loss.item()
-        
-                # Calculate accuracy
-                _, predicted = torch.max(outputs.data, 1)
-                total += labels.size(0)
-                correct += (predicted == labels).sum().item()
-        
-            epoch_loss = running_loss / len(train_loader)
-            epoch_accuracy = 100 * correct / total
-            print("\n")
-            print(f'Epoch {epoch+1}, Loss: {epoch_loss:.4f}, Accuracy: {epoch_accuracy:.2f}%')
 
         
         
