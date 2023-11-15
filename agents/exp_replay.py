@@ -271,7 +271,7 @@ class ExperienceReplay(ContinualLearner):
         diction_1 = {i:0 for i in range(10)}
         ff = self.buffer.buffer_label[list_of_indices]
         for i in ff:
-            diction_1[i] +=1
+            diction_1[i.item()] +=1
         
         print(diction_1, "diction_1")
         print("self.buffer.buffer_label[list_of_indices]", self.buffer.buffer_label[list_of_indices])
