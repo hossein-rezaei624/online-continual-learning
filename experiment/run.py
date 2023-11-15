@@ -110,7 +110,7 @@ def multiple_run(params, store=False, save_path=None):
                     x_train_tsne = x_train
                     y_train_tsne = y_train
 
-                    train_dataset_tsne = dataset_transform(x_train, y_train, transform=transforms_match['cifar100'])
+                    train_dataset_tsne = dataset_transform(x_train, y_train, transform=transforms_match[agent.data])
                     train_loader_tsne = torch.utils.data.DataLoader(train_dataset_tsne, batch_size=10, shuffle=True, num_workers=0,
                                                    drop_last=True)
                                 
