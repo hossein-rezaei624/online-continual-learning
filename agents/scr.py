@@ -40,63 +40,6 @@ class SupContrastReplay(ContinualLearner):
             RandomGrayscale(p=0.2)
 
         )
-        self.soft_ = nn.Softmax(dim=1)
-    
-    
-    
-    def distribute_samples(self, probabilities, M):
-        # Normalize the probabilities
-        total_probability = sum(probabilities.values())
-        normalized_probabilities = {k: v / total_probability for k, v in probabilities.items()}
-    
-        # Calculate the number of samples for each class
-        samples = {k: round(v * M) for k, v in normalized_probabilities.items()}
-        
-        # Check if there's any discrepancy due to rounding and correct it
-        discrepancy = M - sum(samples.values())
-        
-        for key in samples:
-            if discrepancy == 0:
-                break
-            if discrepancy > 0:
-                samples[key] += 1
-                discrepancy -= 1
-            elif discrepancy < 0 and samples[key] > 0:
-                samples[key] -= 1
-                discrepancy += 1
-
-        return samples
-
-
-    def distribute_excess(self, lst):
-        # Calculate the total excess value
-        total_excess = sum(val - 500 for val in lst if val > 500)
-    
-        # Number of elements that are not greater than 500
-        recipients = [i for i, val in enumerate(lst) if val < 500]
-    
-        num_recipients = len(recipients)
-    
-        # Calculate the average share and remainder
-        avg_share, remainder = divmod(total_excess, num_recipients)
-    
-        lst = [val if val <= 500 else 500 for val in lst]
-        
-        # Distribute the average share
-        for idx in recipients:
-            lst[idx] += avg_share
-        
-        # Distribute the remainder
-        for idx in recipients[:remainder]:
-            lst[idx] += 1
-        
-        # Cap values greater than 500
-        for i, val in enumerate(lst):
-            if val > 500:
-                return self.distribute_excess(lst)
-                break
-    
-        return lst
     
     
     
@@ -116,65 +59,13 @@ class SupContrastReplay(ContinualLearner):
         
 
         device = "cuda"
-        Model_Carto = ResNet18(len(unique_classes))
-        Model_Carto = Model_Carto.to(device)
-        criterion_ = nn.CrossEntropyLoss()
-        optimizer_ = optim.SGD(Model_Carto.parameters(), lr=0.1,
-                              momentum=0.9, weight_decay=5e-4)
-        scheduler_ = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer_, T_max=200)
+
         
 
         mapping = {value: index for index, value in enumerate(unique_classes)}
         reverse_mapping = {index: value for value, index in mapping.items()}
 
 
-        # Initializing the dictionaries        
-        confidence_by_class = {class_id: {epoch: [] for epoch in range(8)} for class_id, __ in enumerate(unique_classes)}
-
-        
-        # Training
-        Carto = torch.zeros((8, len(y_train)))
-        for epoch_ in range(8):
-            print('\nEpoch: %d' % epoch_)
-            Model_Carto.train()
-            train_loss = 0
-            correct = 0
-            total = 0
-            confidence_epoch = []
-            for batch_idx, (inputs, targets, indices_1) in enumerate(train_loader):
-                inputs, targets = inputs.to(device), targets.to(device)                
-                targets = torch.tensor([mapping[val.item()] for val in targets]).to(device)
-                
-                optimizer_.zero_grad()
-                outputs = Model_Carto(inputs)
-                soft_ = self.soft_(outputs)
-                confidence_batch = []
-        
-                # Accumulate confidences and counts
-                for i in range(targets.shape[0]):
-                    confidence_batch.append(soft_[i,targets[i]].item())
-                    
-                    # Update the dictionary with the confidence score for the current class for the current epoch
-                    confidence_by_class[targets[i].item()][epoch_].append(soft_[i, targets[i]].item())
-
-                loss = criterion_(outputs, targets)
-                loss.backward()
-                optimizer_.step()
-        
-                train_loss += loss.item()
-                _, predicted = outputs.max(1)
-                total += targets.size(0)
-                correct += predicted.eq(targets).sum().item()
-        
-                conf_tensor = torch.tensor(confidence_batch)
-                Carto[epoch_, indices_1] = conf_tensor
-                
-            print("Accuracy:", 100.*correct/total, ", and:", correct, "/", total, " ,loss:", train_loss/(batch_idx+1))
-
-            scheduler_.step()
-
-        mean_by_class = {class_id: {epoch: torch.mean(torch.tensor(confidences[epoch])) for epoch in confidences} for class_id, confidences in confidence_by_class.items()}
-        std_of_means_by_class = {class_id: torch.mean(torch.tensor([mean_by_class[class_id][epoch] for epoch in range(8)])) for class_id, __ in enumerate(unique_classes)}
 
                 
         
@@ -228,36 +119,15 @@ class SupContrastReplay(ContinualLearner):
 
 
 
-        updated_std_of_means_by_class = {k: 1 - v.item() for k, v in std_of_means_by_class.items()}
-        
-        ##print("updated_std_of_means_by_class", updated_std_of_means_by_class)
 
-        dist = self.distribute_samples(updated_std_of_means_by_class, top_n)
-
-        
         num_per_class = top_n//len(unique_classes)
         counter_class = [0 for _ in range(len(unique_classes))]
-
-        if len(y_train) == top_n:
-            condition = [num_per_class for _ in range(len(unique_classes))]
-            diff = top_n - num_per_class*len(unique_classes)
-            for o in range(diff):
-                condition[o] += 1
-        else:
-            condition = [value for k, value in dist.items()]
-
-
-        check_bound = len(y_train)/len(unique_classes)
-        ##print("check_bound", check_bound)
-        ##print("condition", condition, sum(condition))
-        for i in range(len(condition)):
-            if condition[i] > check_bound:
-                ##print("iiiiiiiii", i)
-                condition = self.distribute_excess(condition)
-                break
-
+        condition = [num_per_class for _ in range(len(unique_classes))]
+        diff = top_n - num_per_class*len(unique_classes)
+        for o in range(diff):
+            condition[o] += 1
         
-        #here
+
 
         class_indices = defaultdict(list)
         for idx, (_, label, __) in enumerate(train_dataset):
@@ -285,6 +155,5 @@ class SupContrastReplay(ContinualLearner):
 
         self.buffer.buffer_label[list_of_indices] = all_labels.to(device)
         self.buffer.buffer_img[list_of_indices] = all_images.to(device)
-
         
         self.after_train()
