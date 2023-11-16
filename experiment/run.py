@@ -60,6 +60,12 @@ def apply_tsne(features, labels, random_image_indices, perplexity=30, learning_r
         if special_indices:
             plt.scatter(reduced_features[special_indices, 0], reduced_features[special_indices, 1], color=color, marker='^', label=f'Class {i} special', s=30)
     
+
+        # Calculate centroid and annotate
+        centroid = np.mean(reduced_features[indices, :], axis=0)
+        plt.text(centroid[0], centroid[1], f'Class {i}', color=color, fontsize=9)
+
+
     
     ##plt.legend()
     plt.savefig("tsneASERplus")
