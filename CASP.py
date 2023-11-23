@@ -13,7 +13,7 @@ from torch.utils.data import Dataset
 import pickle
 
     
-self.soft_ = nn.Softmax(dim=1)
+soft_ = nn.Softmax(dim=1)
 
 def distribute_samples(probabilities, M):
     # Normalize the probabilities
@@ -109,7 +109,7 @@ def CASP_update(train_loader, Epoch, x_train, y_train, buffer):
             
             optimizer_.zero_grad()
             outputs = Model_Carto(inputs)
-            soft_ = self.soft_(outputs)
+            soft_ = soft_(outputs)
             confidence_batch = []
     
             # Accumulate confidences and counts
