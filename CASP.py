@@ -78,7 +78,7 @@ def CASP_update(train_loader, train_dataset, Epoch, x_train, y_train, buffer):
     
 
     device = "cuda"
-    Model_Carto = ResNet18(len(unique_classes))
+    Model_Carto = ResNet18(len(unique_classes), None)
     Model_Carto = Model_Carto.to(device)
     criterion_ = nn.CrossEntropyLoss()
     optimizer_ = optim.SGD(Model_Carto.parameters(), lr=0.1,
