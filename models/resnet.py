@@ -99,8 +99,8 @@ class ResNet(nn.Module):
         self.layer4 = self._make_layer(block, nf * 8, num_blocks[3], stride=2)
         self.linear = nn.Linear(nf * 8 * block.expansion, num_classes, bias=bias)
 
-        if self.params_name.agent == 'PCR':
-          if self.params_name.data == 'mini_imagenet':
+        if params_name.agent == 'PCR':
+          if params_name.data == 'mini_imagenet':
             self.pcrLinear = cosLinear(nf * 32 * block.expansion, num_classes)
           else:
             self.pcrLinear = cosLinear(nf * 8 * block.expansion, num_classes)
