@@ -176,7 +176,7 @@ class ContinualLearner(torch.nn.Module, metaclass=abc.ABCMeta):
                                            pred_label.tolist()] == batch_y.cpu().numpy()).sum().item() / batch_y.size(0)
 
 
-                    elif self.agent == 'ER_DVC':
+                    elif self.params.agent == 'ER_DVC':
                         y = self.model(batch_x,batch_x)
                         logits,_,_,_ = y
                         _, pred_label = torch.max(logits, 1)
