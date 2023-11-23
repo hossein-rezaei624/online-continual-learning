@@ -4,7 +4,7 @@ from utils.utils import maybe_cuda
 from collections import defaultdict
 from collections import Counter
 import random
-
+import torch.nn.functional as F
 
 def random_retrieve(buffer, num_retrieve, excl_indices=None, return_indices=False):
     filled_indices = np.arange(buffer.current_index)
@@ -160,6 +160,99 @@ class ClassBalancedRandomSampling:
             cls.class_index_cache = cls_ind_cache
 
 
+
+class ClassBalancedRandomSampling_MI:
+    # For faster label-based sampling (e.g., class balanced sampling), cache class-index via auxiliary dictionary
+    # Store {class, set of memory sample indices from class} key-value pairs to speed up label-based sampling
+    # e.g., {<cls_A>: {<ind_1>, <ind_2>}, <cls_B>: {}, <cls_C>: {<ind_3>}, ...}
+    class_index_cache = None
+    class_num_cache = None
+
+    @classmethod
+    def sample(cls, model, buffer_x, buffer_y, n_smp_cls, excl_indices=None, device="cpu"):
+        """
+            Take same number of random samples from each class from buffer.
+                Args:
+                    buffer_x (tensor): data buffer.
+                    buffer_y (tensor): label buffer.
+                    n_smp_cls (int): number of samples to take from each class.
+                    excl_indices (set): indices of buffered instances to be excluded from sampling.
+                    device (str): device for tensor allocation.
+                Returns
+                    x (tensor): class balanced random sample data tensor.
+                    y (tensor): class balanced random sample label tensor.
+                    sample_ind (tensor): class balanced random sample index tensor.
+        """
+        if excl_indices is None:
+            excl_indices = set()
+
+        # Get indices for class balanced random samples
+        # cls_ind_cache = class_index_tensor_list_cache(buffer_y, num_class, excl_indices, device=device)
+
+        sample_ind = torch.tensor([], device=device, dtype=torch.long)
+
+        # Use cache to retrieve indices belonging to each class in buffer
+        for ind_set in cls.class_index_cache.values():
+            if ind_set:
+                # Exclude some indices
+                valid_ind = ind_set - excl_indices
+                valid_ind = torch.Tensor(list(valid_ind)).long()
+                cand_x = buffer_x[valid_ind]
+                y = model.forward_mi(cand_x)
+                MI = -agmax_loss(y)
+                ind = MI.sort(descending=True)[1][:n_smp_cls]
+                # Apply permutation, and select indices
+                sample_ind = torch.cat((sample_ind, ind))
+
+        x = buffer_x[sample_ind]
+        y = buffer_y[sample_ind]
+
+        x = maybe_cuda(x)
+        y = maybe_cuda(y)
+
+        return x, y, sample_ind
+
+    @classmethod
+    def update_cache(cls, buffer_y, num_class, new_y=None, ind=None, device="cpu"):
+        """
+            Collect indices of buffered data from each class in set.
+            Update class_index_cache with list of such sets.
+                Args:
+                    buffer_y (tensor): label buffer.
+                    num_class (int): total number of unique class labels.
+                    new_y (tensor): label tensor for replacing memory samples at ind in buffer.
+                    ind (tensor): indices of memory samples to be updated.
+                    device (str): device for tensor allocation.
+        """
+        if cls.class_index_cache is None:
+            # Initialize caches
+            cls.class_index_cache = defaultdict(set)
+            cls.class_num_cache = torch.zeros(num_class, dtype=torch.long, device=device)
+
+        if new_y is not None:
+            # If ASER update is being used, keep updating existing caches
+            # Get labels of memory samples to be replaced
+            orig_y = buffer_y[ind]
+            # Update caches
+            for i, ny, oy in zip(ind, new_y, orig_y):
+                oy_int = oy.item()
+                ny_int = ny.item()
+                i_int = i.item()
+                # Update dictionary according to new class label of index i
+                if oy_int in cls.class_index_cache and i_int in cls.class_index_cache[oy_int]:
+                    cls.class_index_cache[oy_int].remove(i_int)
+                    cls.class_num_cache[oy_int] -= 1
+                cls.class_index_cache[ny_int].add(i_int)
+                cls.class_num_cache[ny_int] += 1
+        else:
+            # If only ASER retrieve is being used, reset cache and update it based on buffer
+            cls_ind_cache = defaultdict(set)
+            for i, c in enumerate(buffer_y):
+                cls_ind_cache[c.item()].add(i)
+            cls.class_index_cache = cls_ind_cache
+
+
+
 class BufferClassTracker(object):
     # For faster label-based sampling (e.g., class balanced sampling), cache class-index via auxiliary dictionary
     # Store {class, set of memory sample indices from class} key-value pairs to speed up label-based sampling
@@ -202,3 +295,44 @@ class BufferClassTracker(object):
     def check_tracker(self):
         print(self.class_num_cache.sum())
         print(len([k for i in self.class_index_cache.values() for k in i]))
+
+
+def agmax_loss(y):
+    z, zt, zzt = y
+    Pz = F.softmax(z, dim=1)
+    Pzt = F.softmax(zt, dim=1)
+    Pzzt = F.softmax(zzt, dim=1)
+
+    # -1/3*(H(z) + H(zt) + H(z, zt)), H(x) = -E[log(x)]
+    entropy = entropy_loss(Pz, Pzt, Pzzt)
+    return entropy
+
+
+def clamp_to_eps(Pz, Pzt, Pzzt):
+    eps = np.finfo(float).eps
+    # make sure no zero for log
+    Pz[(Pz < eps).data] = eps
+    Pzt[(Pzt < eps).data] = eps
+    Pzzt[(Pzzt < eps).data] = eps
+
+    return Pz, Pzt, Pzzt
+
+
+def batch_probability(Pz, Pzt, Pzzt):
+
+    Pz = Pz / Pz.sum()
+    Pzt = Pzt / Pzt.sum()
+    Pzzt = Pzzt / Pzzt.sum()
+
+    # return Pz, Pzt, Pzzt
+    return clamp_to_eps(Pz, Pzt, Pzzt)
+
+
+def entropy_loss(Pz, Pzt, Pzzt):
+    # negative entropy loss
+    Pz, Pzt, Pzzt = batch_probability(Pz, Pzt, Pzzt)
+    entropy = (Pz * torch.log(Pz)).sum(dim=1)
+    entropy += (Pzt * torch.log(Pzt)).sum(dim=1)
+    entropy += (Pzzt * torch.log(Pzzt)).sum(dim=1)
+    entropy /= 3
+    return entropy
