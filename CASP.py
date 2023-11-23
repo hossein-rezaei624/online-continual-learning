@@ -70,7 +70,7 @@ def distribute_excess(lst):
     return lst
 
 
-def CASP_update(train_loader, Epoch, x_train, y_train, buffer):
+def CASP_update(train_loader, train_dataset, Epoch, x_train, y_train, buffer):
         
     unique_classes = set()
     for _, labels, indices_1 in train_loader:
@@ -166,7 +166,7 @@ def CASP_update(train_loader, Epoch, x_train, y_train, buffer):
 
     
     subset_data = torch.utils.data.Subset(train_dataset, top_indices_sorted)
-    trainloader_C = torch.utils.data.DataLoader(subset_data, batch_size=self.batch, shuffle=False, num_workers=0)
+    trainloader_C = torch.utils.data.DataLoader(subset_data, batch_size=10, shuffle=False, num_workers=0)
 
     images_list = []
     labels_list = []
@@ -181,7 +181,7 @@ def CASP_update(train_loader, Epoch, x_train, y_train, buffer):
 
     updated_std_of_means_by_class = {k: v.item() for k, v in std_of_means_by_class.items()}
     
-    dist = self.distribute_samples(updated_std_of_means_by_class, top_n)
+    dist = distribute_samples(updated_std_of_means_by_class, top_n)
 
     
     num_per_class = top_n//len(unique_classes)
@@ -199,7 +199,7 @@ def CASP_update(train_loader, Epoch, x_train, y_train, buffer):
     check_bound = len(y_train)/len(unique_classes)
     for i in range(len(condition)):
         if condition[i] > check_bound:
-            condition = self.distribute_excess(condition)
+            condition = distribute_excess(condition)
             break
 
     
@@ -225,5 +225,3 @@ def CASP_update(train_loader, Epoch, x_train, y_train, buffer):
     buffer.buffer_label[list_of_indices] = shuffled_labels.to(device)
     buffer.buffer_img[list_of_indices] = shuffled_images.to(device)
     
-    
-    self.after_train()
