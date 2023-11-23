@@ -122,7 +122,7 @@ class ResNet(nn.Module):
         out = self.layer3(out)
         out = self.layer4(out)
         out = avg_pool2d(out, 4)
-        if self.params_name.agent == 'ER_DVC' and self.DVC_tri:
+        if params_name.agent == 'ER_DVC' and DVC_tri:
           out = out.contiguous().view(out.size(0), -1)
         else:
           out = out.view(out.size(0), -1)
@@ -136,7 +136,7 @@ class ResNet(nn.Module):
     def forward(self, x):
         out = self.features(x)
         logits = self.logits(out)
-        if self.params_name.agent == 'ER_DVC' and self.DVC_tri:
+        if params_name.agent == 'ER_DVC' and DVC_tri:
           return logits,out
         else:
           return logits
