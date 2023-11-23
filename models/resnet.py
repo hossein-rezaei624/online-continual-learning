@@ -235,7 +235,7 @@ def ResNet152(nclasses, nf=64, bias=True):
 
 class SupConResNet(nn.Module):
     """backbone + projection head"""
-    def __init__(self, dim_in=160, params_name, head='mlp', feat_dim=128):
+    def __init__(self, dim_in=160, params_name = None, head='mlp', feat_dim=128):
         super(SupConResNet, self).__init__()
         self.encoder = Reduced_ResNet18(100, params_name)
         if head == 'linear':
