@@ -70,7 +70,7 @@ def distribute_excess(lst):
     return lst
 
 
-def CASP_update(train_loader, train_dataset, Epoch, x_train, y_train, buffer):
+def CASP_update(train_loader, train_dataset, Epoch, x_train, y_train, buffer, params_name):
         
     unique_classes = set()
     for _, labels, indices_1 in train_loader:
@@ -78,7 +78,7 @@ def CASP_update(train_loader, train_dataset, Epoch, x_train, y_train, buffer):
     
 
     device = "cuda"
-    Model_Carto = ResNet18(len(unique_classes), None)
+    Model_Carto = ResNet18(len(unique_classes), params_name)
     Model_Carto = Model_Carto.to(device)
     criterion_ = nn.CrossEntropyLoss()
     optimizer_ = optim.SGD(Model_Carto.parameters(), lr=0.1,
