@@ -15,7 +15,7 @@ import pickle
     
 self.soft_ = nn.Softmax(dim=1)
 
-def distribute_samples(self, probabilities, M):
+def distribute_samples(probabilities, M):
     # Normalize the probabilities
     total_probability = sum(probabilities.values())
     normalized_probabilities = {k: v / total_probability for k, v in probabilities.items()}
@@ -39,7 +39,7 @@ def distribute_samples(self, probabilities, M):
     return samples
 
     
-def distribute_excess(self, lst):
+def distribute_excess(lst):
     # Calculate the total excess value
     total_excess = sum(val - 500 for val in lst if val > 500)
 
@@ -64,20 +64,14 @@ def distribute_excess(self, lst):
     # Cap values greater than 500
     for i, val in enumerate(lst):
         if val > 500:
-            return self.distribute_excess(lst)
+            return distribute_excess(lst)
             break
 
     return lst
 
 
-def train_learner(self, x_train, y_train):
-    self.before_train(x_train, y_train)
-    # set up loader
-    train_dataset = dataset_transform(x_train, y_train, transform=transforms_match[self.data])
-    train_loader = data.DataLoader(train_dataset, batch_size=self.batch, shuffle=True, num_workers=0,
-                                   drop_last=True)
-    
-    
+def CASP_update(train_loader, Epoch, x_train, y_train, buffer):
+        
     unique_classes = set()
     for _, labels, indices_1 in train_loader:
         unique_classes.update(labels.numpy())
@@ -97,12 +91,12 @@ def train_learner(self, x_train, y_train):
 
 
     # Initializing the dictionaries        
-    confidence_by_class = {class_id: {epoch: [] for epoch in range(6)} for class_id, __ in enumerate(unique_classes)}
+    confidence_by_class = {class_id: {epoch: [] for epoch in range(Epoch)} for class_id, __ in enumerate(unique_classes)}
 
     
     # Training
-    Carto = torch.zeros((6, len(y_train)))
-    for epoch_ in range(6):
+    Carto = torch.zeros((Epoch, len(y_train)))
+    for epoch_ in range(Epoch):
         print('\nEpoch: %d' % epoch_)
         Model_Carto.train()
         train_loss = 0
@@ -142,82 +136,17 @@ def train_learner(self, x_train, y_train):
         scheduler_.step()
 
     mean_by_class = {class_id: {epoch: torch.mean(torch.tensor(confidences[epoch])) for epoch in confidences} for class_id, confidences in confidence_by_class.items()}
-    std_of_means_by_class = {class_id: torch.std(torch.tensor([mean_by_class[class_id][epoch] for epoch in range(6)])) for class_id, __ in enumerate(unique_classes)}
+    std_of_means_by_class = {class_id: torch.std(torch.tensor([mean_by_class[class_id][epoch] for epoch in range(Epoch)])) for class_id, __ in enumerate(unique_classes)}
     
-    ##print("std_of_means_by_class", std_of_means_by_class)
 
     Confidence_mean = Carto.mean(dim=0)
     Variability = Carto.std(dim=0)
     
-    ##plt.scatter(Variability, Confidence_mean, s = 2)
-    
-    ##plt.xlabel("Variability") 
-    ##plt.ylabel("Confidence") 
-    
-    ##plt.savefig('scatter_plot.png')
-
-   
-    
-    # set up model
-    self.model = self.model.train()
-    for ep in range(self.epoch):
-        for i, batch_data in enumerate(train_loader):
-            # batch update
-            batch_x, batch_y, indices_1 = batch_data
-            batch_x_aug = torch.stack([transforms_aug[self.data](batch_x[idx].cpu())
-                                       for idx in range(batch_x.size(0))])
-            batch_x = maybe_cuda(batch_x, self.cuda)
-            batch_x_aug = maybe_cuda(batch_x_aug, self.cuda)
-            batch_y = maybe_cuda(batch_y, self.cuda)
-            batch_x_combine = torch.cat((batch_x, batch_x_aug))
-            batch_y_combine = torch.cat((batch_y, batch_y))
-            for j in range(self.mem_iters):
-                logits, feas= self.model.pcrForward(batch_x_combine)
-                novel_loss = 0*self.criterion(logits, batch_y_combine)
-                self.opt.zero_grad()
-
-
-                mem_x, mem_y = self.buffer.retrieve(x=batch_x, y=batch_y)
-                if mem_x.size(0) > 0:
-                    # mem_x, mem_y = Rotation(mem_x, mem_y)
-                    mem_x_aug = torch.stack([transforms_aug[self.data](mem_x[idx].cpu())
-                                             for idx in range(mem_x.size(0))])
-                    mem_x = maybe_cuda(mem_x, self.cuda)
-                    mem_x_aug = maybe_cuda(mem_x_aug, self.cuda)
-                    mem_y = maybe_cuda(mem_y, self.cuda)
-                    mem_x_combine = torch.cat([mem_x, mem_x_aug])
-                    mem_y_combine = torch.cat([mem_y, mem_y])
-
-
-                    mem_logits, mem_fea= self.model.pcrForward(mem_x_combine)
-
-                    combined_feas = torch.cat([mem_fea, feas])
-                    combined_labels = torch.cat((mem_y_combine, batch_y_combine))
-                    combined_feas_aug = self.model.pcrLinear.L.weight[combined_labels]
-
-                    combined_feas_norm = torch.norm(combined_feas, p=2, dim=1).unsqueeze(1).expand_as(combined_feas)
-                    combined_feas_normalized = combined_feas.div(combined_feas_norm + 0.000001)
-
-                    combined_feas_aug_norm = torch.norm(combined_feas_aug, p=2, dim=1).unsqueeze(1).expand_as(
-                        combined_feas_aug)
-                    combined_feas_aug_normalized = combined_feas_aug.div(combined_feas_aug_norm + 0.000001)
-                    cos_features = torch.cat([combined_feas_normalized.unsqueeze(1),
-                                              combined_feas_aug_normalized.unsqueeze(1)],
-                                             dim=1)
-                    PSC = SupConLoss(temperature=0.09, contrast_mode='proxy')
-                    novel_loss += PSC(features=cos_features, labels=combined_labels)
-
-
-                novel_loss.backward()
-                self.opt.step()
-            # update mem
-            self.buffer.update(batch_x, batch_y)
-
 
     list_of_indices = []
     counter__ = 0
-    for i in range(self.buffer.buffer_label.shape[0]):
-        if self.buffer.buffer_label[i].item() in unique_classes:
+    for i in range(buffer.buffer_label.shape[0]):
+        if buffer.buffer_label[i].item() in unique_classes:
             counter__ +=1
             list_of_indices.append(i)
 
@@ -227,21 +156,13 @@ def train_learner(self, x_train, y_train):
     sorted_indices_1 = np.argsort(Confidence_mean.numpy())
     sorted_indices_2 = np.argsort(Variability.numpy())
     
-    #top_indices_1 = sorted_indices_1[:top_n] #hard to learn
-    #top_indices_sorted = top_indices_1 #hard to learn
-    
-    #top_indices_1 = sorted_indices_1[-top_n:] #easy to learn
-    #top_indices_sorted = top_indices_1[::-1] #easy to learn
-    
-    #top_indices_1 = sorted_indices_2[-top_n:] #ambigiuous
-    #top_indices_sorted = top_indices_1[::-1] #ambiguous
 
 
-    ##top_indices_sorted = sorted_indices_1 #hard to learn
+    ##top_indices_sorted = sorted_indices_1 #hard
     
-    ##top_indices_sorted = sorted_indices_1[::-1] #easy to learn
+    ##top_indices_sorted = sorted_indices_1[::-1] #simple
 
-    top_indices_sorted = sorted_indices_2[::-1] #ambiguous
+    top_indices_sorted = sorted_indices_2[::-1] #challenging
 
     
     subset_data = torch.utils.data.Subset(train_dataset, top_indices_sorted)
@@ -260,8 +181,6 @@ def train_learner(self, x_train, y_train):
 
     updated_std_of_means_by_class = {k: v.item() for k, v in std_of_means_by_class.items()}
     
-    ##print("updated_std_of_means_by_class", updated_std_of_means_by_class)
-
     dist = self.distribute_samples(updated_std_of_means_by_class, top_n)
 
     
@@ -278,16 +197,12 @@ def train_learner(self, x_train, y_train):
 
 
     check_bound = len(y_train)/len(unique_classes)
-    ##print("check_bound", check_bound)
-    ##print("condition", condition, sum(condition))
     for i in range(len(condition)):
         if condition[i] > check_bound:
-            ##print("iiiiiiiii", i)
             condition = self.distribute_excess(condition)
             break
 
     
-    ##print("condition", condition, sum(condition), "top_n", top_n)
     images_list_ = []
     labels_list_ = []
     
@@ -297,7 +212,6 @@ def train_learner(self, x_train, y_train):
             labels_list_.append(all_labels[i])
             images_list_.append(all_images[i])
         if counter_class == condition:
-            ##print("yesssss")
             break
 
     
@@ -307,10 +221,9 @@ def train_learner(self, x_train, y_train):
     indices = torch.randperm(all_images_.size(0))
     shuffled_images = all_images_[indices]
     shuffled_labels = all_labels_[indices]
-    ##print("shuffled_labels.shape", shuffled_labels.shape)
     
-    self.buffer.buffer_label[list_of_indices] = shuffled_labels.to(device)
-    self.buffer.buffer_img[list_of_indices] = shuffled_images.to(device)
+    buffer.buffer_label[list_of_indices] = shuffled_labels.to(device)
+    buffer.buffer_img[list_of_indices] = shuffled_images.to(device)
     
     
     self.after_train()
