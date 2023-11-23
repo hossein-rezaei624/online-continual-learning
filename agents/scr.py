@@ -8,6 +8,8 @@ from utils.utils import maybe_cuda, AverageMeter
 from kornia.augmentation import RandomResizedCrop, RandomHorizontalFlip, ColorJitter, RandomGrayscale
 import torch.nn as nn
 
+from CASP import CASP_update
+
 class SupContrastReplay(ContinualLearner):
     def __init__(self, model, opt, params):
         super(SupContrastReplay, self).__init__(model, opt, params)
@@ -15,6 +17,7 @@ class SupContrastReplay(ContinualLearner):
         self.mem_size = params.mem_size
         self.eps_mem_batch = params.eps_mem_batch
         self.mem_iters = params.mem_iters
+        self.params_name = params
         self.transform = nn.Sequential(
             RandomResizedCrop(size=(input_size_match[self.params.data][1], input_size_match[self.params.data][2]), scale=(0.2, 1.)),
             RandomHorizontalFlip(),
@@ -66,4 +69,8 @@ class SupContrastReplay(ContinualLearner):
                             '==>>> it: {}, avg. loss: {:.6f}, '
                                 .format(i, losses.avg(), acc_batch.avg())
                         )
+        
+        if self.params_name.CASP:
+            CASP_update(train_loader, train_dataset, self.params_name.CASP_Epoch, x_train, y_train, self.buffer, self.params_name)
+        
         self.after_train()
