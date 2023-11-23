@@ -1,3 +1,4 @@
+import torch
 import torch.nn as nn
 from models.resnet import ResNet18
 import numpy as np
