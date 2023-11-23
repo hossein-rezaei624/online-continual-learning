@@ -60,6 +60,11 @@ class SupConLoss(nn.Module):
         elif self.contrast_mode == 'all':
             anchor_feature = contrast_feature
             anchor_count = contrast_count
+        elif self.contrast_mode == 'proxy':
+            anchor_feature = features[:, 0]
+            contrast_feature = features[:, 1]
+            anchor_count = 1
+            contrast_count = 1
         else:
             raise ValueError('Unknown mode: {}'.format(self.contrast_mode))
 
@@ -80,10 +85,13 @@ class SupConLoss(nn.Module):
             torch.arange(batch_size * anchor_count).view(-1, 1).to(device),
             0
         )
-        mask = mask * logits_mask
 
         # compute log_prob
-        exp_logits = torch.exp(logits) * logits_mask
+        if self.contrast_mode == 'proxy':
+            exp_logits = torch.exp(logits)
+        else:
+            mask = mask * logits_mask
+            exp_logits = torch.exp(logits) * logits_mask
         log_prob = logits - torch.log(exp_logits.sum(1, keepdim=True))
 
         # compute mean of log-likelihood over positive
