@@ -191,6 +191,13 @@ if __name__ == "__main__":
                         help='warmup of buffer before retrieve')
     parser.add_argument('--head', type=str, default='mlp',
                         help='projection head')
+    
+    ########################CASP#######################
+    parser.add_argument('--CASP', default=False, type=boolean_string,
+                        help='Enable CASP update strategy when set to True.')
+    parser.add_argument('--CASP_Epoch', default=8, type=int,
+                        help='The number of epochs used for CASP model.')
+    
     args = parser.parse_args()
     args.cuda = torch.cuda.is_available()
     main(args)
