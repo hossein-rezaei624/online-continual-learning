@@ -7,6 +7,7 @@ from utils.setup_elements import transforms_match, transforms_aug
 from utils.utils import maybe_cuda
 from utils.loss import SupConLoss
 
+from CASP import CASP_update
 
 class ProxyContrastiveReplay(ContinualLearner):
     """
@@ -25,6 +26,7 @@ class ProxyContrastiveReplay(ContinualLearner):
         self.mem_size = params.mem_size
         self.eps_mem_batch = params.eps_mem_batch
         self.mem_iters = params.mem_iters
+        self.params_name = params
 
     def train_learner(self, x_train, y_train):
         self.before_train(x_train, y_train)
@@ -87,4 +89,8 @@ class ProxyContrastiveReplay(ContinualLearner):
                 # update mem
                 self.buffer.update(batch_x, batch_y)
 
+        if self.params_name.CASP:
+            CASP_update(train_loader, train_dataset, self.params_name.CASP_Epoch, x_train, y_train, self.buffer, self.params_name)
+        
+        
         self.after_train()
