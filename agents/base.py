@@ -174,6 +174,17 @@ class ContinualLearner(torch.nn.Module, metaclass=abc.ABCMeta):
                         # _, preds = torch.matmul(means, feature).max(0)
                         correct_cnt = (np.array(self.old_labels)[
                                            pred_label.tolist()] == batch_y.cpu().numpy()).sum().item() / batch_y.size(0)
+
+
+                    elif self.params.agent=='PCR':
+                        logits, _ = self.model.pcrForward(batch_x)
+                        # mask = torch.zeros_like(logits)
+                        # mask[:, self.old_labels] = 1
+                        # logits = logits.masked_fill(mask == 0, -1e9)
+                        _, pred_label = torch.max(logits, 1)
+                        correct_cnt = (pred_label == batch_y).sum().item() / batch_y.size(0)
+
+
                     else:
                         logits = self.model.forward(batch_x)
                         _, pred_label = torch.max(logits, 1)
