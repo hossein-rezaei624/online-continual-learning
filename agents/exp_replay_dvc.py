@@ -9,6 +9,7 @@ from utils.utils import maybe_cuda, AverageMeter
 from torchvision.transforms import RandomResizedCrop, RandomHorizontalFlip, ColorJitter, RandomGrayscale
 from loss import agmax_loss, cross_entropy_loss
 
+from CASP import CASP_update
 
 class ExperienceReplay_DVC(ContinualLearner):
     def __init__(self, model, opt, params):
@@ -20,6 +21,7 @@ class ExperienceReplay_DVC(ContinualLearner):
 
         self.eps_mem_batch = params.eps_mem_batch
         self.mem_iters = params.mem_iters
+        self.params_name = params
         self.transform = nn.Sequential(
             RandomResizedCrop(size=(input_size_match[self.params.data][1], input_size_match[self.params.data][2]), scale=(0.2, 1.)),
             RandomHorizontalFlip(),
@@ -124,4 +126,8 @@ class ExperienceReplay_DVC(ContinualLearner):
                         'running mem acc: {:.3f}'
                             .format(i, losses_mem.avg(), acc_mem.avg())
                     )
+        
+        if self.params_name.CASP:
+            CASP_update(train_loader, train_dataset, self.params_name.CASP_Epoch, x_train, y_train, self.buffer, self.params_name)
+        
         self.after_train()
