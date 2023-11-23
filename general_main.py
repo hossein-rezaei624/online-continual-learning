@@ -26,7 +26,7 @@ if __name__ == "__main__":
     # Commandline arguments
     parser = argparse.ArgumentParser(description="Online Continual Learning PyTorch")
     ########################General#########################
-    parser.add_argument('--num_runs', dest='num_runs', default=1, type=int,
+    parser.add_argument('--num_runs', dest='num_runs', default=10, type=int,
                         help='Number of runs (default: %(default)s)')
     parser.add_argument('--seed', dest='seed', default=0, type=int,
                         help='Random seed')
@@ -48,11 +48,11 @@ if __name__ == "__main__":
 
     ########################Agent#########################
     parser.add_argument('--agent', dest='agent', default='ER',
-                        choices=['ER', 'EWC', 'AGEM', 'CNDPM', 'LWF', 'ICARL', 'GDUMB', 'ASER', 'SCR'],
+                        choices=['ER', 'EWC', 'AGEM', 'CNDPM', 'LWF', 'ICARL', 'GDUMB', 'ASER', 'SCR', 'PCR', 'ER_DVC'],
                         help='Agent selection  (default: %(default)s)')
     parser.add_argument('--update', dest='update', default='random', choices=['random', 'GSS', 'ASER'],
                         help='Update method  (default: %(default)s)')
-    parser.add_argument('--retrieve', dest='retrieve', default='random', choices=['MIR', 'random', 'ASER', 'match', 'mem_match'],
+    parser.add_argument('--retrieve', dest='retrieve', default='random', choices=['MIR', 'random', 'ASER', 'match', 'mem_match', 'MGI'],
                         help='Retrieve method  (default: %(default)s)')
 
     ########################Optimizer#########################
@@ -61,7 +61,7 @@ if __name__ == "__main__":
     parser.add_argument('--learning_rate', dest='learning_rate', default=0.1,
                         type=float,
                         help='Learning_rate (default: %(default)s)')
-    parser.add_argument('--epoch', dest='epoch', default=1,
+    parser.add_argument('--epoch', dest='epoch', default=25,
                         type=int,
                         help='The number of epochs used for one task. (default: %(default)s)')
     parser.add_argument('--batch', dest='batch', default=10,
@@ -83,7 +83,7 @@ if __name__ == "__main__":
     parser.add_argument('--plot_sample', dest='plot_sample', default=False,
                         type=boolean_string,
                         help='In NI scenario, should sample images be plotted (default: %(default)s)')
-    parser.add_argument('--data', dest='data', default="cifar10",
+    parser.add_argument('--data', dest='data', default="cifar100",
                         help='Path to the dataset. (default: %(default)s)')
     parser.add_argument('--cl_type', dest='cl_type', default="nc", choices=['nc', 'ni'],
                         help='Continual learning type: new class "nc" or new instance "ni". (default: %(default)s)')
@@ -99,7 +99,7 @@ if __name__ == "__main__":
                         help='If False, offline training will be performed (default: %(default)s)')
 
     ########################ER#########################
-    parser.add_argument('--mem_size', dest='mem_size', default=10000,
+    parser.add_argument('--mem_size', dest='mem_size', default=1000,
                         type=int,
                         help='Memory buffer size (default: %(default)s)')
     parser.add_argument('--eps_mem_batch', dest='eps_mem_batch', default=10,
@@ -152,6 +152,11 @@ if __name__ == "__main__":
                         help='value for gradient clipping')
     parser.add_argument('--mem_epoch', dest='mem_epoch', default=70, type=int, help='Epochs to train for memory')
 
+
+    ########################DVC#######################
+    parser.add_argument('--dl_weight', dest='dl_weight', default=4.0,
+                        type=float, help='weight of dl loss')
+    
     #######################Tricks#########################
     parser.add_argument('--labels_trick', dest='labels_trick', default=False, type=boolean_string,
                         help='Labels trick')
