@@ -105,6 +105,7 @@ class ExperienceReplay(ContinualLearner):
                             .format(i, losses_mem.avg(), acc_mem.avg())
                     )
         
-        CASP_update(train_loader, train_dataset, 8, x_train, y_train, self.buffer, self.params_name)
+        if self.params_name.CASP:
+            CASP_update(train_loader, train_dataset, self.params_name.CASP_Epoch, x_train, y_train, self.buffer, self.params_name)
         
         self.after_train()
