@@ -87,7 +87,7 @@ class cosLinear(nn.Module):
         return scores
 
 class ResNet(nn.Module):
-    def __init__(self, block, num_blocks, num_classes, nf, bias):
+    def __init__(self, block, num_blocks, num_classes, params_name, DVC_tri, nf, bias):
         super(ResNet, self).__init__()
         self.in_planes = nf
         self.conv1 = conv3x3(3, nf * 1)
@@ -121,7 +121,7 @@ class ResNet(nn.Module):
         out = self.layer3(out)
         out = self.layer4(out)
         out = avg_pool2d(out, 4)
-        if params_name.agent == 'ER_DVC':
+        if params_name.agent == 'ER_DVC' and DVC_tri:
           out = out.contiguous().view(out.size(0), -1)
         else:
           out = out.view(out.size(0), -1)
@@ -135,7 +135,7 @@ class ResNet(nn.Module):
     def forward(self, x):
         out = self.features(x)
         logits = self.logits(out)
-        if params_name.agent == 'ER_DVC':
+        if params_name.agent == 'ER_DVC' and DVC_tri:
           return logits,out
         else:
           return logits
@@ -202,17 +202,17 @@ def Reduced_ResNet18_DVC(nclasses, params_name, nf=20, bias=True):
     """
     Reduced ResNet18 as in GEM MIR(note that nf=20).
     """
-    backnone = ResNet(BasicBlock, [2, 2, 2, 2], nclasses, params_name, nf, bias)
+    backnone = ResNet(BasicBlock, [2, 2, 2, 2], nclasses, params_name, True, nf, bias)
     return DVCNet(backbone=backnone,n_units=128,n_classes=nclasses,has_mi_qnet=True)
 
 def Reduced_ResNet18(nclasses, params_name, nf=20, bias=True):
     """
     Reduced ResNet18 as in GEM MIR(note that nf=20).
     """
-    return ResNet(BasicBlock, [2, 2, 2, 2], nclasses, params_name, nf, bias)
+    return ResNet(BasicBlock, [2, 2, 2, 2], nclasses, params_name, False, nf, bias)
 
 def ResNet18(nclasses, params_name, nf=64, bias=True):
-    return ResNet(BasicBlock, [2, 2, 2, 2], nclasses, params_name, nf, bias)
+    return ResNet(BasicBlock, [2, 2, 2, 2], nclasses, params_name, False, nf, bias)
 
 '''
 See https://github.com/kuangliu/pytorch-cifar/blob/master/models/resnet.py
