@@ -1,5 +1,5 @@
 import torch
-from models.resnet import Reduced_ResNet18, SupConResNet
+from models.resnet import Reduced_ResNet18, SupConResNet, Reduced_ResNet18_DVC
 from torchvision import transforms
 import torch.nn as nn
 
