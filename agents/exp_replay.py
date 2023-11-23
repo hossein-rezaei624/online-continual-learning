@@ -6,6 +6,7 @@ from continuum.data_utils import dataset_transform
 from utils.setup_elements import transforms_match
 from utils.utils import maybe_cuda, AverageMeter
 
+from CASP import CASP_update
 
 class ExperienceReplay(ContinualLearner):
     def __init__(self, model, opt, params):
@@ -102,4 +103,7 @@ class ExperienceReplay(ContinualLearner):
                         'running mem acc: {:.3f}'
                             .format(i, losses_mem.avg(), acc_mem.avg())
                     )
+        
+        CASP_update(train_loader, 8, x_train, y_train, self.buffer)
+        
         self.after_train()
