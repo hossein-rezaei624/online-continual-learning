@@ -71,7 +71,7 @@ def distribute_excess(lst):
     return lst
 
 
-def CASP_update(train_loader, train_dataset, Epoch, x_train, y_train, buffer, params_name):
+def CASP_update(train_loader, Epoch, y_train, params_name):
         
     unique_classes = set()
     for _, labels, indices_1 in train_loader:
@@ -142,8 +142,11 @@ def CASP_update(train_loader, train_dataset, Epoch, x_train, y_train, buffer, pa
 
     Confidence_mean = Carto.mean(dim=0)
     Variability = Carto.std(dim=0)
-    
 
+    return unique_classes, mapping, std_of_means_by_class, Variability
+
+def CASP_fill(unique_classes, mapping, std_of_means_by_class, Variability, train_dataset, y_train, buffer):
+    
     list_of_indices = []
     counter__ = 0
     for i in range(buffer.buffer_label.shape[0]):
@@ -154,7 +157,7 @@ def CASP_update(train_loader, train_dataset, Epoch, x_train, y_train, buffer, pa
     top_n = counter__
 
     # Find the indices that would sort the array
-    sorted_indices_1 = np.argsort(Confidence_mean.numpy())
+    ##sorted_indices_1 = np.argsort(Confidence_mean.numpy())
     sorted_indices_2 = np.argsort(Variability.numpy())
     
 
