@@ -38,35 +38,35 @@ def distribute_samples(probabilities, M):
     return samples
 
     
-def distribute_excess(lst):
+def distribute_excess(condition, max_samples_per_class):
     # Calculate the total excess value
-    total_excess = sum(val - 500 for val in lst if val > 500)
+    total_excess = sum(val - max_samples_per_class for val in condition if val > max_samples_per_class)
 
     # Number of elements that are not greater than 500
-    recipients = [i for i, val in enumerate(lst) if val < 500]
+    recipients = [i for i, val in enumerate(condition) if val < max_samples_per_class]
 
     num_recipients = len(recipients)
 
     # Calculate the average share and remainder
     avg_share, remainder = divmod(total_excess, num_recipients)
 
-    lst = [val if val <= 500 else 500 for val in lst]
+    condition = [val if val <= max_samples_per_class else max_samples_per_class for val in condition]
     
     # Distribute the average share
     for idx in recipients:
-        lst[idx] += avg_share
+        condition[idx] += avg_share
     
     # Distribute the remainder
     for idx in recipients[:remainder]:
-        lst[idx] += 1
+        condition[idx] += 1
     
-    # Cap values greater than 500
-    for i, val in enumerate(lst):
-        if val > 500:
-            return distribute_excess(lst)
+    # Cap values greater than max_samples_per_class
+    for i, val in enumerate(condition):
+        if val > max_samples_per_class:
+            return distribute_excess(condition)
             break
 
-    return lst
+    return condition
 
 
 def CASP_update(train_loader, train_dataset, Epoch, x_train, y_train, buffer, params_name):
@@ -192,7 +192,7 @@ def CASP_update(train_loader, train_dataset, Epoch, x_train, y_train, buffer, pa
     max_samples_per_class = len(y_train)/len(unique_classes)
     for i in range(len(condition)):
         if condition[i] > max_samples_per_class:
-            condition = distribute_excess(condition)
+            condition = distribute_excess(condition, max_samples_per_class)
             break
     
     images_list_ = []
