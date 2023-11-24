@@ -226,6 +226,6 @@ def CASP_fill(unique_classes, mapping, std_of_means_by_class, Variability, train
     shuffled_images = all_images_[indices]
     shuffled_labels = all_labels_[indices]
     
-    buffer.buffer_label[list_of_indices] = shuffled_labels.to(device)
-    buffer.buffer_img[list_of_indices] = shuffled_images.to(device)
+    buffer.buffer_label[list_of_indices] = shuffled_labels.to("cuda")
+    buffer.buffer_img[list_of_indices] = shuffled_images.to("cuda")
     
