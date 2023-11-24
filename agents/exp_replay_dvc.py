@@ -9,7 +9,7 @@ from utils.utils import maybe_cuda, AverageMeter
 from torchvision.transforms import RandomResizedCrop, RandomHorizontalFlip, ColorJitter, RandomGrayscale
 from loss import agmax_loss, cross_entropy_loss
 
-from CASP import CASP_update
+from CASP import CASP_update, CASP_fill
 
 class ExperienceReplay_DVC(ContinualLearner):
     def __init__(self, model, opt, params):
@@ -37,6 +37,11 @@ class ExperienceReplay_DVC(ContinualLearner):
         train_dataset = dataset_transform(x_train, y_train, transform=transforms_match[self.data])
         train_loader = data.DataLoader(train_dataset, batch_size=self.batch, shuffle=True, num_workers=0,
                                        drop_last=True)
+        
+        if self.params_name.CASP:
+            unique_classes, mapping, std_of_means_by_class, Variability = CASP_update(train_loader, self.params_name.CASP_Epoch, y_train, self.params_name)
+        
+        
         # set up model
         self.model = self.model.train()
         self.transform = self.transform.cuda()
@@ -128,6 +133,6 @@ class ExperienceReplay_DVC(ContinualLearner):
                     )
         
         if self.params_name.CASP:
-            CASP_update(train_loader, train_dataset, self.params_name.CASP_Epoch, x_train, y_train, self.buffer, self.params_name)
+            CASP_fill(unique_classes, mapping, std_of_means_by_class, Variability, train_dataset, y_train, self.buffer)
         
         self.after_train()
