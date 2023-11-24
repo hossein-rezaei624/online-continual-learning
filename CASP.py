@@ -16,7 +16,11 @@ import pickle
 
 def distribute_samples(probabilities, M):
     # Normalize the probabilities
+    # Sum up the total probability to use for normalization    
     total_probability = sum(probabilities.values())
+
+    # Create a new dictionary with normalized probabilities
+    # Each probability is divided by the total to ensure they sum up to 1
     normalized_probabilities = {k: v / total_probability for k, v in probabilities.items()}
 
     # Calculate the number of samples for each class
@@ -24,17 +28,22 @@ def distribute_samples(probabilities, M):
     
     # Check if there's any discrepancy due to rounding and correct it
     discrepancy = M - sum(samples.values())
-    
+
+    # Iterate over each class to adjust the number of samples
     for key in samples:
+        # If there is no discrepancy, stop adjusting
         if discrepancy == 0:
             break
+        # If we have fewer samples than M, add a sample to the current class
         if discrepancy > 0:
             samples[key] += 1
             discrepancy -= 1
+        # If we have more samples than M, remove a sample from the current class if possible
         elif discrepancy < 0 and samples[key] > 0:
             samples[key] -= 1
             discrepancy += 1
 
+    # Return the final distribution of samples
     return samples
 
     
