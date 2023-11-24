@@ -40,6 +40,12 @@ class GSSGreedyUpdate(object):
                 # replace samples with outcome =1
                 added_indx = torch.arange(end=batch_item_sim.size(0))
                 sub_index = outcome.squeeze(1).bool()
+
+                buffer.buffer_img = buffer.buffer_img.to("cuda")
+                x = x.to("cuda")
+                added_indx = added_indx.to("cuda")
+                index = index.to("cuda")
+                
                 buffer.buffer_img[index[sub_index]] = x[added_indx[sub_index]].clone()
                 buffer.buffer_label[index[sub_index]] = y[added_indx[sub_index]].clone()
                 self.buffer_score[index[sub_index]] = batch_item_sim[added_indx[sub_index]].clone()
