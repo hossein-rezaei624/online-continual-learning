@@ -78,7 +78,7 @@ def distribute_excess(condition, max_samples_per_class):
     return condition
 
 
-def CASP_update(train_loader, train_dataset, Epoch, x_train, y_train, buffer, params_name):
+def CASP_update(train_loader, train_dataset, CASP_Epoch, x_train, y_train, buffer, params_name):
         
     # Identify unique classes in the dataset
     unique_classes = set()
@@ -101,12 +101,12 @@ def CASP_update(train_loader, train_dataset, Epoch, x_train, y_train, buffer, pa
 
 
     # Initialize dictionaries to store confidence scores by class        
-    confidence_by_class = {class_id: {epoch: [] for epoch in range(Epoch)} for class_id, __ in enumerate(unique_classes)}
+    confidence_by_class = {class_id: {epoch: [] for epoch in range(CASP_Epoch)} for class_id, __ in enumerate(unique_classes)}
 
     
     # Training
-    confidence_by_sample = torch.zeros((Epoch, len(y_train)))
-    for epoch in range(Epoch):
+    confidence_by_sample = torch.zeros((CASP_Epoch, len(y_train)))
+    for epoch in range(CASP_Epoch):
         print('\nEpoch: %d' % epoch)
         CASP_Model.train()
         train_loss = 0
@@ -148,7 +148,7 @@ def CASP_update(train_loader, train_dataset, Epoch, x_train, y_train, buffer, pa
 
     # Calculate mean and standard deviation of confidence scores
     mean_by_class = {class_id: {epoch: torch.mean(torch.tensor(confidences[epoch])) for epoch in confidences} for class_id, confidences in confidence_by_class.items()}
-    std_of_means_by_class = {class_id: torch.std(torch.tensor([mean_by_class[class_id][epoch] for epoch in range(Epoch)])) for class_id, __ in enumerate(unique_classes)}
+    std_of_means_by_class = {class_id: torch.std(torch.tensor([mean_by_class[class_id][epoch] for epoch in range(CASP_Epoch)])) for class_id, __ in enumerate(unique_classes)}
     
     # Compute overall confidence mean and variability
     Confidence_mean = confidence_by_sample.mean(dim=0)
@@ -193,8 +193,8 @@ def CASP_update(train_loader, train_dataset, Epoch, x_train, y_train, buffer, pa
     if len(y_train) == counter:
         condition = [num_per_class for _ in range(len(unique_classes))]
         diff = top_n - num_per_class*len(unique_classes)
-        for o in range(diff):
-            condition[o] += 1
+        for i in range(diff):
+            condition[i] += 1
     else:
         condition = [value for k, value in class_distribution.items()]
 
