@@ -103,7 +103,6 @@ def CASP_update(train_loader, train_dataset, Epoch, x_train, y_train, buffer, pa
         train_loss = 0
         correct = 0
         total = 0
-        confidence_epoch = []
         for batch_idx, (inputs, targets, indices_1) in enumerate(train_loader):
             inputs, targets = inputs.to(device), targets.to(device)                
             targets = torch.tensor([class_index_mapping[val.item()] for val in targets]).to(device)
