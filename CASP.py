@@ -42,7 +42,7 @@ def distribute_excess(condition, max_samples_per_class):
     # Calculate the total excess value
     total_excess = sum(val - max_samples_per_class for val in condition if val > max_samples_per_class)
 
-    # Number of elements that are not greater than 500
+    # Number of elements that are not greater than max_samples_per_class
     recipients = [i for i, val in enumerate(condition) if val < max_samples_per_class]
 
     num_recipients = len(recipients)
