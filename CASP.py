@@ -101,7 +101,11 @@ def CASP_update(train_loader, train_dataset, CASP_Epoch, x_train, y_train, buffe
 
 
     # Initialize dictionaries to store confidence scores by class        
-    confidence_by_class = {class_id: {epoch: [] for epoch in range(CASP_Epoch)} for class_id, __ in enumerate(unique_classes)}
+    confidence_by_class = {
+        class_id: {
+            epoch: [] 
+            for epoch in range(CASP_Epoch)} 
+        for class_id, __ in enumerate(unique_classes)}
 
     
     # Training
@@ -147,8 +151,16 @@ def CASP_update(train_loader, train_dataset, CASP_Epoch, x_train, y_train, buffe
         scheduler.step()
 
     # Calculate mean and standard deviation of confidence scores
-    mean_by_class = {class_id: {epoch: torch.mean(torch.tensor(confidences[epoch])) for epoch in confidences} for class_id, confidences in confidence_by_class.items()}
-    std_of_means_by_class = {class_id: torch.std(torch.tensor([mean_by_class[class_id][epoch] for epoch in range(CASP_Epoch)])) for class_id, __ in enumerate(unique_classes)}
+    mean_by_class = {
+        class_id: {
+            epoch: torch.mean(torch.tensor(confidences[epoch])) 
+            for epoch in confidences} 
+        for class_id, confidences in confidence_by_class.items()
+    }
+    std_of_means_by_class = {
+        class_id: torch.std(torch.tensor([mean_by_class[class_id][epoch] for epoch in range(CASP_Epoch)])) 
+        for class_id, __ in enumerate(unique_classes)
+    }
     
     # Compute overall confidence mean and variability
     Confidence_mean = confidence_by_sample.mean(dim=0)
