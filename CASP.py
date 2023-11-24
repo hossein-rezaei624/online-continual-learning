@@ -143,8 +143,8 @@ def CASP_update(train_loader, train_dataset, Epoch, x_train, y_train, buffer, pa
     std_of_means_by_class = {class_id: torch.std(torch.tensor([mean_by_class[class_id][epoch] for epoch in range(Epoch)])) for class_id, __ in enumerate(unique_classes)}
     
     # Compute overall confidence mean and variability
-    Confidence_mean = Carto.mean(dim=0)
-    Variability = Carto.std(dim=0)
+    Confidence_mean = confidence_by_sample.mean(dim=0)
+    Variability = confidence_by_sample.std(dim=0)
     
     buffer_indices_list = []
     counter = 0
