@@ -24,10 +24,9 @@ class ExperienceReplay(ContinualLearner):
         train_loader = data.DataLoader(train_dataset, batch_size=self.batch, shuffle=True, num_workers=0,
                                        drop_last=True)
         
-    ##    if self.params_name.CASP:
-    ##        CASP_update(train_loader, train_dataset, self.params_name.CASP_Epoch, x_train, y_train, self.buffer, self.params_name)
+        if self.params_name.CASP:
+            unique_classes, mapping, std_of_means_by_class, Variability = CASP_update(train_loader, self.params_name.CASP_Epoch, y_train, self.params_name)
 
-        fm = train_loader
         
         # set up model
         self.model = self.model.train()
@@ -112,6 +111,6 @@ class ExperienceReplay(ContinualLearner):
                     )
         
         if self.params_name.CASP:
-            CASP_update(fm, train_dataset, self.params_name.CASP_Epoch, x_train, y_train, self.buffer, self.params_name)
+            CASP_fill(unique_classes, mapping, std_of_means_by_class, Variability, train_dataset, y_train, self.buffer)
         
         self.after_train()
