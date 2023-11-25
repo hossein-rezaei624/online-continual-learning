@@ -113,4 +113,4 @@ class ResNet(nn.Module):
         return logits
 
 def ResNet18(nclasses, params_name, nf=64, bias=True):
-    return ResNet(BasicBlock, [2, 2, 2, 2], nclasses, nf, bias)
+    return ResNet(BasicBlock, [2, 2, 2, 2], nclasses, params_name, nf, bias)
