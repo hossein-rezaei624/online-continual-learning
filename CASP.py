@@ -80,9 +80,6 @@ def CASP_update(train_loader, Epoch, y_train, params_name):
 
     device = "cuda"
     Model_Carto = ResNet18(len(unique_classes), params_name)
-    if params_name.data == 'mini_imagenet':
-        print("yessssssssssssssssssssssssss")
-        Model_Carto.linear = nn.Linear(640, len(unique_classes), bias=True)
     Model_Carto = Model_Carto.to(device)
     criterion_ = nn.CrossEntropyLoss()
     optimizer_ = optim.SGD(Model_Carto.parameters(), lr=0.1,
