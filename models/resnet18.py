@@ -66,6 +66,22 @@ class Bottleneck(nn.Module):
         out = relu(out)
         return out
 
+class cosLinear(nn.Module):
+    def __init__(self, indim, outdim):
+        super(cosLinear, self).__init__()
+        self.L = nn.Linear(indim, outdim, bias = False)
+        self.scale = 0.09
+
+    def forward(self, x):
+        x_norm = torch.norm(x, p=2, dim =1).unsqueeze(1).expand_as(x)
+        x_normalized = x.div(x_norm+ 0.000001)
+
+        L_norm = torch.norm(self.L.weight, p=2, dim =1).unsqueeze(1).expand_as(self.L.weight.data)
+        weight_normalized = self.L.weight.div(L_norm + 0.000001)
+        cos_dist = torch.mm(x_normalized,weight_normalized.transpose(0,1))
+        scores = cos_dist / self.scale
+        return scores
+
 class ResNet(nn.Module):
     def __init__(self, block, num_blocks, num_classes, params_name, nf, bias):
         super(ResNet, self).__init__()
@@ -82,6 +98,11 @@ class ResNet(nn.Module):
         else:
           self.linear = nn.Linear(nf * 8 * block.expansion, num_classes, bias=bias)
 
+        if self.params_name.agent == 'PCR':
+          if self.params_name.data == 'mini_imagenet':
+            self.pcrLinear = cosLinear(nf * 32 * block.expansion, num_classes)
+          else:
+            self.pcrLinear = cosLinear(nf * 8 * block.expansion, num_classes)
 
     def _make_layer(self, block, planes, num_blocks, stride):
         strides = [stride] + [1] * (num_blocks - 1)
