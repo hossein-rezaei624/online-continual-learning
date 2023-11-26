@@ -8,6 +8,7 @@ import torch.nn as nn
 from torch.nn.functional import relu, avg_pool2d
 from torch.autograd import Variable
 import torch
+from models.extractor import BaseModule
 def conv3x3(in_planes, out_planes, stride=1):
     return nn.Conv2d(in_planes, out_planes, kernel_size=3, stride=stride,
                      padding=1, bias=False)
@@ -87,8 +88,10 @@ class cosLinear(nn.Module):
         return scores
 
 class ResNet(nn.Module):
-    def __init__(self, block, num_blocks, num_classes, nf, bias):
+    def __init__(self, block, num_blocks, num_classes, params_name, DVC_tri, nf, bias):
         super(ResNet, self).__init__()
+        self.params_name = params_name
+        self.DVC_tri = DVC_tri
         self.in_planes = nf
         self.conv1 = conv3x3(3, nf * 1)
         self.bn1 = nn.BatchNorm2d(nf * 1)
@@ -96,8 +99,13 @@ class ResNet(nn.Module):
         self.layer2 = self._make_layer(block, nf * 2, num_blocks[1], stride=2)
         self.layer3 = self._make_layer(block, nf * 4, num_blocks[2], stride=2)
         self.layer4 = self._make_layer(block, nf * 8, num_blocks[3], stride=2)
-        self.linear = nn.Linear(nf * 32 * block.expansion, num_classes, bias=bias)
-        self.pcrLinear = cosLinear(nf * 32 * block.expansion, num_classes)
+        self.linear = nn.Linear(nf * 8 * block.expansion, num_classes, bias=bias)
+
+        if self.params_name.agent == 'PCR':
+          if self.params_name.data == 'mini_imagenet':
+            self.pcrLinear = cosLinear(nf * 32 * block.expansion, num_classes)
+          else:
+            self.pcrLinear = cosLinear(nf * 8 * block.expansion, num_classes)
 
 
     def _make_layer(self, block, planes, num_blocks, stride):
@@ -116,7 +124,10 @@ class ResNet(nn.Module):
         out = self.layer3(out)
         out = self.layer4(out)
         out = avg_pool2d(out, 4)
-        out = out.view(out.size(0), -1)
+        if self.params_name.agent == 'ER_DVC' and self.DVC_tri:
+          out = out.contiguous().view(out.size(0), -1)
+        else:
+          out = out.view(out.size(0), -1)
         return out
 
     def logits(self, x):
@@ -127,7 +138,10 @@ class ResNet(nn.Module):
     def forward(self, x):
         out = self.features(x)
         logits = self.logits(out)
-        return logits
+        if self.params_name.agent == 'ER_DVC' and self.DVC_tri:
+          return logits,out
+        else:
+          return logits
 
     def pcrForward(self, x):
         out = self.features(x)
@@ -135,14 +149,73 @@ class ResNet(nn.Module):
         return logits, out
 
 
-def Reduced_ResNet18(nclasses, nf=20, bias=True):
+
+class QNet(BaseModule):
+    def __init__(self,
+                 n_units,
+                 n_classes):
+        super(QNet, self).__init__()
+
+        self.model = nn.Sequential(
+            nn.Linear(2 * n_classes, n_units),
+            nn.ReLU(True),
+            nn.Linear(n_units, n_classes),
+        )
+
+    def forward(self, zcat):
+        zzt = self.model(zcat)
+        return zzt
+
+
+class DVCNet(BaseModule):
+    def __init__(self,
+                 backbone,
+                 n_units,
+                 n_classes,
+                 has_mi_qnet=True):
+        super(DVCNet, self).__init__()
+
+        self.backbone = backbone
+        self.has_mi_qnet = has_mi_qnet
+
+        if has_mi_qnet:
+            self.qnet = QNet(n_units=n_units,
+                             n_classes=n_classes)
+
+    def forward(self, x, xt):
+        size = x.size(0)
+        xx = torch.cat((x, xt))
+        zz,fea = self.backbone(xx)
+        z = zz[0:size]
+        zt = zz[size:]
+
+        fea_z = fea[0:size]
+        fea_zt = fea[size:]
+
+        if not self.has_mi_qnet:
+            return z, zt, None
+
+        zcat = torch.cat((z, zt), dim=1)
+        zzt = self.qnet(zcat)
+
+        return z, zt, zzt,[torch.sum(torch.abs(fea_z), 1).reshape(-1, 1),torch.sum(torch.abs(fea_zt), 1).reshape(-1, 1)]
+
+
+def Reduced_ResNet18_DVC(nclasses, params_name, nf=20, bias=True):
     """
     Reduced ResNet18 as in GEM MIR(note that nf=20).
     """
-    return ResNet(BasicBlock, [2, 2, 2, 2], nclasses, nf, bias)
+    backnone = ResNet(BasicBlock, [2, 2, 2, 2], nclasses, params_name, True, nf, bias)
+    return DVCNet(backbone=backnone,n_units=128,n_classes=nclasses,has_mi_qnet=True)
 
-def ResNet18(nclasses, nf=64, bias=True):
-    return ResNet(BasicBlock, [2, 2, 2, 2], nclasses, nf, bias)
+def Reduced_ResNet18(nclasses, params_name, nf=20, bias=True):
+    """
+    Reduced ResNet18 as in GEM MIR(note that nf=20).
+    """
+    return ResNet(BasicBlock, [2, 2, 2, 2], nclasses, params_name, False, nf, bias)
+
+def ResNet18(nclasses, params_name, nf=64, bias=True):
+    return ResNet(BasicBlock, [2, 2, 2, 2], nclasses, params_name, False, nf, bias)
 
 '''
 See https://github.com/kuangliu/pytorch-cifar/blob/master/models/resnet.py
@@ -165,9 +238,9 @@ def ResNet152(nclasses, nf=64, bias=True):
 
 class SupConResNet(nn.Module):
     """backbone + projection head"""
-    def __init__(self, dim_in=160, head='mlp', feat_dim=128):
+    def __init__(self, params_name, dim_in=160, head='mlp', feat_dim=128):
         super(SupConResNet, self).__init__()
-        self.encoder = Reduced_ResNet18(100)
+        self.encoder = Reduced_ResNet18(100, params_name)
         if head == 'linear':
             self.head = nn.Linear(dim_in, feat_dim)
         elif head == 'mlp':
