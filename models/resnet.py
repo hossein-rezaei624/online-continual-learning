@@ -6,9 +6,9 @@ Code adapted from https://github.com/facebookresearch/GradientEpisodicMemory
 import torch.nn.functional as F
 import torch.nn as nn
 from torch.nn.functional import relu, avg_pool2d
-#from torch.autograd import Variable
+from torch.autograd import Variable
 import torch
-#from models.extractor import BaseModule
+from models.extractor import BaseModule
 def conv3x3(in_planes, out_planes, stride=1):
     return nn.Conv2d(in_planes, out_planes, kernel_size=3, stride=stride,
                      padding=1, bias=False)
@@ -99,8 +99,13 @@ class ResNet(nn.Module):
         self.layer2 = self._make_layer(block, nf * 2, num_blocks[1], stride=2)
         self.layer3 = self._make_layer(block, nf * 4, num_blocks[2], stride=2)
         self.layer4 = self._make_layer(block, nf * 8, num_blocks[3], stride=2)
-        self.linear = nn.Linear(nf * 32 * block.expansion, num_classes, bias=bias)
-
+        
+        if (self.params_name.CASP or self.params_name.agent == 'PCR') and self.params_name.agent != 'ER_DVC' :
+          if self.params_name.data == 'mini_imagenet':
+            self.linear = nn.Linear(nf * 32 * block.expansion, num_classes, bias=bias)
+        else:
+          self.linear = nn.Linear(nf * 8 * block.expansion, num_classes, bias=bias)
+            
         if self.params_name.agent == 'PCR':
           if self.params_name.data == 'mini_imagenet':
             self.pcrLinear = cosLinear(nf * 32 * block.expansion, num_classes)
@@ -124,10 +129,10 @@ class ResNet(nn.Module):
         out = self.layer3(out)
         out = self.layer4(out)
         out = avg_pool2d(out, 4)
-   ##     if self.params_name.agent == 'ER_DVC' and self.DVC_tri:
-   ##       out = out.contiguous().view(out.size(0), -1)
-   ##     else:
-        out = out.view(out.size(0), -1)
+        if self.params_name.agent == 'ER_DVC' and self.DVC_tri:
+          out = out.contiguous().view(out.size(0), -1)
+        else:
+          out = out.view(out.size(0), -1)
         return out
 
     def logits(self, x):
@@ -138,10 +143,10 @@ class ResNet(nn.Module):
     def forward(self, x):
         out = self.features(x)
         logits = self.logits(out)
- ##       if self.params_name.agent == 'ER_DVC' and self.DVC_tri:
- ##         return logits,out
- ##       else:
-        return logits
+        if self.params_name.agent == 'ER_DVC' and self.DVC_tri:
+          return logits,out
+        else:
+          return logits
 
     def pcrForward(self, x):
         out = self.features(x)
@@ -150,7 +155,7 @@ class ResNet(nn.Module):
 
 
 
-'''class QNet(BaseModule):
+class QNet(BaseModule):
     def __init__(self,
                  n_units,
                  n_classes):
@@ -206,7 +211,7 @@ def Reduced_ResNet18_DVC(nclasses, params_name, nf=20, bias=True):
     Reduced ResNet18 as in GEM MIR(note that nf=20).
     """
     backnone = ResNet(BasicBlock, [2, 2, 2, 2], nclasses, params_name, True, nf, bias)
-    return DVCNet(backbone=backnone,n_units=128,n_classes=nclasses,has_mi_qnet=True)'''
+    return DVCNet(backbone=backnone,n_units=128,n_classes=nclasses,has_mi_qnet=True)
 
 def Reduced_ResNet18(nclasses, params_name, nf=20, bias=True):
     """
