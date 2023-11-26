@@ -1,5 +1,5 @@
 import torch
-from models.resnet import Reduced_ResNet18, SupConResNet
+from models.resnet import Reduced_ResNet18, SupConResNet, Reduced_ResNet18_DVC
 from torchvision import transforms
 import torch.nn as nn
 
@@ -94,16 +94,26 @@ def setup_architecture(params):
         from models.ndpm.ndpm import Ndpm
         return Ndpm(params)
     if params.data == 'cifar100':
-        return Reduced_ResNet18(nclass, params)
+        if params.agent == 'ER_DVC':
+            return Reduced_ResNet18_DVC(nclass, params)
+        else:
+            return Reduced_ResNet18(nclass, params)
     elif params.data == 'cifar10':
-        return Reduced_ResNet18(nclass, params)
+        if params.agent == 'ER_DVC':
+            return Reduced_ResNet18_DVC(nclass, params)
+        else:
+            return Reduced_ResNet18(nclass, params)
     elif params.data == 'core50':
         model = Reduced_ResNet18(nclass, params)
-        model.linear = nn.Linear(2560, nclass, bias=True)
+        model.backbone.linear = nn.Linear(2560, nclass, bias=True)
         return model
     elif params.data == 'mini_imagenet':
-        model = Reduced_ResNet18(nclass, params)
-        model.linear = nn.Linear(640, nclass, bias=True)
+        if params.agent == 'ER_DVC':
+            model= Reduced_ResNet18_DVC(nclass, params)
+            model.backbone.linear = nn.Linear(640, nclass, bias=True)
+        else:
+            model = Reduced_ResNet18(nclass, params)
+            model.linear = nn.Linear(640, nclass, bias=True)
         return model
     elif params.data == 'openloris':
         return Reduced_ResNet18(nclass, params)
