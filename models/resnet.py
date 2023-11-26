@@ -6,8 +6,8 @@ Code adapted from https://github.com/facebookresearch/GradientEpisodicMemory
 import torch.nn.functional as F
 import torch.nn as nn
 from torch.nn.functional import relu, avg_pool2d
-from torch.autograd import Variable
-import torch
+#from torch.autograd import Variable
+#import torch
 #from models.extractor import BaseModule
 def conv3x3(in_planes, out_planes, stride=1):
     return nn.Conv2d(in_planes, out_planes, kernel_size=3, stride=stride,
