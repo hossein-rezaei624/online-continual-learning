@@ -23,10 +23,10 @@ python general_main.py --data cifar10 --num_tasks 5 --cl_type nc --agent ER --re
 python general_main.py --data cifar10 --num_tasks 5 --cl_type nc --agent ER --retrieve MIR --update random --mem_size 1000
 
 #GSS
-python general_main.py --data cifar10 --num_tasks 5 --cl_type nc --retrieve random --update GSS --mem_size 1000 --epoch 10
+python general_main.py --data cifar10 --num_tasks 5 --cl_type nc --agent ER --retrieve random --update GSS --mem_size 1000 --epoch 10
 
 #ASER
-python general_main.py --data cifar10 --num_tasks 5 --cl_type nc --update ASER --retrieve ASER --mem_size 1000 --n_smp_cls 9.0 --epoch 10
+python general_main.py --data cifar10 --num_tasks 5 --cl_type nc --agent ER --retrieve ASER --update ASER --mem_size 1000 --n_smp_cls 9.0 --epoch 10
 
 #SCR
 python general_main.py --data cifar10 --num_tasks 5 --cl_type nc --agent SCR --retrieve random --update random --mem_size 1000
@@ -35,12 +35,12 @@ python general_main.py --data cifar10 --num_tasks 5 --cl_type nc --agent SCR --r
 python general_main.py --data cifar10 --num_tasks 5 --cl_type nc --agent ER_DVC --retrieve MGI --update random --mem_size 1000 --dl_weight 2.0
 
 #PCR
-python general_main.py --data cifar10 --num_tasks 5 --cl_type nc --agent SCR --retrieve random --update random --mem_size 1000
+python general_main.py --data cifar10 --num_tasks 5 --cl_type nc --agent PCR --retrieve random --update random --mem_size 1000
 ```
 
 ### Sample command to add CASP
 ```shell
-#ER
+#ER + CASP
 python general_main.py --data cifar10 --num_tasks 5 --cl_type nc --agent ER --retrieve random --update random --mem_size 1000 --CASP True --CASP_Epoch 4
 ```
 
