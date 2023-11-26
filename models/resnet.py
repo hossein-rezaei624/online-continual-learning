@@ -103,6 +103,8 @@ class ResNet(nn.Module):
         if (self.params_name.CASP or self.params_name.agent == 'PCR') and self.params_name.agent != 'ER_DVC' :
           if self.params_name.data == 'mini_imagenet':
             self.linear = nn.Linear(nf * 32 * block.expansion, num_classes, bias=bias)
+          else:
+            self.linear = nn.Linear(nf * 8 * block.expansion, num_classes, bias=bias)
         else:
           self.linear = nn.Linear(nf * 8 * block.expansion, num_classes, bias=bias)
             
