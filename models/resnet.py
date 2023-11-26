@@ -100,7 +100,7 @@ class ResNet(nn.Module):
         self.layer3 = self._make_layer(block, nf * 4, num_blocks[2], stride=2)
         self.layer4 = self._make_layer(block, nf * 8, num_blocks[3], stride=2)
         
-        if (self.params_name.CASP or self.params_name.agent == 'PCR') and self.params_name.agent != 'ER_DVC' :
+        if (self.params_name.CASP or self.params_name.agent == 'PCR') and not self.DVC_tri :
           if self.params_name.data == 'mini_imagenet':
             self.linear = nn.Linear(nf * 32 * block.expansion, num_classes, bias=bias)
           else:
