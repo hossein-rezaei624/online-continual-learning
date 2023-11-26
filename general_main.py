@@ -48,7 +48,7 @@ if __name__ == "__main__":
 
     ########################Agent#########################
     parser.add_argument('--agent', dest='agent', default='ER',
-                        choices=['ER', 'EWC', 'AGEM', 'CNDPM', 'LWF', 'ICARL', 'GDUMB', 'ASER', 'SCR', 'PCR', 'ER_DVC'],
+                        choices=['ER', 'EWC', 'AGEM', 'CNDPM', 'LWF', 'ICARL', 'GDUMB', 'SCR', 'PCR', 'ER_DVC'],
                         help='Agent selection  (default: %(default)s)')
     parser.add_argument('--update', dest='update', default='random', choices=['random', 'GSS', 'ASER'],
                         help='Update method  (default: %(default)s)')
@@ -126,7 +126,7 @@ if __name__ == "__main__":
                         help='Random sampling batch size to estimate score')
 
     ########################ASER########################
-    parser.add_argument('--k', dest='k', default=5,
+    parser.add_argument('--k', dest='k', default=3,
                         type=int,
                         help='Number of nearest neighbors (K) to perform ASER (default: %(default)s)')
 
@@ -136,7 +136,7 @@ if __name__ == "__main__":
                              ' "asv" - Use extremal values of Adversarial SV and Cooperative SV,'
                              ' "asvm" - Use mean values of Adversarial SV and Cooperative SV')
 
-    parser.add_argument('--n_smp_cls', dest='n_smp_cls', default=2.0,
+    parser.add_argument('--n_smp_cls', dest='n_smp_cls', default=3.0,
                         type=float,
                         help='Maximum number of samples per class for random sampling (default: %(default)s)')
 
