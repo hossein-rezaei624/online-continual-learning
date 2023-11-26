@@ -76,9 +76,6 @@ python general_main.py --data cifar10 --num_tasks 5 --cl_type nc --agent ER --re
             ├──random_retrieve.py           #File for random retrieval
             ├──reservoir_update.py          #File for random update
     
-        ├──global_vars.py               #Global variables for CN-DPM
-        ├──io.py                        #Code related to load and store csv or yarml
-        ├──kd_manager.py                #File for knowledge distillation
         ├──name_match.py                #Match name strings to objects 
         ├──setup_elements.py            #Set up and initialize basic elements
         ├──utils.py                     #File for general utilities
