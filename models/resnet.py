@@ -6,7 +6,8 @@ Code adapted from https://github.com/facebookresearch/GradientEpisodicMemory
 import torch.nn.functional as F
 import torch.nn as nn
 from torch.nn.functional import relu, avg_pool2d
-
+from torch.autograd import Variable
+import torch
 def conv3x3(in_planes, out_planes, stride=1):
     return nn.Conv2d(in_planes, out_planes, kernel_size=3, stride=stride,
                      padding=1, bias=False)
@@ -66,6 +67,25 @@ class Bottleneck(nn.Module):
         out = relu(out)
         return out
 
+
+class cosLinear(nn.Module):
+    def __init__(self, indim, outdim):
+        super(cosLinear, self).__init__()
+        self.L = nn.Linear(indim, outdim, bias = False)
+        self.scale = 0.09
+
+
+
+    def forward(self, x):
+        x_norm = torch.norm(x, p=2, dim =1).unsqueeze(1).expand_as(x)
+        x_normalized = x.div(x_norm+ 0.000001)
+
+        L_norm = torch.norm(self.L.weight, p=2, dim =1).unsqueeze(1).expand_as(self.L.weight.data)
+        weight_normalized = self.L.weight.div(L_norm + 0.000001)
+        cos_dist = torch.mm(x_normalized,weight_normalized.transpose(0,1))
+        scores = cos_dist / self.scale
+        return scores
+
 class ResNet(nn.Module):
     def __init__(self, block, num_blocks, num_classes, nf, bias):
         super(ResNet, self).__init__()
@@ -76,7 +96,8 @@ class ResNet(nn.Module):
         self.layer2 = self._make_layer(block, nf * 2, num_blocks[1], stride=2)
         self.layer3 = self._make_layer(block, nf * 4, num_blocks[2], stride=2)
         self.layer4 = self._make_layer(block, nf * 8, num_blocks[3], stride=2)
-        self.linear = nn.Linear(nf * 8 * block.expansion, num_classes, bias=bias)
+        self.linear = nn.Linear(nf * 32 * block.expansion, num_classes, bias=bias)
+        self.pcrLinear = cosLinear(nf * 32 * block.expansion, num_classes)
 
 
     def _make_layer(self, block, planes, num_blocks, stride):
@@ -107,6 +128,11 @@ class ResNet(nn.Module):
         out = self.features(x)
         logits = self.logits(out)
         return logits
+
+    def pcrForward(self, x):
+        out = self.features(x)
+        logits = self.pcrLinear(out)
+        return logits, out
 
 
 def Reduced_ResNet18(nclasses, nf=20, bias=True):
